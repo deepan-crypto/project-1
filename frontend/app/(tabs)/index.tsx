@@ -6,10 +6,9 @@ import {
   ScrollView,
   StatusBar,
   TouchableOpacity,
-  Image,
 } from 'react-native';
-import { Lightbulb } from 'lucide-react-native';
 import PollCard from '@/components/PollCard';
+import LogoSvg from '@/components/LogoSvg';
 
 const mockPolls = [
   {
@@ -78,15 +77,11 @@ export default function HomeScreen() {
       <StatusBar barStyle="dark-content" />
 
       <View style={styles.logoHeader}>
-        <Image
-          source={require('../../assets/images/ican.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+        <LogoSvg width={30} height={40} />
       </View>
 
       <View style={styles.header}>
-        <Lightbulb size={28} color="#45BFD0" />
+        <LogoSvg width={24} height={32} />
         <Text style={styles.headerTitle}>Thoughts</Text>
       </View>
 
