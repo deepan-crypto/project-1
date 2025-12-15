@@ -109,14 +109,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8F9FA',
   },
   logoHeader: {
-    paddingTop: 50,
-    paddingBottom: 12,
+    paddingTop: 30,
+    paddingBottom: 8,
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
   },
   logo: {
-    width: 40,
-    height: 40,
+    width: 50,
+    height: 50,
   },
   header: {
     flexDirection: 'row',
