@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   StatusBar,
+  Image,
 } from 'react-native';
 import { router } from 'expo-router';
 import { X } from 'lucide-react-native';
@@ -34,6 +35,14 @@ export default function PostsScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
+      <View style={styles.logoHeader}>
+        <Image
+          source={require('../../assets/images/ican.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
+
       <View style={styles.header}>
         <View style={styles.headerContent}>
           <View style={styles.userInfo}>
@@ -41,7 +50,7 @@ export default function PostsScreen() {
             <Text style={styles.userName}>Abigail</Text>
           </View>
           <TouchableOpacity onPress={handleClose}>
-            <X size={24} color="#000" />
+            <X size={24} color="#101720" />
           </TouchableOpacity>
         </View>
       </View>
@@ -60,8 +69,8 @@ export default function PostsScreen() {
             value={mainThought}
             onChangeText={setMainThought}
             placeholder="Say something!"
-            placeholderTextColor="#999"
-            multiline
+            placeholderTextColor="#6C7278"
+            multiline={true}
           />
 
           <View style={styles.thoughtsContainer}>
@@ -72,7 +81,7 @@ export default function PostsScreen() {
                 value={thought1}
                 onChangeText={setThought1}
                 placeholder=""
-                placeholderTextColor="#999"
+                placeholderTextColor="#6C7278"
               />
             </View>
 
@@ -83,7 +92,7 @@ export default function PostsScreen() {
                 value={thought2}
                 onChangeText={setThought2}
                 placeholder=""
-                placeholderTextColor="#999"
+                placeholderTextColor="#6C7278"
               />
             </View>
 
@@ -94,7 +103,7 @@ export default function PostsScreen() {
                 value={thought3}
                 onChangeText={setThought3}
                 placeholder=""
-                placeholderTextColor="#999"
+                placeholderTextColor="#6C7278"
               />
             </View>
           </View>
@@ -113,8 +122,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
+  logoHeader: {
+    paddingTop: 40,
+    paddingBottom: 12,
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  logo: {
+    width: 30,
+    height: 40,
+  },
   header: {
-    paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 16,
     borderBottomWidth: 1,
@@ -137,9 +155,9 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   userName: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
-    color: '#000',
+    color: '#101720',
   },
   keyboardView: {
     flex: 1,
@@ -151,12 +169,12 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   mainInput: {
-    fontSize: 16,
-    color: '#000',
+    fontSize: 14,
+    color: '#101720',
     padding: 16,
-    backgroundColor: '#F8F9FA',
-    borderRadius: 12,
-    minHeight: 80,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 8,
+    minHeight: 60,
     marginBottom: 24,
     textAlignVertical: 'top',
   },
@@ -169,22 +187,22 @@ const styles = StyleSheet.create({
   },
   thoughtLabel: {
     fontSize: 14,
-    color: '#666',
+    color: '#6C7278',
     fontWeight: '500',
   },
   input: {
-    fontSize: 16,
-    color: '#000',
+    fontSize: 14,
+    color: '#101720',
     padding: 16,
-    backgroundColor: '#F8F9FA',
-    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: '#E0E0E0',
   },
   postButton: {
-    backgroundColor: '#45BFD0',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: '#458FD0',
+    borderRadius: 8,
+    paddingVertical: 14,
     alignItems: 'center',
   },
   postButtonText: {
@@ -193,3 +211,4 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+

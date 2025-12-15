@@ -58,11 +58,11 @@ export default function PollCard({
 
       <View style={styles.footer}>
         <View style={styles.likes}>
-          <Heart size={20} color="#999" />
+          <Heart size={18} color="#687684" />
           <Text style={styles.likesText}>{likes}</Text>
         </View>
         <TouchableOpacity>
-          <Share2 size={20} color="#999" />
+          <Share2 size={18} color="#687684" />
         </TouchableOpacity>
       </View>
     </View>
@@ -86,9 +86,9 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     marginRight: 12,
     backgroundColor: '#E0E0E0',
   },
@@ -96,18 +96,18 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   userName: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
-    color: '#000',
+    color: '#101720',
     marginBottom: 4,
   },
   question: {
     fontSize: 14,
-    color: '#333',
+    color: '#687684',
     lineHeight: 20,
   },
   options: {
-    gap: 10,
+    gap: 8,
     marginBottom: 16,
   },
   optionButton: {
@@ -115,32 +115,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: '#458FD0',
     borderRadius: 8,
     overflow: 'hidden',
   },
   optionContent: {
     flex: 1,
     position: 'relative',
-    padding: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
   },
   optionProgress: {
     position: 'absolute',
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: '#E8F7FA',
+    backgroundColor: 'rgba(69, 143, 208, 0.2)',
     borderRadius: 8,
   },
   optionText: {
     fontSize: 14,
-    color: '#333',
+    color: '#101720',
     zIndex: 1,
+    textAlign: 'center',
   },
   percentage: {
     fontSize: 14,
-    color: '#666',
-    fontWeight: '600',
+    color: '#6C7278',
+    fontWeight: '500',
     paddingHorizontal: 12,
   },
   footer: {
@@ -155,6 +157,7 @@ const styles = StyleSheet.create({
   },
   likesText: {
     fontSize: 14,
-    color: '#999',
+    color: '#687684',
   },
 });
+

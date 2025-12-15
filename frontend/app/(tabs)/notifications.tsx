@@ -93,16 +93,16 @@ export default function NotificationsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#F5F5F5',
   },
   logoHeader: {
-    paddingTop: 50,
+    paddingTop: 40,
     paddingBottom: 12,
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
   },
   logo: {
-    width: 40,
+    width: 30,
     height: 40,
   },
   header: {
@@ -114,9 +114,9 @@ const styles = StyleSheet.create({
     borderBottomColor: '#E0E0E0',
   },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#000',
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#101720',
   },
   scrollView: {
     flex: 1,
@@ -137,9 +137,9 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
     marginRight: 12,
     backgroundColor: '#E0E0E0',
   },
@@ -149,15 +149,15 @@ const styles = StyleSheet.create({
   },
   notificationText: {
     fontSize: 14,
-    color: '#333',
+    color: '#687684',
     marginBottom: 4,
   },
   userName: {
     fontWeight: '600',
-    color: '#000',
+    color: '#101720',
   },
   time: {
     fontSize: 12,
-    color: '#999',
+    color: '#6C7278',
   },
 });

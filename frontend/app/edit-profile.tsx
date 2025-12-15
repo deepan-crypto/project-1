@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#E0E0E0',
     },
     changePhotoText: {
-        color: '#45BFD0',
+        color: '#458FD0',
         fontSize: 14,
         fontWeight: '600',
     },
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 14,
-        color: '#333',
+        color: '#101720',
         fontWeight: '500',
     },
     input: {
@@ -142,16 +142,16 @@ const styles = StyleSheet.create({
         borderColor: '#E0E0E0',
         borderRadius: 8,
         padding: 12,
-        fontSize: 16,
-        color: '#333',
-        backgroundColor: '#FAFAFA',
+        fontSize: 14,
+        color: '#101720',
+        backgroundColor: '#FFFFFF',
     },
     bioInput: {
         height: 120,
         paddingTop: 12,
     },
     saveButton: {
-        backgroundColor: '#45BFD0',
+        backgroundColor: '#458FD0',
         borderRadius: 8,
         paddingVertical: 14,
         alignItems: 'center',
@@ -162,3 +162,4 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
 });
+
