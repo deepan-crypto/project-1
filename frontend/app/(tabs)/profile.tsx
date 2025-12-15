@@ -86,13 +86,15 @@ export default function ProfileScreen() {
             <Text style={styles.following}>523 Following</Text>
           </View>
 
-          <TouchableOpacity style={styles.shareButton} onPress={handleShareProfile}>
-            <Text style={styles.shareButtonText}>Share profile</Text>
-          </TouchableOpacity>
+          <View style={styles.buttonsRow}>
+            <TouchableOpacity style={styles.shareButton} onPress={handleShareProfile}>
+              <Text style={styles.shareButtonText}>Share profile</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
-            <Text style={styles.editButtonText}>Edit profile</Text>
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
+              <Text style={styles.editButtonText}>Edit profile</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         <View style={styles.pollsSection}>
@@ -193,13 +195,16 @@ const styles = StyleSheet.create({
     gap: 24,
     marginBottom: 16,
   },
+  buttonsRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
   shareButton: {
     borderWidth: 1,
     borderColor: '#45BFD0',
     borderRadius: 8,
-    paddingHorizontal: 32,
+    paddingHorizontal: 24,
     paddingVertical: 10,
-    marginBottom: 12,
   },
   shareButtonText: {
     color: '#45BFD0',
@@ -210,7 +215,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E0E0E0',
     borderRadius: 8,
-    paddingHorizontal: 32,
+    paddingHorizontal: 24,
     paddingVertical: 10,
   },
   editButtonText: {

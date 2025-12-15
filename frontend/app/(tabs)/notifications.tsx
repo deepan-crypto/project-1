@@ -52,6 +52,14 @@ export default function NotificationsScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
+      <View style={styles.logoHeader}>
+        <Image
+          source={require('../../assets/images/icon.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
+
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Notifications</Text>
       </View>
@@ -87,9 +95,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F8F9FA',
   },
+  logoHeader: {
+    paddingTop: 50,
+    paddingBottom: 12,
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+  },
+  logo: {
+    width: 40,
+    height: 40,
+  },
   header: {
     paddingHorizontal: 20,
-    paddingTop: 60,
+    paddingTop: 12,
     paddingBottom: 16,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,

@@ -10,6 +10,7 @@ import {
   Platform,
   StatusBar,
 } from 'react-native';
+import { router } from 'expo-router';
 import { X } from 'lucide-react-native';
 
 export default function PostsScreen() {
@@ -25,6 +26,10 @@ export default function PostsScreen() {
     setThought3('');
   };
 
+  const handleClose = () => {
+    router.replace('/(tabs)');
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
@@ -35,7 +40,7 @@ export default function PostsScreen() {
             <View style={styles.avatar} />
             <Text style={styles.userName}>Abigail</Text>
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleClose}>
             <X size={24} color="#000" />
           </TouchableOpacity>
         </View>
