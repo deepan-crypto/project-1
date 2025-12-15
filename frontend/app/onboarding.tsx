@@ -47,6 +47,24 @@ export default function OnboardingScreen() {
         ) : null}
       </View>
 
+      <View style={styles.ctaSection}>
+        {/* CTA Card - Gradient bars */}
+        <View style={styles.ctaCard}>
+          <LinearGradient
+            colors={['#3DD1E0', '#45BFD0']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={styles.ctaBar}
+          />
+          <LinearGradient
+            colors={['#45BFD0', '#5DE0EF']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={[styles.ctaBar, styles.ctaBarSecond]}
+          />
+        </View>
+      </View>
+
       <View style={styles.footer}>
         <View style={styles.pagination}>
           {onboardingData.map((_, index) => (
@@ -86,17 +104,38 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
   },
   title: {
-    fontSize: 24,
-    fontWeight: '600',
+    fontSize: 16,
+    fontFamily: 'Poppins_500Medium',
+    fontWeight: '500',
     color: '#FFFFFF',
     textAlign: 'center',
-    marginBottom: 16,
+    lineHeight: 32,
+    letterSpacing: 0,
+    marginBottom: 8,
   },
   subtitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontFamily: 'Poppins_500Medium',
+    fontWeight: '500',
     color: '#FFFFFF',
     textAlign: 'center',
+    lineHeight: 32,
+    letterSpacing: 0,
+  },
+  ctaSection: {
+    paddingHorizontal: 40,
+    paddingBottom: 40,
+  },
+  ctaCard: {
+    gap: 12,
+  },
+  ctaBar: {
+    height: 12,
+    borderRadius: 6,
+    width: '100%',
+  },
+  ctaBarSecond: {
+    width: '70%',
   },
   footer: {
     paddingBottom: 60,
@@ -108,7 +147,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   paginationDot: {
-    width: 8,
+    width: 40,
     height: 8,
     borderRadius: 4,
     backgroundColor: 'rgba(255, 255, 255, 0.4)',
@@ -116,7 +155,6 @@ const styles = StyleSheet.create({
   },
   paginationDotActive: {
     backgroundColor: '#FFFFFF',
-    width: 24,
   },
   buttons: {
     flexDirection: 'row',
@@ -129,6 +167,8 @@ const styles = StyleSheet.create({
   skipText: {
     color: '#FFFFFF',
     fontSize: 16,
+    fontFamily: 'Poppins_500Medium',
+    fontWeight: '500',
   },
   nextButton: {
     backgroundColor: '#FFFFFF',
@@ -139,6 +179,7 @@ const styles = StyleSheet.create({
   nextText: {
     color: '#45BFD0',
     fontSize: 16,
-    fontWeight: '600',
+    fontFamily: 'Poppins_500Medium',
+    fontWeight: '500',
   },
 });

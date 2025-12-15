@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -37,14 +37,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 48,
-    fontWeight: 'bold',
+    fontSize: 32,
+    fontFamily: 'Poppins_500Medium',
+    fontWeight: '500',
     color: '#FFFFFF',
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 16,
+    fontFamily: 'Poppins_500Medium',
+    fontWeight: '500',
     color: '#FFFFFF',
     opacity: 0.9,
   },
 });
+
