@@ -4,7 +4,7 @@ export default function LogoHeader() {
     return (
         <View style={styles.header}>
             <Image
-                source={require('../../assets/images/icon.png')}
+                source={require('../../assets/images/ican.png')}
                 style={styles.logo}
                 resizeMode="contain"
             />

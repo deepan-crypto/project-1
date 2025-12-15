@@ -54,7 +54,7 @@ export default function NotificationsScreen() {
 
       <View style={styles.logoHeader}>
         <Image
-          source={require('../../assets/images/icon.png')}
+          source={require('../../assets/images/ican.png')}
           style={styles.logo}
           resizeMode="contain"
         />
