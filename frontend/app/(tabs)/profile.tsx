@@ -6,7 +6,10 @@ import {
   StatusBar,
   Image,
   TouchableOpacity,
+  Share,
+  Alert,
 } from 'react-native';
+import { router } from 'expo-router';
 
 const mockUserPolls = [
   {
@@ -43,6 +46,21 @@ const mockUserPolls = [
 ];
 
 export default function ProfileScreen() {
+  const handleEditProfile = () => {
+    router.push('/edit-profile');
+  };
+
+  const handleShareProfile = async () => {
+    try {
+      await Share.share({
+        message: 'Check out my profile on the app!',
+        title: 'Share Profile',
+      });
+    } catch (error) {
+      Alert.alert('Error', 'Unable to share profile');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
@@ -61,11 +79,18 @@ export default function ProfileScreen() {
           />
           <Text style={styles.name}>Abigail</Text>
           <Text style={styles.bio}>
-            Bicycle enthusiast, lover of bicycles and outdoor adventures
+            Bicycle enthusiast. Love to talk about bicycles and cycling!
           </Text>
-          <Text style={styles.followers}>523 Followers</Text>
+          <View style={styles.statsRow}>
+            <Text style={styles.followers}>523 Followers</Text>
+            <Text style={styles.following}>523 Following</Text>
+          </View>
 
-          <TouchableOpacity style={styles.editButton}>
+          <TouchableOpacity style={styles.shareButton} onPress={handleShareProfile}>
+            <Text style={styles.shareButtonText}>Share profile</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
             <Text style={styles.editButtonText}>Edit profile</Text>
           </TouchableOpacity>
         </View>
@@ -158,17 +183,38 @@ const styles = StyleSheet.create({
   followers: {
     fontSize: 14,
     color: '#999',
+  },
+  following: {
+    fontSize: 14,
+    color: '#999',
+  },
+  statsRow: {
+    flexDirection: 'row',
+    gap: 24,
     marginBottom: 16,
   },
-  editButton: {
+  shareButton: {
     borderWidth: 1,
     borderColor: '#45BFD0',
     borderRadius: 8,
     paddingHorizontal: 32,
     paddingVertical: 10,
+    marginBottom: 12,
+  },
+  shareButtonText: {
+    color: '#45BFD0',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  editButton: {
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 8,
+    paddingHorizontal: 32,
+    paddingVertical: 10,
   },
   editButtonText: {
-    color: '#45BFD0',
+    color: '#666',
     fontSize: 14,
     fontWeight: '600',
   },
