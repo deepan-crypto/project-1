@@ -37,7 +37,7 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <LinearGradient colors={['#45BFD0', '#2B9EB3']} style={styles.container}>
+    <LinearGradient colors={['#07F2DF', '#458FD0']} style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>{onboardingData[currentPage].title}</Text>
         {onboardingData[currentPage].subtitle ? (
