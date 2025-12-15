@@ -38,17 +38,19 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontFamily: 'Poppins_500Medium',
-    fontWeight: '500',
+    fontFamily: 'OpenSans_300Light',
+    fontWeight: '300',
     color: '#FFFFFF',
     marginBottom: 8,
+    lineHeight: 32 * 1.4,
   },
   subtitle: {
     fontSize: 16,
-    fontFamily: 'Poppins_500Medium',
-    fontWeight: '500',
+    fontFamily: 'OpenSans_300Light',
+    fontWeight: '300',
     color: '#FFFFFF',
     opacity: 0.9,
+    lineHeight: 16 * 1.4,
   },
 });
 
