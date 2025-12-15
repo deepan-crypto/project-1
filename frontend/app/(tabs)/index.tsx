@@ -6,9 +6,9 @@ import {
   ScrollView,
   StatusBar,
   TouchableOpacity,
+  Image,
 } from 'react-native';
 import PollCard from '@/components/PollCard';
-import LogoSvg from '@/components/LogoSvg';
 
 const mockPolls = [
   {
@@ -77,12 +77,11 @@ export default function HomeScreen() {
       <StatusBar barStyle="dark-content" />
 
       <View style={styles.logoHeader}>
-        <LogoSvg width={30} height={40} />
-      </View>
-
-      <View style={styles.header}>
-        <LogoSvg width={24} height={32} />
-        <Text style={styles.headerTitle}>Thoughts</Text>
+        <Image
+          source={require('../../assets/images/ican.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
       </View>
 
       <ScrollView
@@ -104,30 +103,16 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8F9FA',
   },
   logoHeader: {
-    paddingTop: 30,
-    paddingBottom: 8,
+    paddingTop: 40,
+    paddingBottom: 12,
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-  },
-  logo: {
-    width: 50,
-    height: 50,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 12,
-    paddingBottom: 16,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
   },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#000',
-    marginLeft: 12,
+  logo: {
+    width: 30,
+    height: 40,
   },
   scrollView: {
     flex: 1,
