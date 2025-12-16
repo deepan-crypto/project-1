@@ -38,39 +38,51 @@ export default function PollCard({
       </View>
 
       {/* Poll Options */}
-      <View style={styles.options}>
-        {options.map((option) => (
-          <View key={option.id} style={styles.optionRow}>
+      <View style={styles.optionsContainer}>
+        {options.map((option, index) => {
+          const isThisOptionVoted = hasVoted && option.percentage > 0 && option.percentage === Math.max(...options.map(o => o.percentage));
+
+          return (
             <TouchableOpacity
-              style={[
-                styles.optionButton,
-                hasVoted && styles.optionButtonVoted
-              ]}
+              key={option.id}
+              style={[styles.option, hasVoted && styles.optionWithProgress]}
+              disabled={hasVoted}
             >
+              {hasVoted && (
+                <View
+                  style={[
+                    styles.progressBar,
+                    { width: `${option.percentage}%` },
+                    isThisOptionVoted ? styles.progressBarVoted : styles.progressBarNotVoted,
+                  ]}
+                />
+              )}
               <View style={styles.optionContent}>
-                {hasVoted && (
-                  <View
+                <View style={styles.optionTextContainer}>
+                  <Text
                     style={[
-                      styles.optionProgress,
-                      { width: `${option.percentage}%` },
+                      styles.optionText,
+                      isThisOptionVoted && styles.optionTextVoted,
                     ]}
-                  />
+                  >
+                    {option.text}{option.emoji ? ` ${option.emoji}` : ''}
+                  </Text>
+                </View>
+                {hasVoted && (
+                  <Text
+                    style={[
+                      styles.optionPercentage,
+                      isThisOptionVoted && styles.optionPercentageVoted,
+                    ]}
+                  >
+                    {option.percentage}%
+                  </Text>
                 )}
-                <Text style={[
-                  styles.optionText,
-                  hasVoted && styles.optionTextVoted
-                ]}>
-                  {option.text}{option.emoji ? ` ${option.emoji}` : ''}
-                </Text>
               </View>
             </TouchableOpacity>
-            {hasVoted && (
-              <Text style={styles.percentage}>{option.percentage}%</Text>
-            )}
-          </View>
-        ))}
+          );
+        })}
       </View>
-
       {/* Footer with likes and share */}
       <View style={styles.footer}>
         <TouchableOpacity style={styles.likeButton}>
@@ -88,15 +100,13 @@ export default function PollCard({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 0,
+    marginBottom: 12,
     paddingVertical: 16,
     paddingHorizontal: 16,
-    marginBottom: 0,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E8E8E8',
   },
   header: {
     flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 12,
   },
   avatar: {
@@ -110,64 +120,83 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   userName: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
-    color: '#000000',
-    marginBottom: 2,
+    color: '#101720',
+  },
+  timeAgo: {
+    fontSize: 12,
+    color: '#6C7278',
   },
   question: {
-    fontSize: 14,
-    color: '#6C7278',
+    fontSize: 15,
+    color: '#101720',
+    marginBottom: 12,
     lineHeight: 20,
   },
-  options: {
+  optionsContainer: {
     gap: 8,
     marginBottom: 12,
   },
-  optionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  optionButton: {
-    flex: 1,
+  option: {
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
     borderWidth: 1,
-    borderColor: '#458FD0',
-    borderRadius: 25,
+    borderColor: '#E0E0E0',
+  },
+  optionWithProgress: {
+    position: 'relative',
     overflow: 'hidden',
   },
-  optionButtonVoted: {
-    borderWidth: 0,
-  },
-  optionContent: {
-    position: 'relative',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-  },
-  optionProgress: {
+  progressBar: {
     position: 'absolute',
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: '#458FD0',
-    borderRadius: 25,
+    borderRadius: 20,
+  },
+  progressBarVoted: {
+    backgroundColor: '#458FD0', // Blue for voted option
+  },
+  progressBarNotVoted: {
+    backgroundColor: '#6C7278', // Gray for other options when poll is voted
+  },
+  progressBarUnvoted: {
+    backgroundColor: '#F5F5F5', // Light gray when poll not voted
+  },
+  optionContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    position: 'relative',
+    zIndex: 1,
+  },
+  optionTextContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  optionEmoji: {
+    fontSize: 16,
+    marginRight: 8,
   },
   optionText: {
     fontSize: 14,
     color: '#101720',
-    zIndex: 1,
-    textAlign: 'center',
   },
   optionTextVoted: {
     color: '#FFFFFF',
-    fontWeight: '500',
+    fontWeight: '600',
   },
-  percentage: {
+  optionPercentage: {
     fontSize: 14,
-    color: '#6C7278',
-    fontWeight: '500',
-    marginLeft: 12,
-    minWidth: 40,
-    textAlign: 'right',
+    color: '#101720',
+    marginLeft: 8,
+  },
+  optionPercentageVoted: {
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
   footer: {
     flexDirection: 'row',
