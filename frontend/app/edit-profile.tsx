@@ -44,6 +44,11 @@ export default function EditProfileScreen() {
 
             if (!result.canceled && result.assets[0]) {
                 setProfileImage(result.assets[0].uri);
+                Alert.alert(
+                    'Image Selected',
+                    'Your profile picture has been selected. Press the "Save" button below to update your profile.',
+                    [{ text: 'OK' }]
+                );
             }
         } catch (error) {
             console.error('Error picking image:', error);
@@ -83,6 +88,13 @@ export default function EditProfileScreen() {
                 } as any);
             }
 
+            console.log('Sending profile update...', {
+                hasFullName: !!fullName.trim(),
+                hasUsername: !!username.trim(),
+                hasBio: !!bio.trim(),
+                hasImage: !!profileImage,
+            });
+
             const response = await fetch(`${API_BASE_URL}/users/profile`, {
                 method: 'PUT',
                 headers: {
@@ -92,16 +104,26 @@ export default function EditProfileScreen() {
             });
 
             const data = await response.json();
+            console.log('Response:', response.status, data);
 
             if (response.ok) {
-                Alert.alert('Success', 'Profile updated successfully');
-                router.back();
+                Alert.alert(
+                    'Success!',
+                    'Your profile has been updated successfully.',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () => router.back()
+                        }
+                    ]
+                );
             } else {
-                Alert.alert('Error', data.message || 'Failed to update profile');
+                console.error('Update failed:', data);
+                Alert.alert('Error', data.message || 'Failed to update profile. Please try again.');
             }
         } catch (error) {
             console.error('Error saving profile:', error);
-            Alert.alert('Error', 'Network error. Please check your connection.');
+            Alert.alert('Error', 'Network error. Please check your connection and try again.');
         } finally {
             setLoading(false);
         }
