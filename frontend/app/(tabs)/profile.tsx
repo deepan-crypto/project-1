@@ -76,23 +76,27 @@ export default function ProfileScreen() {
       >
         {/* Profile Header Section */}
         <View style={styles.profileHeader}>
-          <Image
-            source={{
-              uri: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200',
-            }}
-            style={styles.profileImage}
-          />
-          <Text style={styles.name}>Abigail</Text>
-          <Text style={styles.bio}>
-            Bicycle enthusiast. Love to talk about bicycles and cycling!
-          </Text>
-          <View style={styles.statsRow}>
-            <Text style={styles.statsText}>
-              <Text style={styles.statsNumber}>523</Text> Followers
-            </Text>
-            <Text style={styles.statsText}>
-              <Text style={styles.statsNumber}>523</Text> Following
-            </Text>
+          <View style={styles.profileTopRow}>
+            <Image
+              source={{
+                uri: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200',
+              }}
+              style={styles.profileImage}
+            />
+            <View style={styles.profileInfo}>
+              <Text style={styles.name}>Abigail</Text>
+              <Text style={styles.bio}>
+                Bicycle enthusiast. Love to talk about bicycles and cycling!
+              </Text>
+              <View style={styles.statsRow}>
+                <Text style={styles.statsText}>
+                  <Text style={styles.statsNumber}>523</Text> Followers
+                </Text>
+                <Text style={styles.statsText}>
+                  <Text style={styles.statsNumber}>523</Text> Following
+                </Text>
+              </View>
+            </View>
           </View>
 
           <View style={styles.buttonsRow}>
@@ -202,40 +206,42 @@ const styles = StyleSheet.create({
   // Profile Header Styles
   profileHeader: {
     backgroundColor: '#FFFFFF',
-    alignItems: 'center',
     paddingVertical: 24,
     paddingHorizontal: 20,
-    borderBottomLeftRadius: 0,
-    borderBottomRightRadius: 0,
+  },
+  profileTopRow: {
+    flexDirection: 'row',
+    marginBottom: 16,
   },
   profileImage: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    marginBottom: 12,
     backgroundColor: '#E0E0E0',
+    marginRight: 12,
+  },
+  profileInfo: {
+    flex: 1,
+    justifyContent: 'center',
   },
   name: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: 'bold',
     color: '#000000',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   bio: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#6C7278',
-    textAlign: 'center',
-    marginBottom: 12,
-    paddingHorizontal: 20,
-    lineHeight: 20,
+    lineHeight: 18,
+    marginBottom: 8,
   },
   statsRow: {
     flexDirection: 'row',
-    gap: 20,
-    marginBottom: 16,
+    gap: 16,
   },
   statsText: {
-    fontSize: 14,
+    fontSize: 13,
     color: '#6C7278',
   },
   statsNumber: {
