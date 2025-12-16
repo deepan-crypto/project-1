@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import API_BASE_URL from '@/config/api';
 import { authStorage } from '@/utils/authStorage';
 import {
@@ -22,7 +22,38 @@ export default function EditProfileScreen() {
     const [username, setUsername] = useState('');
     const [bio, setBio] = useState('');
     const [profileImage, setProfileImage] = useState<string | null>(null);
+    const [existingProfileImage, setExistingProfileImage] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const [loadingData, setLoadingData] = useState(true);
+
+    // Load existing user data on mount
+    useEffect(() => {
+        const loadUserData = async () => {
+            try {
+                const userData = await authStorage.getUser();
+                console.log('Loaded user data for edit:', userData);
+                if (userData) {
+                    setFullName(userData.fullName || '');
+                    setUsername(userData.username || '');
+                    setBio(userData.bio || '');
+
+                    // Set existing profile image
+                    if (userData.profilePicture) {
+                        if (userData.profilePicture.startsWith('http')) {
+                            setExistingProfileImage(userData.profilePicture);
+                        } else {
+                            setExistingProfileImage(`${API_BASE_URL.replace('/api', '')}${userData.profilePicture}`);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading user data:', error);
+            } finally {
+                setLoadingData(false);
+            }
+        };
+        loadUserData();
+    }, []);
 
     const handlePickImage = async () => {
         try {
@@ -136,7 +167,7 @@ export default function EditProfileScreen() {
         router.back();
     };
 
-    const displayImage = profileImage || 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200';
+    const displayImage = profileImage || existingProfileImage || 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200';
 
     return (
         <View style={styles.container}>
