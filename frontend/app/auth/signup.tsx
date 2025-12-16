@@ -61,6 +61,12 @@ export default function SignUpScreen() {
 
     if (!dateOfBirth.trim()) {
       newErrors.dateOfBirth = 'Date of birth is required';
+    } else {
+      // Validate DD/MM/YYYY format
+      const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
+      if (!dateRegex.test(dateOfBirth)) {
+        newErrors.dateOfBirth = 'Please use DD/MM/YYYY format (e.g., 19/02/2007)';
+      }
     }
 
     if (!selectedGender) {
@@ -223,7 +229,7 @@ export default function SignUpScreen() {
                   style={[styles.input, errors.dateOfBirth && styles.inputError]}
                   value={dateOfBirth}
                   onChangeText={setDateOfBirth}
-                  placeholder="18/03/2024"
+                  placeholder="DD/MM/YYYY (e.g., 19/02/2007)"
                   placeholderTextColor="#999"
                 />
                 {errors.dateOfBirth && <Text style={styles.fieldError}>{errors.dateOfBirth}</Text>}
