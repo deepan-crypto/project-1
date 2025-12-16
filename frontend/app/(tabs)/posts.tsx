@@ -70,7 +70,7 @@ export default function PostsScreen() {
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
         >
-          {/* Grey Container for All Inputs */}
+          {/* Thought Inputs - No grey container */}
           <View style={styles.inputsContainer}>
             {/* Thought 1 - Main input with "Say something!" placeholder */}
             <View style={styles.thoughtBox}>
@@ -183,18 +183,19 @@ const styles = StyleSheet.create({
     padding: 20,
     paddingBottom: 40,
   },
-  // Grey container for all inputs
+  // Container for all inputs - no grey background
   inputsContainer: {
-    backgroundColor: '#6C7278',
-    borderRadius: 12,
-    padding: 16,
-    gap: 16,
+    backgroundColor: 'transparent',
+    gap: 12,
     marginBottom: 24,
   },
   thoughtBox: {
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#6C7278',
     padding: 12,
+    minHeight: 70,
   },
   thoughtLabel: {
     fontSize: 14,

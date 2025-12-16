@@ -187,14 +187,17 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#101720',
+    backgroundColor: '#FFFFFF',
   },
   scrollView: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   content: {
     paddingTop: 50,
     paddingBottom: 100,
+    backgroundColor: '#FFFFFF',
+    flexGrow: 1,
   },
   // Profile Header Styles
   profileHeader: {
