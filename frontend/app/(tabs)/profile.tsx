@@ -86,9 +86,11 @@ export default function ProfileScreen() {
 
   const handleShareProfile = async () => {
     try {
+      const profileUrl = `myapp://profile/${user?.username || 'user'}`;
       await Share.share({
-        message: 'Check out my profile on the app!',
+        message: `Check out my profile on the app!\n\n${profileUrl}`,
         title: 'Share Profile',
+        url: profileUrl, // iOS uses this
       });
     } catch (error) {
       Alert.alert('Error', 'Unable to share profile');

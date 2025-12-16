@@ -328,6 +328,35 @@ const getUserStats = async (req, res, next) => {
     }
 };
 
+// @desc    Get user profile by username
+// @route   GET /api/users/username/:username
+// @access  Public
+const getUserByUsername = async (req, res, next) => {
+    try {
+        const user = await User.findOne({ username: req.params.username }).select('-password');
+
+        if (!user) {
+            res.status(404);
+            throw new Error('User not found');
+        }
+
+        res.status(200).json({
+            success: true,
+            user: {
+                id: user._id,
+                fullName: user.fullName,
+                username: user.username,
+                bio: user.bio,
+                profilePicture: user.profilePicture,
+                followers: user.followers,
+                following: user.following,
+            },
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getUserProfile,
     getCurrentUser,
@@ -338,4 +367,5 @@ module.exports = {
     getFollowers,
     getFollowing,
     getUserStats,
+    getUserByUsername,
 };

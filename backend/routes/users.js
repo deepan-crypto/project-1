@@ -12,11 +12,13 @@ const {
     getFollowers,
     getFollowing,
     getUserStats,
+    getUserByUsername,
 } = require('../controllers/userController');
 
 // User profile routes
 router.get('/me', protect, getCurrentUser);
 router.get('/profile/:userId', getUserProfile);
+router.get('/username/:username', getUserByUsername);
 router.put('/profile', protect, upload.single('profilePicture'), updateProfile);
 router.post('/upload-avatar', protect, upload.single('avatar'), uploadAvatar);
 
@@ -30,3 +32,4 @@ router.get('/:userId/following', getFollowing);
 router.get('/:userId/stats', getUserStats);
 
 module.exports = router;
+
