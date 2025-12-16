@@ -119,41 +119,42 @@ export default function PollCard({
       <View style={styles.optionsContainer}>
         {options.map((option, index) => {
           return (
-            <TouchableOpacity
-              key={option.id || index}
-              style={[
-                styles.option,
-                hasVoted && styles.optionWithProgress,
-                !hasVoted && styles.optionUnvoted,
-              ]}
-              onPress={() => handleVote(index)}
-              disabled={voting}
-            >
-              {hasVoted && (
-                <View
-                  style={[
-                    styles.progressBar,
-                    { width: `${option.percentage}%` },
-                  ]}
-                />
-              )}
-              <View style={styles.optionContent}>
-                <Text
-                  style={[
-                    styles.optionText,
-                    hasVoted && styles.optionTextVoted,
-                    !hasVoted && styles.optionTextUnvoted,
-                  ]}
-                >
-                  {option.text}{option.emoji ? ` ${option.emoji}` : ''}
-                </Text>
+            <View key={option.id || index} style={styles.optionRow}>
+              <TouchableOpacity
+                style={[
+                  styles.option,
+                  hasVoted && styles.optionWithProgress,
+                  !hasVoted && styles.optionUnvoted,
+                ]}
+                onPress={() => handleVote(index)}
+                disabled={voting}
+              >
                 {hasVoted && (
-                  <Text style={styles.optionPercentageVoted}>
-                    {option.percentage}%
-                  </Text>
+                  <View
+                    style={[
+                      styles.progressBar,
+                      { width: `${option.percentage}%` },
+                    ]}
+                  />
                 )}
-              </View>
-            </TouchableOpacity>
+                <View style={styles.optionContent}>
+                  <Text
+                    style={[
+                      styles.optionText,
+                      hasVoted && styles.optionTextVoted,
+                      !hasVoted && styles.optionTextUnvoted,
+                    ]}
+                  >
+                    {option.text}{option.emoji ? ` ${option.emoji}` : ''}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              {hasVoted && (
+                <Text style={styles.optionPercentageVoted}>
+                  {option.percentage}%
+                </Text>
+              )}
+            </View>
           );
         })}
       </View>
@@ -234,7 +235,12 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 12,
   },
+  optionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   option: {
+    flex: 1,
     borderRadius: 20,
     paddingVertical: 8,
     paddingHorizontal: 16,
@@ -259,17 +265,8 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: '#458FD0',
-    borderRadius: 20,
-  },
-  progressBarVoted: {
-    backgroundColor: '#458FD0',
-  },
-  progressBarNotVoted: {
     backgroundColor: '#6C7278',
-  },
-  progressBarUnvoted: {
-    backgroundColor: '#458FD0',
+    borderRadius: 20,
   },
   optionContent: {
     flexDirection: 'row',
@@ -277,15 +274,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     position: 'relative',
     zIndex: 1,
-  },
-  optionTextContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-  },
-  optionEmoji: {
-    fontSize: 16,
-    marginRight: 8,
   },
   optionText: {
     fontSize: 14,
@@ -299,15 +287,13 @@ const styles = StyleSheet.create({
     color: '#458FD0',
     fontWeight: '600',
   },
-  optionPercentage: {
+  optionPercentageVoted: {
     fontSize: 14,
     color: '#101720',
-    marginLeft: 8,
-  },
-  optionPercentageVoted: {
-    color: '#101720',
     fontWeight: '600',
-    marginLeft: 8,
+    marginLeft: 12,
+    minWidth: 40,
+    textAlign: 'right',
   },
   footer: {
     flexDirection: 'row',

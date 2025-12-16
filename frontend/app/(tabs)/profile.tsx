@@ -323,36 +323,33 @@ export default function ProfileScreen() {
                 {/* Poll Options */}
                 <View style={styles.pollOptions}>
                   {poll.options.map((option: { text: string; percentage: number }, index: number) => (
-                    <TouchableOpacity
-                      key={index}
-                      style={styles.pollOptionContainer}
-                      onPress={() => handleVotePoll(poll.id, index)}
-                    >
-                      <View style={[
-                        styles.pollOption,
-                        poll.hasVoted && styles.pollOptionVoted,
-                        !poll.hasVoted && styles.pollOptionUnvoted,
-                      ]}>
-                        <View style={styles.optionContent}>
-                          {poll.hasVoted && (
-                            <View
-                              style={[
-                                styles.optionProgress,
-                                { width: `${option.percentage}%` },
-                              ]}
-                            />
-                          )}
-                          <Text style={[
-                            styles.optionText,
-                            poll.hasVoted && styles.optionTextVoted,
-                            !poll.hasVoted && styles.optionTextUnvoted,
-                          ]}>{option.text}</Text>
-                        </View>
-                      </View>
+                    <View key={index} style={styles.pollOptionRow}>
+                      <TouchableOpacity
+                        style={[
+                          styles.pollOption,
+                          poll.hasVoted && styles.pollOptionVoted,
+                          !poll.hasVoted && styles.pollOptionUnvoted,
+                        ]}
+                        onPress={() => handleVotePoll(poll.id, index)}
+                      >
+                        {poll.hasVoted && (
+                          <View
+                            style={[
+                              styles.optionProgress,
+                              { width: `${option.percentage}%` },
+                            ]}
+                          />
+                        )}
+                        <Text style={[
+                          styles.optionText,
+                          poll.hasVoted && styles.optionTextVoted,
+                          !poll.hasVoted && styles.optionTextUnvoted,
+                        ]}>{option.text}</Text>
+                      </TouchableOpacity>
                       {poll.hasVoted && (
                         <Text style={styles.percentage}>{option.percentage}%</Text>
                       )}
-                    </TouchableOpacity>
+                    </View>
                   ))}
                 </View>
 
@@ -561,7 +558,7 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 12,
   },
-  pollOptionContainer: {
+  pollOptionRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
