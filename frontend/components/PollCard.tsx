@@ -43,29 +43,34 @@ export default function PollCard({
           return (
             <TouchableOpacity
               key={option.id}
-              style={[styles.option, styles.optionWithProgress]}
+              style={[
+                styles.option,
+                hasVoted && styles.optionWithProgress,
+                !hasVoted && styles.optionUnvoted,
+              ]}
               disabled={hasVoted}
             >
-              <View
-                style={[
-                  styles.progressBar,
-                  { width: `${option.percentage}%` },
-                  hasVoted ? styles.progressBarVoted : styles.progressBarUnvoted,
-                ]}
-              />
+              {hasVoted && (
+                <View
+                  style={[
+                    styles.progressBar,
+                    { width: `${option.percentage}%` },
+                  ]}
+                />
+              )}
               <View style={styles.optionContent}>
                 <View style={styles.optionTextContainer}>
                   <Text
                     style={[
                       styles.optionText,
-                      !hasVoted && styles.optionTextUnvoted,
+                      hasVoted && styles.optionTextVoted,
                     ]}
                   >
                     {option.text}{option.emoji ? ` ${option.emoji}` : ''}
                   </Text>
                 </View>
                 {hasVoted && (
-                  <Text style={styles.optionPercentage}>
+                  <Text style={styles.optionPercentageVoted}>
                     {option.percentage}%
                   </Text>
                 )}
@@ -135,16 +140,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderWidth: 1,
     borderColor: '#E0E0E0',
+    backgroundColor: 'transparent',
+  },
+  optionUnvoted: {
+    borderColor: '#458FD0',
+    borderWidth: 1,
+    backgroundColor: 'transparent',
   },
   optionWithProgress: {
     position: 'relative',
     overflow: 'hidden',
+    borderWidth: 0,
   },
   progressBar: {
     position: 'absolute',
     left: 0,
     top: 0,
     bottom: 0,
+    backgroundColor: '#6C7278',
     borderRadius: 20,
   },
   progressBarVoted: {
@@ -181,7 +194,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   optionTextUnvoted: {
-    color: '#FFFFFF',
+    color: '#458FD0',
     fontWeight: '600',
   },
   optionPercentage: {
@@ -192,6 +205,7 @@ const styles = StyleSheet.create({
   optionPercentageVoted: {
     color: '#FFFFFF',
     fontWeight: '600',
+    marginLeft: 8,
   },
   footer: {
     flexDirection: 'row',
@@ -210,7 +224,7 @@ const styles = StyleSheet.create({
   },
   likesText: {
     fontSize: 14,
-    color: '#687684',
+    color: '#3f87ceff',
   },
 });
 
