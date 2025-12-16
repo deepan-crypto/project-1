@@ -182,10 +182,19 @@ const votePoll = async (req, res, next) => {
             });
         }
 
+        // Calculate percentages
+        const percentages = poll.calculatePercentages();
+
         res.status(200).json({
             success: true,
             message: 'Vote recorded successfully',
-            poll,
+            options: percentages.map((opt, idx) => ({
+                id: idx,
+                text: opt.text,
+                emoji: opt.emoji,
+                percentage: opt.percentage,
+            })),
+            hasVoted: true,
         });
     } catch (error) {
         next(error);

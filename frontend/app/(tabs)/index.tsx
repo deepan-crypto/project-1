@@ -53,7 +53,13 @@ export default function HomeScreen() {
 
   const fetchPolls = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/polls`);
+      const token = await authStorage.getToken();
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/polls`, { headers });
       const data = await response.json();
 
       if (response.ok && data.polls) {
@@ -173,18 +179,18 @@ export default function HomeScreen() {
 
     const data = await response.json();
 
-    if (response.ok) {
+    if (response.ok && data.options) {
       return {
-        options: data.options.map((opt: any, idx: number) => ({
-          id: idx,
-          text: opt.text,
-          percentage: opt.percentage,
-          emoji: opt.emoji,
-        })),
+        options: data.options,
         hasVoted: true
       };
     } else {
-      Alert.alert('Error', data.message || 'Failed to vote');
+      // Handle already voted silently
+      if (data.message?.includes('already voted')) {
+        console.log('Already voted on this poll');
+      } else {
+        Alert.alert('Error', data.message || 'Failed to vote');
+      }
       throw new Error(data.message || 'Failed to vote');
     }
   };

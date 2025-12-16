@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { protect } = require('../middleware/auth');
+const { protect, optionalAuth } = require('../middleware/auth');
 const {
     createPoll,
     getAllPolls,
@@ -15,8 +15,8 @@ const {
 
 // Poll CRUD routes
 router.post('/', protect, createPoll);
-router.get('/', getAllPolls);
-router.get('/user/:userId', getUserPolls);
+router.get('/', optionalAuth, getAllPolls);
+router.get('/user/:userId', optionalAuth, getUserPolls);
 router.get('/:pollId', getPollDetails);
 router.delete('/:pollId', protect, deletePoll);
 
