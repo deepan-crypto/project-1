@@ -18,9 +18,62 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    router.replace('/(tabs)');
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!username.trim()) {
+      newErrors.username = 'Username is required';
+    }
+
+    if (!password.trim()) {
+      newErrors.password = 'Password is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleLogin = async () => {
+    // Clear previous errors
+    setErrors({});
+
+    // Validate form
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store token (you can use AsyncStorage here)
+        // await AsyncStorage.setItem('token', data.token);
+        router.replace('/(tabs)');
+      } else {
+        // Handle backend errors
+        setErrors({ general: data.message || 'Login failed. Please check your credentials.' });
+      }
+    } catch (error) {
+      setErrors({ general: 'Network error. Please check your connection.' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -40,21 +93,28 @@ export default function LoginScreen() {
             </TouchableOpacity>
 
             <View style={styles.form}>
+              {errors.general && (
+                <View style={styles.errorContainer}>
+                  <Text style={styles.errorText}>{errors.general}</Text>
+                </View>
+              )}
+
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Username</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, errors.username && styles.inputError]}
                   value={username}
                   onChangeText={setUsername}
                   placeholder="LOISBECKET"
                   placeholderTextColor="#999"
                   autoCapitalize="none"
                 />
+                {errors.username && <Text style={styles.fieldError}>{errors.username}</Text>}
               </View>
 
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Password</Text>
-                <View style={styles.passwordContainer}>
+                <View style={[styles.passwordContainer, errors.password && styles.inputError]}>
                   <TextInput
                     style={styles.passwordInput}
                     value={password}
@@ -74,6 +134,7 @@ export default function LoginScreen() {
                     )}
                   </TouchableOpacity>
                 </View>
+                {errors.password && <Text style={styles.fieldError}>{errors.password}</Text>}
               </View>
 
               <View style={styles.row}>
@@ -94,8 +155,14 @@ export default function LoginScreen() {
                 </TouchableOpacity>
               </View>
 
-              <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-                <Text style={styles.loginButtonText}>Log In</Text>
+              <TouchableOpacity
+                style={[styles.loginButton, loading && styles.loginButtonDisabled]}
+                onPress={handleLogin}
+                disabled={loading}
+              >
+                <Text style={styles.loginButtonText}>
+                  {loading ? 'Logging In...' : 'Log In'}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -220,5 +287,28 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  errorContainer: {
+    backgroundColor: '#ffebee',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+  },
+  errorText: {
+    color: '#c62828',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  fieldError: {
+    color: '#c62828',
+    fontSize: 12,
+    marginTop: 4,
+  },
+  inputError: {
+    borderColor: '#c62828',
+    borderWidth: 1,
+  },
+  loginButtonDisabled: {
+    opacity: 0.6,
   },
 });

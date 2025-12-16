@@ -26,9 +26,93 @@ export default function SignUpScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [selectedGender, setSelectedGender] = useState('');
   const [showGenderModal, setShowGenderModal] = useState(false);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [loading, setLoading] = useState(false);
 
-  const handleSignUp = () => {
-    router.replace('/(tabs)');
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validateForm = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!fullName.trim()) {
+      newErrors.fullName = 'Full name is required';
+    }
+
+    if (!email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!validateEmail(email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+
+    if (!username.trim()) {
+      newErrors.username = 'Username is required';
+    } else if (username.length < 3) {
+      newErrors.username = 'Username must be at least 3 characters';
+    }
+
+    if (!password.trim()) {
+      newErrors.password = 'Password is required';
+    } else if (password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+
+    if (!dateOfBirth.trim()) {
+      newErrors.dateOfBirth = 'Date of birth is required';
+    }
+
+    if (!selectedGender) {
+      newErrors.gender = 'Please select a gender';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSignUp = async () => {
+    // Clear previous errors
+    setErrors({});
+
+    // Validate form
+    if (!validateForm()) {
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          fullName,
+          email,
+          username,
+          password,
+          dateOfBirth,
+          gender: selectedGender,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Store token (you can use AsyncStorage here)
+        // await AsyncStorage.setItem('token', data.token);
+        router.replace('/(tabs)');
+      } else {
+        // Handle backend errors
+        setErrors({ general: data.message || 'Signup failed. Please try again.' });
+      }
+    } catch (error) {
+      setErrors({ general: 'Network error. Please check your connection.' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -51,21 +135,28 @@ export default function SignUpScreen() {
             </TouchableOpacity>
 
             <View style={styles.form}>
+              {errors.general && (
+                <View style={styles.errorContainer}>
+                  <Text style={styles.errorText}>{errors.general}</Text>
+                </View>
+              )}
+
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Full Name</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, errors.fullName && styles.inputError]}
                   value={fullName}
                   onChangeText={setFullName}
                   placeholder="Lois Becket"
                   placeholderTextColor="#999"
                 />
+                {errors.fullName && <Text style={styles.fieldError}>{errors.fullName}</Text>}
               </View>
 
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Email</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, errors.email && styles.inputError]}
                   value={email}
                   onChangeText={setEmail}
                   placeholder="Loisbecket@gmail.com"
@@ -73,23 +164,25 @@ export default function SignUpScreen() {
                   keyboardType="email-address"
                   autoCapitalize="none"
                 />
+                {errors.email && <Text style={styles.fieldError}>{errors.email}</Text>}
               </View>
 
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Username</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, errors.username && styles.inputError]}
                   value={username}
                   onChangeText={setUsername}
                   placeholder="LOISBECKET"
                   placeholderTextColor="#999"
                   autoCapitalize="none"
                 />
+                {errors.username && <Text style={styles.fieldError}>{errors.username}</Text>}
               </View>
 
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>New Password</Text>
-                <View style={styles.passwordContainer}>
+                <View style={[styles.passwordContainer, errors.password && styles.inputError]}>
                   <TextInput
                     style={styles.passwordInput}
                     value={password}
@@ -109,23 +202,25 @@ export default function SignUpScreen() {
                     )}
                   </TouchableOpacity>
                 </View>
+                {errors.password && <Text style={styles.fieldError}>{errors.password}</Text>}
               </View>
 
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Date of Birth</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, errors.dateOfBirth && styles.inputError]}
                   value={dateOfBirth}
                   onChangeText={setDateOfBirth}
                   placeholder="18/03/2024"
                   placeholderTextColor="#999"
                 />
+                {errors.dateOfBirth && <Text style={styles.fieldError}>{errors.dateOfBirth}</Text>}
               </View>
 
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Select Gender</Text>
                 <TouchableOpacity
-                  style={styles.dropdown}
+                  style={[styles.dropdown, errors.gender && styles.inputError]}
                   onPress={() => setShowGenderModal(true)}
                 >
                   <Text
@@ -138,10 +233,17 @@ export default function SignUpScreen() {
                   </Text>
                   <ChevronDown size={20} color="#999" />
                 </TouchableOpacity>
+                {errors.gender && <Text style={styles.fieldError}>{errors.gender}</Text>}
               </View>
 
-              <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}>
-                <Text style={styles.signUpButtonText}>Sign Up</Text>
+              <TouchableOpacity
+                style={[styles.signUpButton, loading && styles.signUpButtonDisabled]}
+                onPress={handleSignUp}
+                disabled={loading}
+              >
+                <Text style={styles.signUpButtonText}>
+                  {loading ? 'Signing Up...' : 'Sign Up'}
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -342,5 +444,28 @@ const styles = StyleSheet.create({
   genderOptionText: {
     fontSize: 16,
     color: '#000',
+  },
+  errorContainer: {
+    backgroundColor: '#ffebee',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 16,
+  },
+  errorText: {
+    color: '#c62828',
+    fontSize: 14,
+    textAlign: 'center',
+  },
+  fieldError: {
+    color: '#c62828',
+    fontSize: 12,
+    marginTop: 4,
+  },
+  inputError: {
+    borderColor: '#c62828',
+    borderWidth: 1,
+  },
+  signUpButtonDisabled: {
+    opacity: 0.6,
   },
 });

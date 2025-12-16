@@ -14,6 +14,39 @@ const signup = async (req, res, next) => {
             throw new Error('Please provide all required fields');
         }
 
+        // Validate email format
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            res.status(400);
+            throw new Error('Please provide a valid email address');
+        }
+
+        // Validate password length
+        if (password.length < 6) {
+            res.status(400);
+            throw new Error('Password must be at least 6 characters long');
+        }
+
+        // Validate username length
+        if (username.length < 3) {
+            res.status(400);
+            throw new Error('Username must be at least 3 characters long');
+        }
+
+        // Check for existing email
+        const existingEmail = await User.findOne({ email });
+        if (existingEmail) {
+            res.status(400);
+            throw new Error('This email is already registered. Please use a different email or login.');
+        }
+
+        // Check for existing username
+        const existingUsername = await User.findOne({ username });
+        if (existingUsername) {
+            res.status(400);
+            throw new Error('This username is already taken. Please choose a different username.');
+        }
+
         // Create user
         const user = await User.create({
             fullName,
@@ -57,12 +90,18 @@ const login = async (req, res, next) => {
             throw new Error('Please provide username and password');
         }
 
+        // Validate minimum lengths
+        if (username.trim().length === 0 || password.trim().length === 0) {
+            res.status(400);
+            throw new Error('Username and password cannot be empty');
+        }
+
         // Find user and include password
         const user = await User.findOne({ username }).select('+password');
 
         if (!user) {
             res.status(401);
-            throw new Error('Invalid credentials');
+            throw new Error('No account found with this username. Please check your username or sign up.');
         }
 
         // Check password
@@ -70,7 +109,7 @@ const login = async (req, res, next) => {
 
         if (!isPasswordCorrect) {
             res.status(401);
-            throw new Error('Invalid credentials');
+            throw new Error('Incorrect password. Please try again.');
         }
 
         // Generate token
