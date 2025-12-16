@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Share, Alert } from 'react-native';
 import { Heart, Share2, Trash2 } from 'lucide-react-native';
 
 interface PollOption {
@@ -18,7 +19,9 @@ interface PollCardProps {
   options: PollOption[];
   likes: number;
   hasVoted?: boolean;
+  isLiked?: boolean;
   onDelete?: (id: string) => void;
+  onLike?: (id: string) => Promise<{ likes: number; liked: boolean }>;
 }
 
 export default function PollCard({
@@ -26,10 +29,44 @@ export default function PollCard({
   user,
   question,
   options,
-  likes,
+  likes: initialLikes,
   hasVoted = false,
+  isLiked: initialIsLiked = false,
   onDelete,
+  onLike,
 }: PollCardProps) {
+  const [likes, setLikes] = useState(initialLikes);
+  const [isLiked, setIsLiked] = useState(initialIsLiked);
+  const [liking, setLiking] = useState(false);
+
+  const handleLike = async () => {
+    if (!id || !onLike || liking) return;
+    setLiking(true);
+    try {
+      const result = await onLike(id);
+      setLikes(result.likes);
+      setIsLiked(result.liked);
+    } catch (error) {
+      console.error('Error liking poll:', error);
+    } finally {
+      setLiking(false);
+    }
+  };
+
+  const handleShare = async () => {
+    if (!id) return;
+    try {
+      const pollUrl = `myapp://poll/${id}`;
+      await Share.share({
+        message: `Check out this poll: "${question}"\n\n${pollUrl}`,
+        title: 'Share Poll',
+        url: pollUrl,
+      });
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
   return (
     <View style={styles.card}>
       {/* Header with user info */}
@@ -83,12 +120,20 @@ export default function PollCard({
       </View>
       {/* Footer with likes and share */}
       <View style={styles.footer}>
-        <TouchableOpacity style={styles.likeButton}>
-          <Heart size={18} color="#687684" />
-          <Text style={styles.likesText}>{likes}</Text>
+        <TouchableOpacity
+          style={styles.likeButton}
+          onPress={handleLike}
+          disabled={liking}
+        >
+          <Heart
+            size={18}
+            color={isLiked ? "#FF4444" : "#687684"}
+            fill={isLiked ? "#FF4444" : "transparent"}
+          />
+          <Text style={[styles.likesText, isLiked && styles.likedText]}>{likes}</Text>
         </TouchableOpacity>
         <View style={styles.footerRight}>
-          <TouchableOpacity style={styles.shareButton}>
+          <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
             <Share2 size={18} color="#687684" />
           </TouchableOpacity>
           {onDelete && id && (
@@ -237,6 +282,9 @@ const styles = StyleSheet.create({
   likesText: {
     fontSize: 14,
     color: '#3f87ceff',
+  },
+  likedText: {
+    color: '#FF4444',
   },
   footerRight: {
     flexDirection: 'row',

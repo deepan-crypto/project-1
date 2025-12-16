@@ -157,6 +157,43 @@ export default function ProfileScreen() {
     );
   };
 
+  // Handle like poll
+  const handleLikePoll = async (pollId: string) => {
+    try {
+      const token = await authStorage.getToken();
+      if (!token) return;
+
+      const response = await fetch(`${API_BASE_URL}/polls/${pollId}/like`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Update poll in state
+        setPolls(polls.map(p =>
+          p.id === pollId ? { ...p, likes: data.likesCount } : p
+        ));
+      }
+    } catch (error) {
+      console.error('Error liking poll:', error);
+    }
+  };
+
+  // Handle share poll
+  const handleSharePoll = async (pollId: string, question: string) => {
+    try {
+      const pollUrl = `myapp://poll/${pollId}`;
+      await Share.share({
+        message: `Check out this poll: "${question}"\n\n${pollUrl}`,
+        title: 'Share Poll',
+      });
+    } catch (error) {
+      console.error('Error sharing:', error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
@@ -279,13 +316,19 @@ export default function ProfileScreen() {
                 {/* Poll Footer with Actions */}
                 <View style={styles.pollFooter}>
                   <View style={styles.footerLeft}>
-                    <TouchableOpacity style={styles.actionButton}>
+                    <TouchableOpacity
+                      style={styles.actionButton}
+                      onPress={() => handleLikePoll(poll.id)}
+                    >
                       <Heart size={18} color="#6C7278" />
                       <Text style={styles.likesCount}>{poll.likes}</Text>
                     </TouchableOpacity>
                   </View>
                   <View style={styles.footerRight}>
-                    <TouchableOpacity style={styles.actionButton}>
+                    <TouchableOpacity
+                      style={styles.actionButton}
+                      onPress={() => handleSharePoll(poll.id, poll.question)}
+                    >
                       <Share2 size={18} color="#6C7278" />
                     </TouchableOpacity>
                     <TouchableOpacity

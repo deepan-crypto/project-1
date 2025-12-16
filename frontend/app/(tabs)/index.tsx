@@ -119,6 +119,41 @@ export default function HomeScreen() {
     );
   };
 
+  // Handle like poll
+  const handleLikePoll = async (pollId: string): Promise<{ likes: number; liked: boolean }> => {
+    const token = await authStorage.getToken();
+    if (!token) {
+      Alert.alert('Error', 'Please log in to like polls');
+      throw new Error('Not authenticated');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/polls/${pollId}/like`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      return { likes: data.likesCount, liked: true };
+    } else {
+      // If already liked, try to unlike
+      if (data.message?.includes('already liked')) {
+        const unlikeResponse = await fetch(`${API_BASE_URL}/polls/${pollId}/unlike`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        const unlikeData = await unlikeResponse.json();
+        return { likes: unlikeData.likesCount, liked: false };
+      }
+      throw new Error(data.message || 'Failed to like poll');
+    }
+  };
+
   // Load on mount
   useEffect(() => {
     fetchPolls();
@@ -174,6 +209,7 @@ export default function HomeScreen() {
               key={poll.id}
               {...poll}
               onDelete={poll.userId === currentUserId ? handleDeletePoll : undefined}
+              onLike={handleLikePoll}
             />
           ))}
         </ScrollView>
