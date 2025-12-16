@@ -250,24 +250,26 @@ const styles = StyleSheet.create({
   optionWithProgress: {
     position: 'relative',
     overflow: 'hidden',
-    borderWidth: 0,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    backgroundColor: '#F5F5F5',
   },
   progressBar: {
     position: 'absolute',
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: '#6C7278',
+    backgroundColor: '#458FD0',
     borderRadius: 20,
   },
   progressBarVoted: {
-    backgroundColor: '#6C7278', // Gray for voted options
+    backgroundColor: '#458FD0',
   },
   progressBarNotVoted: {
-    backgroundColor: '#6C7278', // Gray (not used, keeping for compatibility)
+    backgroundColor: '#6C7278',
   },
   progressBarUnvoted: {
-    backgroundColor: '#458FD0', // Blue for unvoted options
+    backgroundColor: '#458FD0',
   },
   optionContent: {
     flexDirection: 'row',
@@ -290,7 +292,7 @@ const styles = StyleSheet.create({
     color: '#101720',
   },
   optionTextVoted: {
-    color: '#FFFFFF',
+    color: '#101720',
     fontWeight: '600',
   },
   optionTextUnvoted: {
@@ -303,7 +305,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   optionPercentageVoted: {
-    color: '#FFFFFF',
+    color: '#458FD0',
     fontWeight: '600',
     marginLeft: 8,
   },
