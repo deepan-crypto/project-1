@@ -23,22 +23,41 @@ interface PollCardProps {
   isLiked?: boolean;
   onDelete?: (id: string) => void;
   onLike?: (id: string) => Promise<{ likes: number; liked: boolean }>;
+  onVote?: (pollId: string, optionIndex: number) => Promise<{ options: PollOption[]; hasVoted: boolean }>;
 }
 
 export default function PollCard({
   id,
   user,
   question,
-  options,
+  options: initialOptions,
   likes: initialLikes,
-  hasVoted = false,
+  hasVoted: initialHasVoted = false,
   isLiked: initialIsLiked = false,
   onDelete,
   onLike,
+  onVote,
 }: PollCardProps) {
+  const [options, setOptions] = useState(initialOptions);
+  const [hasVoted, setHasVoted] = useState(initialHasVoted);
   const [likes, setLikes] = useState(initialLikes);
   const [isLiked, setIsLiked] = useState(initialIsLiked);
   const [liking, setLiking] = useState(false);
+  const [voting, setVoting] = useState(false);
+
+  const handleVote = async (optionIndex: number) => {
+    if (!id || !onVote || voting || hasVoted) return;
+    setVoting(true);
+    try {
+      const result = await onVote(id, optionIndex);
+      setOptions(result.options);
+      setHasVoted(result.hasVoted);
+    } catch (error) {
+      console.error('Error voting:', error);
+    } finally {
+      setVoting(false);
+    }
+  };
 
   const handleLike = async () => {
     if (!id || !onLike || liking) return;
@@ -95,6 +114,8 @@ export default function PollCard({
                 hasVoted && styles.optionWithProgress,
                 !hasVoted && styles.optionUnvoted,
               ]}
+              onPress={() => handleVote(index)}
+              disabled={hasVoted || voting}
             >
               {hasVoted && (
                 <View

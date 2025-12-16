@@ -154,6 +154,41 @@ export default function HomeScreen() {
     }
   };
 
+  // Handle vote on poll
+  const handleVotePoll = async (pollId: string, optionIndex: number): Promise<{ options: { id: number; text: string; percentage: number; emoji?: string }[]; hasVoted: boolean }> => {
+    const token = await authStorage.getToken();
+    if (!token) {
+      Alert.alert('Error', 'Please log in to vote');
+      throw new Error('Not authenticated');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/polls/${pollId}/vote`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ optionIndex }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      return {
+        options: data.options.map((opt: any, idx: number) => ({
+          id: idx,
+          text: opt.text,
+          percentage: opt.percentage,
+          emoji: opt.emoji,
+        })),
+        hasVoted: true
+      };
+    } else {
+      Alert.alert('Error', data.message || 'Failed to vote');
+      throw new Error(data.message || 'Failed to vote');
+    }
+  };
+
   // Load on mount
   useEffect(() => {
     fetchPolls();
@@ -210,6 +245,7 @@ export default function HomeScreen() {
               {...poll}
               onDelete={poll.userId === currentUserId ? handleDeletePoll : undefined}
               onLike={handleLikePoll}
+              onVote={handleVotePoll}
             />
           ))}
         </ScrollView>
