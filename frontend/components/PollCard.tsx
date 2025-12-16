@@ -46,12 +46,12 @@ export default function PollCard({
   const [voting, setVoting] = useState(false);
 
   const handleVote = async (optionIndex: number) => {
-    if (!id || !onVote || voting || hasVoted) return;
+    if (!id || !onVote || voting) return;
     setVoting(true);
     try {
       const result = await onVote(id, optionIndex);
       setOptions(result.options);
-      setHasVoted(result.hasVoted);
+      setHasVoted(true);
     } catch (error) {
       console.error('Error voting:', error);
     } finally {
@@ -115,7 +115,7 @@ export default function PollCard({
                 !hasVoted && styles.optionUnvoted,
               ]}
               onPress={() => handleVote(index)}
-              disabled={hasVoted || voting}
+              disabled={voting}
             >
               {hasVoted && (
                 <View

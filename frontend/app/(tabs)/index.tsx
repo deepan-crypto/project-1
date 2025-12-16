@@ -185,12 +185,7 @@ export default function HomeScreen() {
         hasVoted: true
       };
     } else {
-      // Handle already voted silently
-      if (data.message?.includes('already voted')) {
-        console.log('Already voted on this poll');
-      } else {
-        Alert.alert('Error', data.message || 'Failed to vote');
-      }
+      Alert.alert('Error', data.message || 'Failed to vote');
       throw new Error(data.message || 'Failed to vote');
     }
   };

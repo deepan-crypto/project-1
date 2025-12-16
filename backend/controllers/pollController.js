@@ -150,29 +150,33 @@ const votePoll = async (req, res, next) => {
             throw new Error('Poll not found');
         }
 
-        // Check if user already voted
-        const alreadyVoted = poll.options.some(opt =>
-            opt.votes.includes(req.user._id)
-        );
-
-        if (alreadyVoted) {
-            res.status(400);
-            throw new Error('You have already voted on this poll');
-        }
-
         // Validate option index
         if (optionIndex < 0 || optionIndex >= poll.options.length) {
             res.status(400);
             throw new Error('Invalid option index');
         }
 
-        // Add vote
+        // Check if user already voted and on which option
+        let previousVoteIndex = -1;
+        poll.options.forEach((opt, idx) => {
+            const userVoteIndex = opt.votes.findIndex(
+                vote => vote.toString() === req.user._id.toString()
+            );
+            if (userVoteIndex !== -1) {
+                previousVoteIndex = idx;
+                // Remove the old vote
+                opt.votes.splice(userVoteIndex, 1);
+                opt.voteCount = Math.max(0, opt.voteCount - 1);
+            }
+        });
+
+        // Add new vote
         poll.options[optionIndex].votes.push(req.user._id);
         poll.options[optionIndex].voteCount += 1;
         await poll.save();
 
-        // Create notification for poll owner
-        if (poll.userId.toString() !== req.user._id.toString()) {
+        // Create notification for poll owner (only if first time voting)
+        if (previousVoteIndex === -1 && poll.userId.toString() !== req.user._id.toString()) {
             await Notification.create({
                 recipientId: poll.userId,
                 senderId: req.user._id,
@@ -182,12 +186,12 @@ const votePoll = async (req, res, next) => {
             });
         }
 
-        // Calculate percentages
+        // Calculate percentages for ALL options
         const percentages = poll.calculatePercentages();
 
         res.status(200).json({
             success: true,
-            message: 'Vote recorded successfully',
+            message: previousVoteIndex === -1 ? 'Vote recorded successfully' : 'Vote changed successfully',
             options: percentages.map((opt, idx) => ({
                 id: idx,
                 text: opt.text,
@@ -195,6 +199,7 @@ const votePoll = async (req, res, next) => {
                 percentage: opt.percentage,
             })),
             hasVoted: true,
+            votedOptionIndex: optionIndex,
         });
     } catch (error) {
         next(error);
