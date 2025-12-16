@@ -10,38 +10,42 @@ import {
   Alert,
 } from 'react-native';
 import { router } from 'expo-router';
+import { Heart, Share2, ArrowRight } from 'lucide-react-native';
 
 const mockUserPolls = [
   {
     id: '1',
-    question: 'Whats best for a day?',
+    question: 'Whats best for a daily ride?',
     options: [
-      { text: 'Hybrid', percentage: 0 },
-      { text: 'City Bike', percentage: 0 },
+      { text: 'Hybrid', percentage: 20 },
+      { text: 'City Bike', percentage: 80 },
     ],
     likes: 363,
     voted: false,
+    time: 'Today',
   },
   {
     id: '2',
-    question: 'Average distance for cycling?',
+    question: 'Average distance for a good workout!',
     options: [
-      { text: '25kms', percentage: 45 },
-      { text: '50kms', percentage: 55 },
+      { text: '25kms', percentage: 75 },
+      { text: '50kms', percentage: 52 },
     ],
     likes: 363,
     voted: true,
+    time: '1 year ago',
   },
   {
     id: '3',
-    question: 'Speed thats good for cycling?',
+    question: 'Speed thats good for climbing',
     options: [
       { text: '24', percentage: 35 },
-      { text: '20', percentage: 30 },
-      { text: '22', percentage: 35 },
+      { text: '20', percentage: 50 },
+      { text: '22', percentage: 75 },
     ],
     likes: 363,
     voted: true,
+    time: '2 years ago',
   },
 ];
 
@@ -63,13 +67,14 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar barStyle="light-content" />
 
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
+        {/* Profile Header Section */}
         <View style={styles.profileHeader}>
           <Image
             source={{
@@ -82,60 +87,94 @@ export default function ProfileScreen() {
             Bicycle enthusiast. Love to talk about bicycles and cycling!
           </Text>
           <View style={styles.statsRow}>
-            <Text style={styles.followers}>523 Followers</Text>
-            <Text style={styles.following}>523 Following</Text>
+            <Text style={styles.statsText}>
+              <Text style={styles.statsNumber}>523</Text> Followers
+            </Text>
+            <Text style={styles.statsText}>
+              <Text style={styles.statsNumber}>523</Text> Following
+            </Text>
           </View>
 
           <View style={styles.buttonsRow}>
-            <TouchableOpacity style={styles.shareButton} onPress={handleShareProfile}>
-              <Text style={styles.shareButtonText}>Share profile</Text>
-            </TouchableOpacity>
-
             <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
               <Text style={styles.editButtonText}>Edit profile</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.shareButton} onPress={handleShareProfile}>
+              <Text style={styles.shareButtonText}>Share profile</Text>
             </TouchableOpacity>
           </View>
         </View>
 
+        {/* Polls Section */}
         <View style={styles.pollsSection}>
           {mockUserPolls.map((poll) => (
             <View key={poll.id} style={styles.pollCard}>
+              {/* Poll Header with User Info */}
               <View style={styles.pollHeader}>
-                <Image
-                  source={{
-                    uri: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100',
-                  }}
-                  style={styles.smallAvatar}
-                />
-                <Text style={styles.pollQuestion}>{poll.question}</Text>
+                <View style={styles.pollUserInfo}>
+                  <Image
+                    source={{
+                      uri: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100',
+                    }}
+                    style={styles.smallAvatar}
+                  />
+                  <View style={styles.pollTextInfo}>
+                    <Text style={styles.pollUserName}>Abigail</Text>
+                    <Text style={styles.pollQuestion}>{poll.question}</Text>
+                  </View>
+                </View>
+                <Text style={styles.pollTime}>{poll.time}</Text>
               </View>
 
+              {/* Voted Label */}
+              {poll.voted && (
+                <Text style={styles.votedLabel}>You voted</Text>
+              )}
+
+              {/* Poll Options */}
               <View style={styles.pollOptions}>
                 {poll.options.map((option, index) => (
-                  <View key={index} style={styles.pollOption}>
-                    <View style={styles.optionContent}>
-                      {poll.voted && (
-                        <View
-                          style={[
-                            styles.optionProgress,
-                            { width: `${option.percentage}%` },
-                          ]}
-                        />
-                      )}
-                      <Text style={styles.optionText}>{option.text}</Text>
+                  <View key={index} style={styles.pollOptionContainer}>
+                    <View style={[
+                      styles.pollOption,
+                      poll.voted && styles.pollOptionVoted
+                    ]}>
+                      <View style={styles.optionContent}>
+                        {poll.voted && (
+                          <View
+                            style={[
+                              styles.optionProgress,
+                              { width: `${option.percentage}%` },
+                            ]}
+                          />
+                        )}
+                        <Text style={[
+                          styles.optionText,
+                          poll.voted && styles.optionTextVoted
+                        ]}>{option.text}</Text>
+                      </View>
                     </View>
                     {poll.voted && (
-                      <Text style={styles.percentage}>{option.percentage}</Text>
+                      <Text style={styles.percentage}>{option.percentage}%</Text>
                     )}
                   </View>
                 ))}
               </View>
 
+              {/* Poll Footer with Actions */}
               <View style={styles.pollFooter}>
-                <Text style={styles.likes}>{poll.likes}</Text>
-                {poll.voted && (
-                  <Text style={styles.votedLabel}>You voted</Text>
-                )}
+                <View style={styles.footerLeft}>
+                  <TouchableOpacity style={styles.actionButton}>
+                    <Heart size={18} color="#6C7278" />
+                    <Text style={styles.likesCount}>{poll.likes}</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.footerRight}>
+                  <TouchableOpacity style={styles.actionButton}>
+                    <Share2 size={18} color="#6C7278" />
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           ))}
@@ -148,162 +187,215 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#101720',
   },
   scrollView: {
     flex: 1,
   },
   content: {
-    paddingTop: 60,
+    paddingTop: 50,
+    paddingBottom: 100,
   },
+  // Profile Header Styles
   profileHeader: {
     backgroundColor: '#FFFFFF',
     alignItems: 'center',
-    paddingVertical: 32,
+    paddingVertical: 24,
     paddingHorizontal: 20,
-    marginBottom: 16,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
   },
   profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    marginBottom: 16,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    marginBottom: 12,
     backgroundColor: '#E0E0E0',
   },
   name: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#000',
-    marginBottom: 8,
+    color: '#000000',
+    marginBottom: 6,
   },
   bio: {
     fontSize: 14,
-    color: '#666',
+    color: '#6C7278',
     textAlign: 'center',
     marginBottom: 12,
-  },
-  followers: {
-    fontSize: 14,
-    color: '#999',
-  },
-  following: {
-    fontSize: 14,
-    color: '#999',
+    paddingHorizontal: 20,
+    lineHeight: 20,
   },
   statsRow: {
     flexDirection: 'row',
-    gap: 24,
+    gap: 20,
     marginBottom: 16,
+  },
+  statsText: {
+    fontSize: 14,
+    color: '#6C7278',
+  },
+  statsNumber: {
+    fontWeight: 'bold',
+    color: '#000000',
   },
   buttonsRow: {
     flexDirection: 'row',
     gap: 12,
   },
-  shareButton: {
-    borderWidth: 1,
-    borderColor: '#458FD0',
-    borderRadius: 8,
-    paddingHorizontal: 24,
-    paddingVertical: 10,
-  },
-  shareButtonText: {
-    color: '#458FD0',
-    fontSize: 14,
-    fontWeight: '600',
-  },
   editButton: {
     borderWidth: 1,
     borderColor: '#101720',
     borderRadius: 8,
-    paddingHorizontal: 24,
+    paddingHorizontal: 20,
     paddingVertical: 10,
+    backgroundColor: 'transparent',
   },
   editButtonText: {
     color: '#101720',
     fontSize: 14,
     fontWeight: '600',
   },
+  shareButton: {
+    borderWidth: 1,
+    borderColor: '#458FD0',
+    borderRadius: 8,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    backgroundColor: 'transparent',
+  },
+  shareButtonText: {
+    color: '#458FD0',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  // Polls Section Styles
   pollsSection: {
-    padding: 16,
-    gap: 16,
+    paddingHorizontal: 0,
+    gap: 0,
   },
   pollCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E8E8E8',
   },
   pollHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 8,
+  },
+  pollUserInfo: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    flex: 1,
   },
   smallAvatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    marginRight: 12,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 10,
     backgroundColor: '#E0E0E0',
   },
-  pollQuestion: {
+  pollTextInfo: {
     flex: 1,
+  },
+  pollUserName: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#000000',
+    marginBottom: 2,
+  },
+  pollQuestion: {
     fontSize: 14,
-    color: '#333',
-    fontWeight: '500',
+    color: '#6C7278',
+    lineHeight: 20,
+  },
+  pollTime: {
+    fontSize: 12,
+    color: '#6C7278',
+  },
+  votedLabel: {
+    fontSize: 12,
+    color: '#458FD0',
+    fontWeight: '600',
+    marginBottom: 8,
+    marginLeft: 50,
   },
   pollOptions: {
-    gap: 10,
-    marginBottom: 16,
+    gap: 8,
+    marginBottom: 12,
   },
-  pollOption: {
+  pollOptionContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+  },
+  pollOption: {
+    flex: 1,
     borderWidth: 1,
     borderColor: '#458FD0',
     borderRadius: 8,
     overflow: 'hidden',
   },
+  pollOptionVoted: {
+    borderColor: '#458FD0',
+    backgroundColor: '#FFFFFF',
+  },
   optionContent: {
-    flex: 1,
     position: 'relative',
-    padding: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
   },
   optionProgress: {
     position: 'absolute',
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: 'rgba(69, 143, 208, 0.2)',
-    borderRadius: 8,
+    backgroundColor: '#458FD0',
+    borderRadius: 7,
   },
   optionText: {
     fontSize: 14,
     color: '#101720',
     zIndex: 1,
+    textAlign: 'center',
+  },
+  optionTextVoted: {
+    color: '#FFFFFF',
+    fontWeight: '500',
   },
   percentage: {
     fontSize: 14,
     color: '#6C7278',
     fontWeight: '500',
-    paddingHorizontal: 12,
+    marginLeft: 12,
+    minWidth: 35,
+    textAlign: 'right',
   },
   pollFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingTop: 4,
   },
-  likes: {
+  footerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  footerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    padding: 4,
+  },
+  likesCount: {
     fontSize: 14,
-    color: '#687684',
-  },
-  votedLabel: {
-    fontSize: 12,
-    color: '#458FD0',
-    fontWeight: '600',
+    color: '#6C7278',
   },
 });
