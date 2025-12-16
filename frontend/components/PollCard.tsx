@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Share, Alert } from 'react-native';
 import { Heart, Share2, Trash2 } from 'lucide-react-native';
 import { router } from 'expo-router';
@@ -45,12 +45,24 @@ export default function PollCard({
   const [liking, setLiking] = useState(false);
   const [voting, setVoting] = useState(false);
 
+  // Sync state with props when they change (e.g., after refetch)
+  useEffect(() => {
+    setOptions(initialOptions);
+    setHasVoted(initialHasVoted);
+    setLikes(initialLikes);
+    setIsLiked(initialIsLiked);
+  }, [initialOptions, initialHasVoted, initialLikes, initialIsLiked]);
+
   const handleVote = async (optionIndex: number) => {
     if (!id || !onVote || voting) return;
     setVoting(true);
     try {
       const result = await onVote(id, optionIndex);
-      setOptions(result.options);
+      console.log('Vote result:', result);
+      console.log('Options received:', result.options);
+      if (result.options && result.options.length > 0) {
+        setOptions(result.options);
+      }
       setHasVoted(true);
     } catch (error) {
       console.error('Error voting:', error);
