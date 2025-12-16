@@ -107,6 +107,10 @@ export default function EditProfileScreen() {
             console.log('Response:', response.status, data);
 
             if (response.ok) {
+                // Save updated user data to storage
+                await authStorage.setUser(data.user);
+                console.log('User data saved to storage:', data.user);
+
                 Alert.alert(
                     'Success!',
                     'Your profile has been updated successfully.',

@@ -1,3 +1,4 @@
+import { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,8 +10,10 @@ import {
   Share,
   Alert,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { Heart, Share2, ArrowRight } from 'lucide-react-native';
+import { authStorage } from '@/utils/authStorage';
+import API_BASE_URL from '@/config/api';
 
 const mockUserPolls = [
   {
@@ -50,6 +53,33 @@ const mockUserPolls = [
 ];
 
 export default function ProfileScreen() {
+  const [user, setUser] = useState<any>(null);
+
+  // Load user data from storage
+  const loadUserData = useCallback(async () => {
+    try {
+      const userData = await authStorage.getUser();
+      console.log('Loaded user data:', userData);
+      if (userData) {
+        setUser(userData);
+      }
+    } catch (error) {
+      console.error('Error loading user data:', error);
+    }
+  }, []);
+
+  // Load on mount
+  useEffect(() => {
+    loadUserData();
+  }, [loadUserData]);
+
+  // Reload when screen comes into focus (after editing profile)
+  useFocusEffect(
+    useCallback(() => {
+      loadUserData();
+    }, [loadUserData])
+  );
+
   const handleEditProfile = () => {
     router.push('/edit-profile');
   };
@@ -63,6 +93,18 @@ export default function ProfileScreen() {
     } catch (error) {
       Alert.alert('Error', 'Unable to share profile');
     }
+  };
+
+  // Get profile image URL (handle relative paths)
+  const getProfileImageUrl = () => {
+    if (!user?.profilePicture) {
+      return 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200';
+    }
+    if (user.profilePicture.startsWith('http')) {
+      return user.profilePicture;
+    }
+    // Convert relative path to full URL
+    return `${API_BASE_URL.replace('/api', '')}${user.profilePicture}`;
   };
 
   return (
@@ -87,15 +129,13 @@ export default function ProfileScreen() {
         <View style={styles.profileHeader}>
           <View style={styles.profileTopRow}>
             <Image
-              source={{
-                uri: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200',
-              }}
+              source={{ uri: getProfileImageUrl() }}
               style={styles.profileImage}
             />
             <View style={styles.profileInfo}>
-              <Text style={styles.name}>Abigail</Text>
+              <Text style={styles.name}>{user?.fullName || 'User'}</Text>
               <Text style={styles.bio}>
-                Bicycle enthusiast. Love to talk about bicycles and cycling!
+                {user?.bio || 'No bio yet'}
               </Text>
               <View style={styles.statsRow}>
                 <Text style={styles.statsText}>
