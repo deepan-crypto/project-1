@@ -579,7 +579,7 @@ const styles = StyleSheet.create({
   },
   pollOptionVoted: {
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: '#6C7278',
     backgroundColor: '#F5F5F5',
     position: 'relative',
     overflow: 'hidden',
