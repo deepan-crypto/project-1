@@ -9,51 +9,26 @@ import {
   TouchableOpacity,
   Share,
   Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
 import { Heart, Share2, ArrowRight } from 'lucide-react-native';
 import { authStorage } from '@/utils/authStorage';
 import API_BASE_URL from '@/config/api';
 
-const mockUserPolls = [
-  {
-    id: '1',
-    question: 'Whats best for a daily ride?',
-    options: [
-      { text: 'Hybrid', percentage: 20 },
-      { text: 'City Bike', percentage: 80 },
-    ],
-    likes: 363,
-    voted: false,
-    time: 'Today',
-  },
-  {
-    id: '2',
-    question: 'Average distance for a good workout!',
-    options: [
-      { text: '25kms', percentage: 75 },
-      { text: '50kms', percentage: 52 },
-    ],
-    likes: 363,
-    voted: true,
-    time: '1 year ago',
-  },
-  {
-    id: '3',
-    question: 'Speed thats good for climbing',
-    options: [
-      { text: '24', percentage: 35 },
-      { text: '20', percentage: 50 },
-      { text: '22', percentage: 75 },
-    ],
-    likes: 363,
-    voted: true,
-    time: '2 years ago',
-  },
-];
+interface UserPoll {
+  id: string;
+  question: string;
+  options: { text: string; percentage: number }[];
+  likes: number;
+  hasVoted: boolean;
+  createdAt: string;
+}
 
 export default function ProfileScreen() {
   const [user, setUser] = useState<any>(null);
+  const [polls, setPolls] = useState<UserPoll[]>([]);
+  const [loadingPolls, setLoadingPolls] = useState(true);
 
   // Load user data from storage
   const loadUserData = useCallback(async () => {
@@ -62,11 +37,46 @@ export default function ProfileScreen() {
       console.log('Loaded user data:', userData);
       if (userData) {
         setUser(userData);
+        // Fetch user's polls
+        fetchUserPolls(userData.id);
       }
     } catch (error) {
       console.error('Error loading user data:', error);
     }
   }, []);
+
+  // Fetch user's polls from API
+  const fetchUserPolls = async (userId: string) => {
+    try {
+      setLoadingPolls(true);
+      const response = await fetch(`${API_BASE_URL}/polls/user/${userId}`);
+      const data = await response.json();
+
+      if (response.ok && data.polls) {
+        setPolls(data.polls);
+      }
+    } catch (error) {
+      console.error('Error fetching user polls:', error);
+    } finally {
+      setLoadingPolls(false);
+    }
+  };
+
+  // Format time ago
+  const formatTimeAgo = (dateString: string) => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString();
+  };
 
   // Load on mount
   useEffect(() => {
@@ -163,78 +173,88 @@ export default function ProfileScreen() {
 
         {/* Polls Section */}
         <View style={styles.pollsSection}>
-          {mockUserPolls.map((poll) => (
-            <View key={poll.id} style={styles.pollCard}>
-              {/* Poll Header with User Info */}
-              <View style={styles.pollHeader}>
-                <View style={styles.pollUserInfo}>
-                  <Image
-                    source={{
-                      uri: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100',
-                    }}
-                    style={styles.smallAvatar}
-                  />
-                  <View style={styles.pollTextInfo}>
-                    <Text style={styles.pollUserName}>Abigail</Text>
-                    <Text style={styles.pollQuestion}>{poll.question}</Text>
-                  </View>
-                </View>
-                <Text style={styles.pollTime}>{poll.time}</Text>
-              </View>
-
-              {/* Voted Label */}
-              {poll.voted && (
-                <Text style={styles.votedLabel}>You voted</Text>
-              )}
-
-              {/* Poll Options */}
-              <View style={styles.pollOptions}>
-                {poll.options.map((option, index) => (
-                  <View key={index} style={styles.pollOptionContainer}>
-                    <View style={[
-                      styles.pollOption,
-                      poll.voted && styles.pollOptionVoted,
-                      !poll.voted && styles.pollOptionUnvoted,
-                    ]}>
-                      <View style={styles.optionContent}>
-                        {poll.voted && (
-                          <View
-                            style={[
-                              styles.optionProgress,
-                              { width: `${option.percentage}%` },
-                            ]}
-                          />
-                        )}
-                        <Text style={[
-                          styles.optionText,
-                          poll.voted && styles.optionTextVoted,
-                          !poll.voted && styles.optionTextUnvoted,
-                        ]}>{option.text}</Text>
-                      </View>
-                    </View>
-                    {poll.voted && (
-                      <Text style={styles.percentage}>{option.percentage}%</Text>
-                    )}
-                  </View>
-                ))}
-              </View>
-
-              {/* Poll Footer with Actions */}
-              <View style={styles.pollFooter}>
-                <View style={styles.footerLeft}>
-                  <TouchableOpacity style={styles.actionButton}>
-                    <Heart size={18} color="#6C7278" />
-                    <Text style={styles.likesCount}>{poll.likes}</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.footerRight}>
-                  <TouchableOpacity style={styles.actionButton}>
-                    <Share2 size={18} color="#6C7278" />
-                  </TouchableOpacity>
-                </View>
-              </View>
+          {loadingPolls ? (
+            <View style={styles.pollsLoading}>
+              <ActivityIndicator size="small" color="#458FD0" />
+              <Text style={styles.pollsLoadingText}>Loading polls...</Text>
             </View>
-          ))}
+          ) : polls.length === 0 ? (
+            <View style={styles.noPollsContainer}>
+              <Text style={styles.noPollsText}>No polls yet</Text>
+              <Text style={styles.noPollsSubtext}>Create your first poll!</Text>
+            </View>
+          ) : (
+            polls.map((poll: UserPoll) => (
+              <View key={poll.id} style={styles.pollCard}>
+                {/* Poll Header with User Info */}
+                <View style={styles.pollHeader}>
+                  <View style={styles.pollUserInfo}>
+                    <Image
+                      source={{ uri: getProfileImageUrl() }}
+                      style={styles.smallAvatar}
+                    />
+                    <View style={styles.pollTextInfo}>
+                      <Text style={styles.pollUserName}>{user?.fullName || 'User'}</Text>
+                      <Text style={styles.pollQuestion}>{poll.question}</Text>
+                    </View>
+                  </View>
+                  <Text style={styles.pollTime}>{formatTimeAgo(poll.createdAt)}</Text>
+                </View>
+
+                {/* Voted Label */}
+                {poll.hasVoted && (
+                  <Text style={styles.votedLabel}>You voted</Text>
+                )}
+
+                {/* Poll Options */}
+                <View style={styles.pollOptions}>
+                  {poll.options.map((option: { text: string; percentage: number }, index: number) => (
+                    <View key={index} style={styles.pollOptionContainer}>
+                      <View style={[
+                        styles.pollOption,
+                        poll.hasVoted && styles.pollOptionVoted,
+                        !poll.hasVoted && styles.pollOptionUnvoted,
+                      ]}>
+                        <View style={styles.optionContent}>
+                          {poll.hasVoted && (
+                            <View
+                              style={[
+                                styles.optionProgress,
+                                { width: `${option.percentage}%` },
+                              ]}
+                            />
+                          )}
+                          <Text style={[
+                            styles.optionText,
+                            poll.hasVoted && styles.optionTextVoted,
+                            !poll.hasVoted && styles.optionTextUnvoted,
+                          ]}>{option.text}</Text>
+                        </View>
+                      </View>
+                      {poll.hasVoted && (
+                        <Text style={styles.percentage}>{option.percentage}%</Text>
+                      )}
+                    </View>
+                  ))}
+                </View>
+
+                {/* Poll Footer with Actions */}
+                <View style={styles.pollFooter}>
+                  <View style={styles.footerLeft}>
+                    <TouchableOpacity style={styles.actionButton}>
+                      <Heart size={18} color="#6C7278" />
+                      <Text style={styles.likesCount}>{poll.likes}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.footerRight}>
+                    <TouchableOpacity style={styles.actionButton}>
+                      <Share2 size={18} color="#6C7278" />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </View>
+            ))
+          )}
         </View>
       </ScrollView>
     </View>
@@ -492,4 +512,28 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6C7278',
   },
+  pollsLoading: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  pollsLoadingText: {
+    marginTop: 8,
+    color: '#666',
+    fontSize: 14,
+  },
+  noPollsContainer: {
+    padding: 40,
+    alignItems: 'center',
+  },
+  noPollsText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  noPollsSubtext: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 4,
+  },
 });
+

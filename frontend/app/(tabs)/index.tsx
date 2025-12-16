@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,71 +7,82 @@ import {
   StatusBar,
   TouchableOpacity,
   Image,
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
+import { useFocusEffect } from 'expo-router';
 import PollCard from '@/components/PollCard';
+import API_BASE_URL from '@/config/api';
 
-const mockPolls = [
-  {
-    id: '1',
-    user: {
-      name: 'Abigail',
-      avatar: 'https://images.pexels.com/photos/774909/pexels-photo-774909.jpeg?auto=compress&cs=tinysrgb&w=100',
-    },
-    question: 'Which is the ultimate weekend vibe?',
-    options: [
-      { id: '1', text: 'Beach time', percentage: 0 },
-      { id: '2', text: 'Netflix & Chill', percentage: 0 },
-      { id: '3', text: 'Hiking Adventure', percentage: 0 },
-    ],
-    likes: 363,
-    hasVoted: false,
-  },
-  {
-    id: '2',
-    user: {
-      name: 'Maxj13',
-      avatar: 'https://images.pexels.com/photos/1222271/pexels-photo-1222271.jpeg?auto=compress&cs=tinysrgb&w=100',
-    },
-    question: 'Which is the must-watch show of the year?',
-    options: [
-      { id: '1', text: 'The Last of Us', percentage: 20 },
-      { id: '2', text: 'Wednesday', percentage: 80 },
-    ],
-    likes: 161,
-    hasVoted: true,
-  },
-  {
-    id: '3',
-    user: {
-      name: 'Dani_kj',
-      avatar: 'https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=100',
-    },
-    question: 'What motivates you the most?',
-    options: [
-      { id: '1', text: 'Passion', percentage: 55, emoji: '🔥' },
-      { id: '2', text: 'Family', percentage: 45, emoji: '❤️' },
-    ],
-    likes: 690,
-    hasVoted: true,
-  },
-  {
-    id: '4',
-    user: {
-      name: 'Tabith',
-      avatar: 'https://images.pexels.com/photos/1542085/pexels-photo-1542085.jpeg?auto=compress&cs=tinysrgb&w=100',
-    },
-    question: "What's worse during a presentation?",
-    options: [
-      { id: '1', text: 'Technical Glitches', percentage: 0, emoji: '💻' },
-      { id: '2', text: 'Forgetting Your Lines', percentage: 0, emoji: '😅' },
-      { id: '3', text: "Questions You Can't Answer", percentage: 0, emoji: '🤔' },
-    ],
-    likes: 245,
-    hasVoted: false,
-  },
-];
+interface Poll {
+  id: string;
+  user: {
+    name: string;
+    avatar: string;
+  };
+  question: string;
+  options: {
+    id: number;
+    text: string;
+    percentage: number;
+    emoji?: string;
+  }[];
+  likes: number;
+  hasVoted: boolean;
+}
 
 export default function HomeScreen() {
+  const [polls, setPolls] = useState<Poll[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const fetchPolls = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/polls`);
+      const data = await response.json();
+
+      if (response.ok && data.polls) {
+        // Transform API data to match PollCard props
+        const transformedPolls = data.polls.map((poll: any) => ({
+          id: poll.id,
+          user: {
+            name: poll.user.name,
+            avatar: poll.user.avatar?.startsWith('http')
+              ? poll.user.avatar
+              : `${API_BASE_URL.replace('/api', '')}${poll.user.avatar}`,
+          },
+          question: poll.question,
+          options: poll.options,
+          likes: poll.likes,
+          hasVoted: poll.hasVoted,
+        }));
+        setPolls(transformedPolls);
+      }
+    } catch (error) {
+      console.error('Error fetching polls:', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  // Load on mount
+  useEffect(() => {
+    fetchPolls();
+  }, []);
+
+  // Reload when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      fetchPolls();
+    }, [])
+  );
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchPolls();
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
@@ -86,15 +97,30 @@ export default function HomeScreen() {
       </View>
 
       {/* Poll Feed */}
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
-        {mockPolls.map((poll) => (
-          <PollCard key={poll.id} {...poll} />
-        ))}
-      </ScrollView>
+      {loading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#458FD0" />
+          <Text style={styles.loadingText}>Loading polls...</Text>
+        </View>
+      ) : polls.length === 0 ? (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>No polls yet</Text>
+          <Text style={styles.emptySubtext}>Be the first to create a poll!</Text>
+        </View>
+      ) : (
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+        >
+          {polls.map((poll) => (
+            <PollCard key={poll.id} {...poll} />
+          ))}
+        </ScrollView>
+      )}
     </View>
   );
 }
@@ -123,5 +149,32 @@ const styles = StyleSheet.create({
   content: {
     paddingBottom: 100,
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    color: '#666',
+    fontSize: 14,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 8,
+  },
 });
+
 
