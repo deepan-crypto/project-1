@@ -28,13 +28,6 @@ const signup = async (req, res, next) => {
             throw new Error('Please provide a valid email address');
         }
 
-        // Validate username format (alphanumeric, underscore, hyphen only)
-        const usernameRegex = /^[a-zA-Z0-9_-]+$/;
-        if (!usernameRegex.test(username)) {
-            res.status(400);
-            throw new Error('Username can only contain letters, numbers, underscores, and hyphens');
-        }
-
         // Validate username length
         if (username.length < 3) {
             res.status(400);
