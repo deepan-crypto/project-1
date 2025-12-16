@@ -17,7 +17,7 @@ const {
 // User profile routes
 router.get('/me', protect, getCurrentUser);
 router.get('/profile/:userId', getUserProfile);
-router.put('/profile', protect, updateProfile);
+router.put('/profile', protect, upload.single('profilePicture'), updateProfile);
 router.post('/upload-avatar', protect, upload.single('avatar'), uploadAvatar);
 
 // Follow/unfollow routes

@@ -69,7 +69,7 @@ const getCurrentUser = async (req, res, next) => {
 // @access  Private
 const updateProfile = async (req, res, next) => {
     try {
-        const { username, bio } = req.body;
+        const { fullName, username, bio } = req.body;
 
         const user = await User.findById(req.user._id);
 
@@ -78,9 +78,45 @@ const updateProfile = async (req, res, next) => {
             throw new Error('User not found');
         }
 
-        // Update fields if provided
-        if (username) user.username = username;
-        if (bio !== undefined) user.bio = bio;
+        // Validate fullName if provided (no numbers allowed)
+        if (fullName !== undefined && fullName.trim()) {
+            const nameRegex = /^[a-zA-Z\s]+$/;
+            if (!nameRegex.test(fullName.trim())) {
+                res.status(400);
+                throw new Error('Name can only contain letters and spaces, no numbers allowed');
+            }
+            user.fullName = fullName.trim();
+        }
+
+        // Validate and update username if provided
+        if (username !== undefined && username.trim()) {
+            // Check minimum length
+            if (username.length < 3) {
+                res.status(400);
+                throw new Error('Username must be at least 3 characters long');
+            }
+
+            // Check if username is different from current
+            if (username !== user.username) {
+                // Check if new username already exists
+                const existingUser = await User.findOne({ username });
+                if (existingUser) {
+                    res.status(400);
+                    throw new Error('This username is already taken. Please choose a different username.');
+                }
+                user.username = username;
+            }
+        }
+
+        // Update bio (can be empty string)
+        if (bio !== undefined) {
+            user.bio = bio;
+        }
+
+        // Handle profile picture upload if file is provided
+        if (req.file) {
+            user.profilePicture = `/uploads/avatars/${req.file.filename}`;
+        }
 
         await user.save();
 
@@ -90,6 +126,7 @@ const updateProfile = async (req, res, next) => {
             user: {
                 id: user._id,
                 fullName: user.fullName,
+                email: user.email,
                 username: user.username,
                 bio: user.bio,
                 profilePicture: user.profilePicture,
