@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Share, Alert } from 'react-native';
 import { Heart, Share2, Trash2 } from 'lucide-react-native';
+import { router } from 'expo-router';
 
 interface PollOption {
   id: string | number;
@@ -67,6 +68,11 @@ export default function PollCard({
     }
   };
 
+  const handleViewLikes = () => {
+    if (!id) return;
+    router.push(`/poll/${id}/likes`);
+  };
+
   return (
     <View style={styles.card}>
       {/* Header with user info */}
@@ -130,7 +136,9 @@ export default function PollCard({
             color={isLiked ? "#FF4444" : "#687684"}
             fill={isLiked ? "#FF4444" : "transparent"}
           />
-          <Text style={[styles.likesText, isLiked && styles.likedText]}>{likes}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleViewLikes}>
+          <Text style={[styles.likesText, isLiked && styles.likedText]}>{likes} likes</Text>
         </TouchableOpacity>
         <View style={styles.footerRight}>
           <TouchableOpacity style={styles.shareButton} onPress={handleShare}>

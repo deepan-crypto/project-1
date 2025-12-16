@@ -342,6 +342,36 @@ const deletePoll = async (req, res, next) => {
     }
 };
 
+// @desc    Get users who liked a poll
+// @route   GET /api/polls/:pollId/likes
+// @access  Public
+const getPollLikes = async (req, res, next) => {
+    try {
+        const poll = await Poll.findById(req.params.pollId)
+            .populate('likes', 'username fullName profilePicture');
+
+        if (!poll) {
+            res.status(404);
+            throw new Error('Poll not found');
+        }
+
+        const likedBy = poll.likes.map(user => ({
+            id: user._id,
+            username: user.username,
+            fullName: user.fullName,
+            profilePicture: user.profilePicture,
+        }));
+
+        res.status(200).json({
+            success: true,
+            count: likedBy.length,
+            users: likedBy,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     createPoll,
     getAllPolls,
@@ -351,4 +381,5 @@ module.exports = {
     unlikePoll,
     getPollDetails,
     deletePoll,
+    getPollLikes,
 };
