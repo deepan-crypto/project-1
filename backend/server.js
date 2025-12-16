@@ -8,6 +8,7 @@ const errorHandler = require('./middleware/errorHandler');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const pollRoutes = require('./routes/polls');
+const postRoutes = require('./routes/posts');
 const notificationRoutes = require('./routes/notifications');
 
 // Initialize express app
@@ -31,6 +32,7 @@ app.use('/uploads', express.static('uploads'));
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/polls', pollRoutes);
+app.use('/api/posts', postRoutes);
 app.use('/api/notifications', notificationRoutes);
 
 // Health check route
