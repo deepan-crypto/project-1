@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import API_BASE_URL from '@/config/api';
+import { authStorage } from '@/utils/authStorage';
 import {
   View,
   Text,
@@ -63,8 +64,9 @@ export default function LoginScreen() {
       const data = await response.json();
 
       if (response.ok) {
-        // Store token (you can use AsyncStorage here)
-        // await AsyncStorage.setItem('token', data.token);
+        // Store token and user data securely
+        await authStorage.setToken(data.token);
+        await authStorage.setUser(data.user);
         router.replace('/(tabs)');
       } else {
         // Handle backend errors

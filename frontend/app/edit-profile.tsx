@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import API_BASE_URL from '@/config/api';
+import { authStorage } from '@/utils/authStorage';
 import {
     View,
     Text,
@@ -53,6 +54,15 @@ export default function EditProfileScreen() {
     const handleSave = async () => {
         setLoading(true);
         try {
+            // Get token from storage
+            const token = await authStorage.getToken();
+
+            if (!token) {
+                Alert.alert('Error', 'Please log in to update your profile');
+                router.replace('/auth/login');
+                return;
+            }
+
             const formData = new FormData();
 
             // Add text fields if they have values
@@ -73,13 +83,10 @@ export default function EditProfileScreen() {
                 } as any);
             }
 
-            // Get token from storage (you'll need to implement token storage)
-            // For now, this will fail if no token
             const response = await fetch(`${API_BASE_URL}/users/profile`, {
                 method: 'PUT',
                 headers: {
-                    // Add your auth token here
-                    // 'Authorization': `Bearer ${token}`,
+                    'Authorization': `Bearer ${token}`,
                 },
                 body: formData,
             });
