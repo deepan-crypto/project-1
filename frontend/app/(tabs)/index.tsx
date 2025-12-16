@@ -37,7 +37,7 @@ const mockPolls = [
       { id: '1', text: 'The Last of Us', percentage: 20 },
       { id: '2', text: 'Wednesday', percentage: 80 },
     ],
-    likes: 363,
+    likes: 161,
     hasVoted: true,
   },
   {
@@ -48,8 +48,8 @@ const mockPolls = [
     },
     question: 'What motivates you the most?',
     options: [
-      { id: '1', text: 'Passion', percentage: 55 },
-      { id: '2', text: 'Family', percentage: 45 },
+      { id: '1', text: 'Passion', percentage: 55, emoji: '🔥' },
+      { id: '2', text: 'Family', percentage: 45, emoji: '❤️' },
     ],
     likes: 690,
     hasVoted: true,
@@ -62,9 +62,9 @@ const mockPolls = [
     },
     question: "What's worse during a presentation?",
     options: [
-      { id: '1', text: 'Technical Glitches', percentage: 0 },
-      { id: '2', text: 'Forgetting Your Lines', percentage: 0 },
-      { id: '3', text: "Questions You Can't Answer", percentage: 0 },
+      { id: '1', text: 'Technical Glitches', percentage: 0, emoji: '💻' },
+      { id: '2', text: 'Forgetting Your Lines', percentage: 0, emoji: '😅' },
+      { id: '3', text: "Questions You Can't Answer", percentage: 0, emoji: '🤔' },
     ],
     likes: 245,
     hasVoted: false,
@@ -76,6 +76,7 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
+      {/* Logo Header */}
       <View style={styles.logoHeader}>
         <Image
           source={require('../../assets/images/ican.png')}
@@ -84,6 +85,7 @@ export default function HomeScreen() {
         />
       </View>
 
+      {/* Poll Feed */}
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
@@ -100,7 +102,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: '#FFFFFF',
   },
   logoHeader: {
     paddingTop: 40,
@@ -116,8 +118,10 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   content: {
-    padding: 16,
+    paddingBottom: 100,
   },
 });
+

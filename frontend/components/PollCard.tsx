@@ -5,6 +5,7 @@ interface PollOption {
   id: string;
   text: string;
   percentage: number;
+  emoji?: string;
 }
 
 interface PollCardProps {
@@ -27,6 +28,7 @@ export default function PollCard({
 }: PollCardProps) {
   return (
     <View style={styles.card}>
+      {/* Header with user info */}
       <View style={styles.header}>
         <Image source={{ uri: user.avatar }} style={styles.avatar} />
         <View style={styles.userInfo}>
@@ -35,33 +37,47 @@ export default function PollCard({
         </View>
       </View>
 
+      {/* Poll Options */}
       <View style={styles.options}>
         {options.map((option) => (
-          <TouchableOpacity key={option.id} style={styles.optionButton}>
-            <View style={styles.optionContent}>
-              {hasVoted && (
-                <View
-                  style={[
-                    styles.optionProgress,
-                    { width: `${option.percentage}%` },
-                  ]}
-                />
-              )}
-              <Text style={styles.optionText}>{option.text}</Text>
-            </View>
+          <View key={option.id} style={styles.optionRow}>
+            <TouchableOpacity
+              style={[
+                styles.optionButton,
+                hasVoted && styles.optionButtonVoted
+              ]}
+            >
+              <View style={styles.optionContent}>
+                {hasVoted && (
+                  <View
+                    style={[
+                      styles.optionProgress,
+                      { width: `${option.percentage}%` },
+                    ]}
+                  />
+                )}
+                <Text style={[
+                  styles.optionText,
+                  hasVoted && styles.optionTextVoted
+                ]}>
+                  {option.text}{option.emoji ? ` ${option.emoji}` : ''}
+                </Text>
+              </View>
+            </TouchableOpacity>
             {hasVoted && (
               <Text style={styles.percentage}>{option.percentage}%</Text>
             )}
-          </TouchableOpacity>
+          </View>
         ))}
       </View>
 
+      {/* Footer with likes and share */}
       <View style={styles.footer}>
-        <View style={styles.likes}>
+        <TouchableOpacity style={styles.likeButton}>
           <Heart size={18} color="#687684" />
           <Text style={styles.likesText}>{likes}</Text>
-        </View>
-        <TouchableOpacity>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.shareButton}>
           <Share2 size={18} color="#687684" />
         </TouchableOpacity>
       </View>
@@ -72,18 +88,16 @@ export default function PollCard({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
+    borderRadius: 0,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    marginBottom: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E8E8E8',
   },
   header: {
     flexDirection: 'row',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   avatar: {
     width: 40,
@@ -96,42 +110,46 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   userName: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
-    color: '#101720',
-    marginBottom: 4,
+    color: '#000000',
+    marginBottom: 2,
   },
   question: {
     fontSize: 14,
-    color: '#687684',
+    color: '#6C7278',
     lineHeight: 20,
   },
   options: {
     gap: 8,
-    marginBottom: 16,
+    marginBottom: 12,
   },
-  optionButton: {
+  optionRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+  },
+  optionButton: {
+    flex: 1,
     borderWidth: 1,
     borderColor: '#458FD0',
-    borderRadius: 8,
+    borderRadius: 25,
     overflow: 'hidden',
   },
+  optionButtonVoted: {
+    borderWidth: 0,
+  },
   optionContent: {
-    flex: 1,
     position: 'relative',
     paddingVertical: 10,
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
   },
   optionProgress: {
     position: 'absolute',
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: 'rgba(69, 143, 208, 0.2)',
-    borderRadius: 8,
+    backgroundColor: '#458FD0',
+    borderRadius: 25,
   },
   optionText: {
     fontSize: 14,
@@ -139,26 +157,38 @@ const styles = StyleSheet.create({
     zIndex: 1,
     textAlign: 'center',
   },
+  optionTextVoted: {
+    color: '#FFFFFF',
+    fontWeight: '500',
+  },
   percentage: {
     fontSize: 14,
     color: '#6C7278',
     fontWeight: '500',
-    paddingHorizontal: 12,
+    marginLeft: 12,
+    minWidth: 40,
+    textAlign: 'right',
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingTop: 4,
   },
-  likes: {
+  likeButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    padding: 4,
+  },
+  shareButton: {
+    padding: 4,
   },
   likesText: {
     fontSize: 14,
     color: '#687684',
   },
 });
+
 
 
