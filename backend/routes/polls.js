@@ -9,6 +9,7 @@ const {
     likePoll,
     unlikePoll,
     getPollDetails,
+    deletePoll,
 } = require('../controllers/pollController');
 
 // Poll CRUD routes
@@ -16,6 +17,7 @@ router.post('/', protect, createPoll);
 router.get('/', getAllPolls);
 router.get('/user/:userId', getUserPolls);
 router.get('/:pollId', getPollDetails);
+router.delete('/:pollId', protect, deletePoll);
 
 // Poll interaction routes
 router.post('/:pollId/vote', protect, votePoll);
@@ -23,3 +25,4 @@ router.post('/:pollId/like', protect, likePoll);
 router.delete('/:pollId/unlike', protect, unlikePoll);
 
 module.exports = router;
+

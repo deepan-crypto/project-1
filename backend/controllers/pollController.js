@@ -65,6 +65,7 @@ const getAllPolls = async (req, res, next) => {
 
             return {
                 id: poll._id,
+                userId: poll.userId._id,
                 user: {
                     name: poll.userId.username,
                     avatar: poll.userId.profilePicture,
@@ -311,6 +312,36 @@ const getPollDetails = async (req, res, next) => {
     }
 };
 
+// @desc    Delete a poll
+// @route   DELETE /api/polls/:pollId
+// @access  Private
+const deletePoll = async (req, res, next) => {
+    try {
+        const poll = await Poll.findById(req.params.pollId);
+
+        if (!poll) {
+            res.status(404);
+            throw new Error('Poll not found');
+        }
+
+        // Check if user owns the poll
+        if (poll.userId.toString() !== req.user._id.toString()) {
+            res.status(403);
+            throw new Error('Not authorized to delete this poll');
+        }
+
+        // Delete the poll
+        await poll.deleteOne();
+
+        res.status(200).json({
+            success: true,
+            message: 'Poll deleted successfully',
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     createPoll,
     getAllPolls,
@@ -319,4 +350,5 @@ module.exports = {
     likePoll,
     unlikePoll,
     getPollDetails,
+    deletePoll,
 };

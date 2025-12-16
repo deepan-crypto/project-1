@@ -1,14 +1,15 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
-import { Heart, Share2 } from 'lucide-react-native';
+import { Heart, Share2, Trash2 } from 'lucide-react-native';
 
 interface PollOption {
-  id: string;
+  id: string | number;
   text: string;
   percentage: number;
   emoji?: string;
 }
 
 interface PollCardProps {
+  id?: string;
   user: {
     name: string;
     avatar: string;
@@ -17,14 +18,17 @@ interface PollCardProps {
   options: PollOption[];
   likes: number;
   hasVoted?: boolean;
+  onDelete?: (id: string) => void;
 }
 
 export default function PollCard({
+  id,
   user,
   question,
   options,
   likes,
   hasVoted = false,
+  onDelete,
 }: PollCardProps) {
   return (
     <View style={styles.card}>
@@ -42,13 +46,12 @@ export default function PollCard({
         {options.map((option, index) => {
           return (
             <TouchableOpacity
-              key={option.id}
+              key={option.id || index}
               style={[
                 styles.option,
                 hasVoted && styles.optionWithProgress,
                 !hasVoted && styles.optionUnvoted,
               ]}
-              disabled={hasVoted}
             >
               {hasVoted && (
                 <View
@@ -59,17 +62,15 @@ export default function PollCard({
                 />
               )}
               <View style={styles.optionContent}>
-                <View style={styles.optionTextContainer}>
-                  <Text
-                    style={[
-                      styles.optionText,
-                      hasVoted && styles.optionTextVoted,
-                      !hasVoted && styles.optionTextUnvoted,
-                    ]}
-                  >
-                    {option.text}{option.emoji ? ` ${option.emoji}` : ''}
-                  </Text>
-                </View>
+                <Text
+                  style={[
+                    styles.optionText,
+                    hasVoted && styles.optionTextVoted,
+                    !hasVoted && styles.optionTextUnvoted,
+                  ]}
+                >
+                  {option.text}{option.emoji ? ` ${option.emoji}` : ''}
+                </Text>
                 {hasVoted && (
                   <Text style={styles.optionPercentageVoted}>
                     {option.percentage}%
@@ -86,9 +87,19 @@ export default function PollCard({
           <Heart size={18} color="#687684" />
           <Text style={styles.likesText}>{likes}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.shareButton}>
-          <Share2 size={18} color="#687684" />
-        </TouchableOpacity>
+        <View style={styles.footerRight}>
+          <TouchableOpacity style={styles.shareButton}>
+            <Share2 size={18} color="#687684" />
+          </TouchableOpacity>
+          {onDelete && id && (
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => onDelete(id)}
+            >
+              <Trash2 size={18} color="#FF4444" />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
     </View>
   );
@@ -227,7 +238,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#3f87ceff',
   },
+  footerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  deleteButton: {
+    padding: 4,
+  },
 });
-
-
-

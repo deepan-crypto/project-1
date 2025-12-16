@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
-import { Heart, Share2, ArrowRight } from 'lucide-react-native';
+import { Heart, Share2, ArrowRight, Trash2 } from 'lucide-react-native';
 import { authStorage } from '@/utils/authStorage';
 import API_BASE_URL from '@/config/api';
 
@@ -117,6 +117,44 @@ export default function ProfileScreen() {
     }
     // Convert relative path to full URL
     return `${API_BASE_URL.replace('/api', '')}${user.profilePicture}`;
+  };
+
+  // Handle delete poll
+  const handleDeletePoll = async (pollId: string) => {
+    Alert.alert(
+      'Delete Poll',
+      'Are you sure you want to delete this poll?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const token = await authStorage.getToken();
+              const response = await fetch(`${API_BASE_URL}/polls/${pollId}`, {
+                method: 'DELETE',
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                },
+              });
+
+              if (response.ok) {
+                // Remove from local state
+                setPolls(polls.filter(p => p.id !== pollId));
+                Alert.alert('Success', 'Poll deleted successfully');
+              } else {
+                const data = await response.json();
+                Alert.alert('Error', data.message || 'Failed to delete poll');
+              }
+            } catch (error) {
+              console.error('Error deleting poll:', error);
+              Alert.alert('Error', 'Network error. Please try again.');
+            }
+          }
+        }
+      ]
+    );
   };
 
   return (
@@ -249,6 +287,12 @@ export default function ProfileScreen() {
                   <View style={styles.footerRight}>
                     <TouchableOpacity style={styles.actionButton}>
                       <Share2 size={18} color="#6C7278" />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.actionButton}
+                      onPress={() => handleDeletePoll(poll.id)}
+                    >
+                      <Trash2 size={18} color="#FF4444" />
                     </TouchableOpacity>
                   </View>
                 </View>

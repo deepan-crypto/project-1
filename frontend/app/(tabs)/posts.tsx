@@ -171,39 +171,39 @@ export default function PostsScreen() {
               />
             </View>
 
-            {/* Option 1 */}
+            {/* Thought 1 */}
             <View style={styles.thoughtBox}>
-              <Text style={styles.thoughtLabel}>Option 1 *</Text>
+              <Text style={styles.thoughtLabel}>Thought 1</Text>
               <TextInput
                 style={styles.thoughtInput}
                 value={thought1}
                 onChangeText={setThought1}
-                placeholder="First option"
+                placeholder="First thought"
                 placeholderTextColor="#6C7278"
                 multiline={true}
               />
             </View>
 
-            {/* Option 2 */}
+            {/* Thought 2 */}
             <View style={styles.thoughtBox}>
-              <Text style={styles.thoughtLabel}>Option 2 *</Text>
+              <Text style={styles.thoughtLabel}>Thought 2</Text>
               <TextInput
                 style={styles.thoughtInput}
                 value={thought2}
                 onChangeText={setThought2}
-                placeholder="Second option"
+                placeholder="Second thought"
                 placeholderTextColor="#6C7278"
               />
             </View>
 
-            {/* Option 3 */}
+            {/* Thought 3 */}
             <View style={styles.thoughtBox}>
-              <Text style={styles.thoughtLabel}>Option 3 (optional)</Text>
+              <Text style={styles.thoughtLabel}>Thought 3</Text>
               <TextInput
                 style={styles.thoughtInput}
                 value={thought3}
                 onChangeText={setThought3}
-                placeholder="Third option"
+                placeholder="Third thought"
                 placeholderTextColor="#6C7278"
               />
             </View>

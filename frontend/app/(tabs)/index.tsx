@@ -9,13 +9,16 @@ import {
   Image,
   ActivityIndicator,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import PollCard from '@/components/PollCard';
 import API_BASE_URL from '@/config/api';
+import { authStorage } from '@/utils/authStorage';
 
 interface Poll {
   id: string;
+  userId?: string;
   user: {
     name: string;
     avatar: string;
@@ -35,6 +38,18 @@ export default function HomeScreen() {
   const [polls, setPolls] = useState<Poll[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  // Load current user ID
+  useEffect(() => {
+    const loadUser = async () => {
+      const user = await authStorage.getUser();
+      if (user) {
+        setCurrentUserId(user.id);
+      }
+    };
+    loadUser();
+  }, []);
 
   const fetchPolls = async () => {
     try {
@@ -45,6 +60,7 @@ export default function HomeScreen() {
         // Transform API data to match PollCard props
         const transformedPolls = data.polls.map((poll: any) => ({
           id: poll.id,
+          userId: poll.userId,
           user: {
             name: poll.user.name,
             avatar: poll.user.avatar?.startsWith('http')
@@ -64,6 +80,43 @@ export default function HomeScreen() {
       setLoading(false);
       setRefreshing(false);
     }
+  };
+
+  // Handle delete poll
+  const handleDeletePoll = async (pollId: string) => {
+    Alert.alert(
+      'Delete Poll',
+      'Are you sure you want to delete this poll?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              const token = await authStorage.getToken();
+              const response = await fetch(`${API_BASE_URL}/polls/${pollId}`, {
+                method: 'DELETE',
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                },
+              });
+
+              if (response.ok) {
+                setPolls(polls.filter(p => p.id !== pollId));
+                Alert.alert('Success', 'Poll deleted successfully');
+              } else {
+                const data = await response.json();
+                Alert.alert('Error', data.message || 'Failed to delete poll');
+              }
+            } catch (error) {
+              console.error('Error deleting poll:', error);
+              Alert.alert('Error', 'Network error. Please try again.');
+            }
+          }
+        }
+      ]
+    );
   };
 
   // Load on mount
@@ -117,7 +170,11 @@ export default function HomeScreen() {
           }
         >
           {polls.map((poll) => (
-            <PollCard key={poll.id} {...poll} />
+            <PollCard
+              key={poll.id}
+              {...poll}
+              onDelete={poll.userId === currentUserId ? handleDeletePoll : undefined}
+            />
           ))}
         </ScrollView>
       )}
