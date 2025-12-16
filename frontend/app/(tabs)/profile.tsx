@@ -67,7 +67,16 @@ export default function ProfileScreen() {
 
   return (
     <View style={styles.container}>
-      <StatusBar barStyle="light-content" />
+      <StatusBar barStyle="dark-content" />
+
+      {/* Logo Header */}
+      <View style={styles.logoHeader}>
+        <Image
+          source={require('../../assets/images/ican.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+      </View>
 
       <ScrollView
         style={styles.scrollView}
@@ -198,10 +207,23 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   content: {
-    paddingTop: 50,
+    paddingTop: 0,
     paddingBottom: 100,
     backgroundColor: '#FFFFFF',
     flexGrow: 1,
+  },
+  // Logo Header Styles
+  logoHeader: {
+    paddingTop: 40,
+    paddingBottom: 12,
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+  },
+  logo: {
+    width: 30,
+    height: 40,
   },
   // Profile Header Styles
   profileHeader: {
