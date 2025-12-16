@@ -40,41 +40,32 @@ export default function PollCard({
       {/* Poll Options */}
       <View style={styles.optionsContainer}>
         {options.map((option, index) => {
-          const isThisOptionVoted = hasVoted && option.percentage > 0 && option.percentage === Math.max(...options.map(o => o.percentage));
-
           return (
             <TouchableOpacity
               key={option.id}
-              style={[styles.option, hasVoted && styles.optionWithProgress]}
+              style={[styles.option, styles.optionWithProgress]}
               disabled={hasVoted}
             >
-              {hasVoted && (
-                <View
-                  style={[
-                    styles.progressBar,
-                    { width: `${option.percentage}%` },
-                    isThisOptionVoted ? styles.progressBarVoted : styles.progressBarNotVoted,
-                  ]}
-                />
-              )}
+              <View
+                style={[
+                  styles.progressBar,
+                  { width: `${option.percentage}%` },
+                  hasVoted ? styles.progressBarVoted : styles.progressBarUnvoted,
+                ]}
+              />
               <View style={styles.optionContent}>
                 <View style={styles.optionTextContainer}>
                   <Text
                     style={[
                       styles.optionText,
-                      isThisOptionVoted && styles.optionTextVoted,
+                      !hasVoted && styles.optionTextUnvoted,
                     ]}
                   >
                     {option.text}{option.emoji ? ` ${option.emoji}` : ''}
                   </Text>
                 </View>
                 {hasVoted && (
-                  <Text
-                    style={[
-                      styles.optionPercentage,
-                      isThisOptionVoted && styles.optionPercentageVoted,
-                    ]}
-                  >
+                  <Text style={styles.optionPercentage}>
                     {option.percentage}%
                   </Text>
                 )}
@@ -157,13 +148,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   progressBarVoted: {
-    backgroundColor: '#458FD0', // Blue for voted option
+    backgroundColor: '#6C7278', // Gray for voted options
   },
   progressBarNotVoted: {
-    backgroundColor: '#6C7278', // Gray for other options when poll is voted
+    backgroundColor: '#6C7278', // Gray (not used, keeping for compatibility)
   },
   progressBarUnvoted: {
-    backgroundColor: '#F5F5F5', // Light gray when poll not voted
+    backgroundColor: '#458FD0', // Blue for unvoted options
   },
   optionContent: {
     flexDirection: 'row',
@@ -186,6 +177,10 @@ const styles = StyleSheet.create({
     color: '#101720',
   },
   optionTextVoted: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  optionTextUnvoted: {
     color: '#FFFFFF',
     fontWeight: '600',
   },
