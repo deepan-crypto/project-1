@@ -100,6 +100,8 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
   },
   logo: {
     width: 30,
