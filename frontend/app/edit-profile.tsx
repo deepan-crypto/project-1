@@ -27,13 +27,13 @@ export default function EditProfileScreen() {
 
     return (
         <View style={styles.container}>
-            <StatusBar barStyle="light-content" />
+            <StatusBar barStyle="dark-content" />
 
             {/* Header with Close Button */}
             <View style={styles.header}>
                 <Text style={styles.headerTitle}>Profile edit</Text>
                 <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-                    <X size={24} color="#FFFFFF" />
+                    <X size={24} color="#101720" />
                 </TouchableOpacity>
             </View>
 
@@ -97,7 +97,7 @@ export default function EditProfileScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#222222',
+        backgroundColor: '#FFFFFF',
     },
     header: {
         flexDirection: 'row',
@@ -106,11 +106,13 @@ const styles = StyleSheet.create({
         paddingTop: 50,
         paddingHorizontal: 20,
         paddingBottom: 16,
+        borderBottomWidth: 1,
+        borderBottomColor: '#E0E0E0',
     },
     headerTitle: {
         fontSize: 16,
         fontWeight: '500',
-        color: '#FFFFFF',
+        color: '#101720',
     },
     closeButton: {
         padding: 8,
@@ -126,6 +128,7 @@ const styles = StyleSheet.create({
     profileImageSection: {
         alignItems: 'center',
         marginBottom: 32,
+        marginTop: 20,
     },
     profileImageContainer: {
         width: 124,
@@ -140,7 +143,7 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%',
         borderRadius: 60,
-        backgroundColor: '#333333',
+        backgroundColor: '#E0E0E0',
     },
     changePhotoText: {
         color: '#4098D2',
@@ -157,17 +160,17 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 14,
-        color: '#FFFFFF',
+        color: '#101720',
         fontWeight: '500',
     },
     input: {
         borderWidth: 1,
-        borderColor: '#4098D2',
+        borderColor: '#E0E0E0',
         borderRadius: 8,
         padding: 12,
         fontSize: 14,
-        color: '#FFFFFF',
-        backgroundColor: '#000000',
+        color: '#101720',
+        backgroundColor: '#FFFFFF',
         height: 44,
     },
     bioInput: {
