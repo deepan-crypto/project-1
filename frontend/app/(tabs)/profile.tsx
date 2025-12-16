@@ -49,7 +49,12 @@ export default function ProfileScreen() {
   const fetchUserPolls = async (userId: string) => {
     try {
       setLoadingPolls(true);
-      const response = await fetch(`${API_BASE_URL}/polls/user/${userId}`);
+      const token = await authStorage.getToken();
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      const response = await fetch(`${API_BASE_URL}/polls/user/${userId}`, { headers });
       const data = await response.json();
 
       if (response.ok && data.polls) {
@@ -181,6 +186,40 @@ export default function ProfileScreen() {
     }
   };
 
+  // Handle vote on poll
+  const handleVotePoll = async (pollId: string, optionIndex: number): Promise<{ options: any[]; hasVoted: boolean }> => {
+    const token = await authStorage.getToken();
+    if (!token) {
+      Alert.alert('Error', 'Please log in to vote');
+      throw new Error('Not authenticated');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/polls/${pollId}/vote`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ optionIndex }),
+    });
+
+    const data = await response.json();
+
+    if (response.ok && data.options) {
+      // Update poll in state with new options
+      setPolls(polls.map(p =>
+        p.id === pollId ? { ...p, options: data.options, hasVoted: true } : p
+      ));
+      return {
+        options: data.options,
+        hasVoted: true
+      };
+    } else {
+      Alert.alert('Error', data.message || 'Failed to vote');
+      throw new Error(data.message || 'Failed to vote');
+    }
+  };
+
   // Handle share poll
   const handleSharePoll = async (pollId: string, question: string) => {
     try {
@@ -284,7 +323,11 @@ export default function ProfileScreen() {
                 {/* Poll Options */}
                 <View style={styles.pollOptions}>
                   {poll.options.map((option: { text: string; percentage: number }, index: number) => (
-                    <View key={index} style={styles.pollOptionContainer}>
+                    <TouchableOpacity
+                      key={index}
+                      style={styles.pollOptionContainer}
+                      onPress={() => handleVotePoll(poll.id, index)}
+                    >
                       <View style={[
                         styles.pollOption,
                         poll.hasVoted && styles.pollOptionVoted,
@@ -309,7 +352,7 @@ export default function ProfileScreen() {
                       {poll.hasVoted && (
                         <Text style={styles.percentage}>{option.percentage}%</Text>
                       )}
-                    </View>
+                    </TouchableOpacity>
                   ))}
                 </View>
 
