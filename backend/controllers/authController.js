@@ -14,6 +14,13 @@ const signup = async (req, res, next) => {
             throw new Error('Please provide all required fields');
         }
 
+        // Validate fullName (no numbers allowed)
+        const nameRegex = /^[a-zA-Z\s]+$/;
+        if (!nameRegex.test(fullName.trim())) {
+            res.status(400);
+            throw new Error('Name can only contain letters and spaces, no numbers allowed');
+        }
+
         // Validate email format
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
@@ -21,16 +28,47 @@ const signup = async (req, res, next) => {
             throw new Error('Please provide a valid email address');
         }
 
-        // Validate password length
-        if (password.length < 6) {
+        // Validate username format (alphanumeric, underscore, hyphen only)
+        const usernameRegex = /^[a-zA-Z0-9_-]+$/;
+        if (!usernameRegex.test(username)) {
             res.status(400);
-            throw new Error('Password must be at least 6 characters long');
+            throw new Error('Username can only contain letters, numbers, underscores, and hyphens');
         }
 
         // Validate username length
         if (username.length < 3) {
             res.status(400);
             throw new Error('Username must be at least 3 characters long');
+        }
+
+        // Validate password strength (8+ chars, uppercase, lowercase, number, special char)
+        if (password.length < 8) {
+            res.status(400);
+            throw new Error('Password must be at least 8 characters long');
+        }
+
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]/;
+        if (!passwordRegex.test(password)) {
+            res.status(400);
+            throw new Error('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&#)');
+        }
+
+        // Validate date of birth if provided
+        if (dateOfBirth) {
+            // Check if dateOfBirth is a valid date
+            const date = new Date(dateOfBirth);
+            if (isNaN(date.getTime())) {
+                res.status(400);
+                throw new Error('Please provide a valid date of birth');
+            }
+
+            // Optional: Check if user is at least 13 years old
+            const thirteenYearsAgo = new Date();
+            thirteenYearsAgo.setFullYear(thirteenYearsAgo.getFullYear() - 13);
+            if (date > thirteenYearsAgo) {
+                res.status(400);
+                throw new Error('You must be at least 13 years old to register');
+            }
         }
 
         // Check for existing email
