@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   optionPercentageVoted: {
-    color: '#458FD0',
+    color: '#101720',
     fontWeight: '600',
     marginLeft: 8,
   },
