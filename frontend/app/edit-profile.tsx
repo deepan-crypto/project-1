@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import API_BASE_URL from '@/config/api';
 import {
     View,
     Text,
@@ -8,22 +9,102 @@ import {
     Image,
     ScrollView,
     StatusBar,
+    Alert,
+    ActivityIndicator,
 } from 'react-native';
 import { router } from 'expo-router';
 import { X } from 'lucide-react-native';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function EditProfileScreen() {
+    const [fullName, setFullName] = useState('');
     const [username, setUsername] = useState('');
     const [bio, setBio] = useState('');
+    const [profileImage, setProfileImage] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
 
-    const handleSave = () => {
-        // Save profile changes
-        router.back();
+    const handlePickImage = async () => {
+        try {
+            // Request permission
+            const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+            if (permissionResult.granted === false) {
+                Alert.alert('Permission required', 'You need to allow access to your photos to change your profile picture.');
+                return;
+            }
+
+            // Launch image picker
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                allowsEditing: true,
+                aspect: [1, 1],
+                quality: 0.8,
+            });
+
+            if (!result.canceled && result.assets[0]) {
+                setProfileImage(result.assets[0].uri);
+            }
+        } catch (error) {
+            console.error('Error picking image:', error);
+            Alert.alert('Error', 'Failed to pick image');
+        }
+    };
+
+    const handleSave = async () => {
+        setLoading(true);
+        try {
+            const formData = new FormData();
+
+            // Add text fields if they have values
+            if (fullName.trim()) formData.append('fullName', fullName.trim());
+            if (username.trim()) formData.append('username', username.trim());
+            if (bio.trim()) formData.append('bio', bio.trim());
+
+            // Add image if selected
+            if (profileImage) {
+                const filename = profileImage.split('/').pop() || 'profile.jpg';
+                const match = /\.(\w+)$/.exec(filename);
+                const type = match ? `image/${match[1]}` : 'image/jpeg';
+
+                formData.append('profilePicture', {
+                    uri: profileImage,
+                    name: filename,
+                    type,
+                } as any);
+            }
+
+            // Get token from storage (you'll need to implement token storage)
+            // For now, this will fail if no token
+            const response = await fetch(`${API_BASE_URL}/users/profile`, {
+                method: 'PUT',
+                headers: {
+                    // Add your auth token here
+                    // 'Authorization': `Bearer ${token}`,
+                },
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                Alert.alert('Success', 'Profile updated successfully');
+                router.back();
+            } else {
+                Alert.alert('Error', data.message || 'Failed to update profile');
+            }
+        } catch (error) {
+            console.error('Error saving profile:', error);
+            Alert.alert('Error', 'Network error. Please check your connection.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleClose = () => {
         router.back();
     };
+
+    const displayImage = profileImage || 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200';
 
     return (
         <View style={styles.container}>
@@ -46,13 +127,11 @@ export default function EditProfileScreen() {
                 <View style={styles.profileImageSection}>
                     <View style={styles.profileImageContainer}>
                         <Image
-                            source={{
-                                uri: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200',
-                            }}
+                            source={{ uri: displayImage }}
                             style={styles.profileImage}
                         />
                     </View>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={handlePickImage}>
                         <Text style={styles.changePhotoText}>Change profile picture</Text>
                     </TouchableOpacity>
                 </View>
@@ -60,13 +139,24 @@ export default function EditProfileScreen() {
                 {/* Form Section */}
                 <View style={styles.form}>
                     <View style={styles.inputGroup}>
+                        <Text style={styles.label}>Full Name</Text>
+                        <TextInput
+                            style={styles.input}
+                            value={fullName}
+                            onChangeText={setFullName}
+                            placeholder="Enter your full name"
+                            placeholderTextColor="#999"
+                        />
+                    </View>
+
+                    <View style={styles.inputGroup}>
                         <Text style={styles.label}>Username</Text>
                         <TextInput
                             style={styles.input}
                             value={username}
                             onChangeText={setUsername}
-                            placeholder=""
-                            placeholderTextColor="#666"
+                            placeholder="Enter your username"
+                            placeholderTextColor="#999"
                         />
                     </View>
 
@@ -76,8 +166,8 @@ export default function EditProfileScreen() {
                             style={[styles.input, styles.bioInput]}
                             value={bio}
                             onChangeText={setBio}
-                            placeholder=""
-                            placeholderTextColor="#666"
+                            placeholder="Tell us about yourself"
+                            placeholderTextColor="#999"
                             multiline={true}
                             numberOfLines={4}
                             textAlignVertical="top"
@@ -86,8 +176,16 @@ export default function EditProfileScreen() {
                 </View>
 
                 {/* Save Button */}
-                <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-                    <Text style={styles.saveButtonText}>Save</Text>
+                <TouchableOpacity
+                    style={styles.saveButton}
+                    onPress={handleSave}
+                    disabled={loading}
+                >
+                    {loading ? (
+                        <ActivityIndicator color="#FFFFFF" />
+                    ) : (
+                        <Text style={styles.saveButtonText}>Save</Text>
+                    )}
                 </TouchableOpacity>
             </ScrollView>
         </View>
