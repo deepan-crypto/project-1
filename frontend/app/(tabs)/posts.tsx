@@ -13,15 +13,14 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { X } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function PostsScreen() {
-  const [mainThought, setMainThought] = useState('');
   const [thought1, setThought1] = useState('');
   const [thought2, setThought2] = useState('');
   const [thought3, setThought3] = useState('');
 
   const handlePost = () => {
-    setMainThought('');
     setThought1('');
     setThought2('');
     setThought3('');
@@ -35,6 +34,7 @@ export default function PostsScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
+      {/* Logo Header */}
       <View style={styles.logoHeader}>
         <Image
           source={require('../../assets/images/ican.png')}
@@ -43,13 +43,19 @@ export default function PostsScreen() {
         />
       </View>
 
+      {/* User Header with Close Button */}
       <View style={styles.header}>
         <View style={styles.headerContent}>
           <View style={styles.userInfo}>
-            <View style={styles.avatar} />
+            <Image
+              source={{
+                uri: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100',
+              }}
+              style={styles.avatar}
+            />
             <Text style={styles.userName}>Abigail</Text>
           </View>
-          <TouchableOpacity onPress={handleClose}>
+          <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
             <X size={24} color="#101720" />
           </TouchableOpacity>
         </View>
@@ -64,31 +70,26 @@ export default function PostsScreen() {
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
         >
-          <TextInput
-            style={styles.mainInput}
-            value={mainThought}
-            onChangeText={setMainThought}
-            placeholder="Say something!"
-            placeholderTextColor="#6C7278"
-            multiline={true}
-          />
-
-          <View style={styles.thoughtsContainer}>
-            <View style={styles.thoughtInput}>
+          {/* Grey Container for All Inputs */}
+          <View style={styles.inputsContainer}>
+            {/* Thought 1 - Main input with "Say something!" placeholder */}
+            <View style={styles.thoughtBox}>
               <Text style={styles.thoughtLabel}>Thought 1</Text>
               <TextInput
-                style={styles.input}
+                style={styles.thoughtInput}
                 value={thought1}
                 onChangeText={setThought1}
-                placeholder=""
+                placeholder="Say something!"
                 placeholderTextColor="#6C7278"
+                multiline={true}
               />
             </View>
 
-            <View style={styles.thoughtInput}>
+            {/* Thought 2 */}
+            <View style={styles.thoughtBox}>
               <Text style={styles.thoughtLabel}>Thought 2</Text>
               <TextInput
-                style={styles.input}
+                style={styles.thoughtInput}
                 value={thought2}
                 onChangeText={setThought2}
                 placeholder=""
@@ -96,10 +97,11 @@ export default function PostsScreen() {
               />
             </View>
 
-            <View style={styles.thoughtInput}>
+            {/* Thought 3 */}
+            <View style={styles.thoughtBox}>
               <Text style={styles.thoughtLabel}>Thought 3</Text>
               <TextInput
-                style={styles.input}
+                style={styles.thoughtInput}
                 value={thought3}
                 onChangeText={setThought3}
                 placeholder=""
@@ -108,8 +110,16 @@ export default function PostsScreen() {
             </View>
           </View>
 
-          <TouchableOpacity style={styles.postButton} onPress={handlePost}>
-            <Text style={styles.postButtonText}>Post</Text>
+          {/* Post Button with Gradient */}
+          <TouchableOpacity onPress={handlePost} style={styles.postButtonContainer}>
+            <LinearGradient
+              colors={['#458FD0', '#07F2DF']}
+              start={{ x: 0.5, y: 0 }}
+              end={{ x: 0.5, y: 1 }}
+              style={styles.postButton}
+            >
+              <Text style={styles.postButtonText}>Post</Text>
+            </LinearGradient>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -137,6 +147,7 @@ const styles = StyleSheet.create({
     paddingBottom: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
+    backgroundColor: '#FFFFFF',
   },
   headerContent: {
     flexDirection: 'row',
@@ -159,6 +170,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#101720',
   },
+  closeButton: {
+    padding: 4,
+  },
   keyboardView: {
     flex: 1,
   },
@@ -167,43 +181,42 @@ const styles = StyleSheet.create({
   },
   content: {
     padding: 20,
+    paddingBottom: 40,
   },
-  mainInput: {
-    fontSize: 14,
-    color: '#101720',
+  // Grey container for all inputs
+  inputsContainer: {
+    backgroundColor: '#6C7278',
+    borderRadius: 12,
     padding: 16,
-    backgroundColor: '#F5F5F5',
-    borderRadius: 8,
-    minHeight: 60,
-    marginBottom: 24,
-    textAlignVertical: 'top',
-  },
-  thoughtsContainer: {
     gap: 16,
     marginBottom: 24,
   },
-  thoughtInput: {
-    gap: 8,
+  thoughtBox: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    padding: 12,
   },
   thoughtLabel: {
     fontSize: 14,
     color: '#6C7278',
     fontWeight: '500',
+    marginBottom: 8,
   },
-  input: {
+  thoughtInput: {
     fontSize: 14,
     color: '#101720',
-    padding: 16,
-    backgroundColor: '#FFFFFF',
+    minHeight: 40,
+    textAlignVertical: 'top',
+    padding: 0,
+  },
+  postButtonContainer: {
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
+    overflow: 'hidden',
   },
   postButton: {
-    backgroundColor: '#458FD0',
-    borderRadius: 8,
     paddingVertical: 14,
     alignItems: 'center',
+    borderRadius: 8,
   },
   postButtonText: {
     color: '#FFFFFF',
@@ -211,4 +224,5 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+
 
