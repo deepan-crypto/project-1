@@ -34,12 +34,11 @@ export default function EditProfileScreen() {
                 return;
             }
 
-            // Launch image picker
+            // Launch image picker (no cropping - direct selection)
             const result = await ImagePicker.launchImageLibraryAsync({
                 mediaTypes: 'images' as any,
-                allowsEditing: true,
-                aspect: [1, 1],
-                quality: 0.8,
+                allowsEditing: false,
+                quality: 0.9,
             });
 
             if (!result.canceled && result.assets[0]) {
