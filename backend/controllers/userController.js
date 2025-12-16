@@ -168,9 +168,6 @@ const uploadAvatar = async (req, res, next) => {
     }
 };
 
-// @desc    Follow a user
-// @route   POST /api/users/:userId/follow
-// @access  Private
 const followUser = async (req, res, next) => {
     try {
         const userToFollow = await User.findById(req.params.userId);
