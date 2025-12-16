@@ -151,7 +151,8 @@ export default function ProfileScreen() {
                   <View key={index} style={styles.pollOptionContainer}>
                     <View style={[
                       styles.pollOption,
-                      poll.voted && styles.pollOptionVoted
+                      poll.voted && styles.pollOptionVoted,
+                      !poll.voted && styles.pollOptionUnvoted,
                     ]}>
                       <View style={styles.optionContent}>
                         {poll.voted && (
@@ -164,7 +165,8 @@ export default function ProfileScreen() {
                         )}
                         <Text style={[
                           styles.optionText,
-                          poll.voted && styles.optionTextVoted
+                          poll.voted && styles.optionTextVoted,
+                          !poll.voted && styles.optionTextUnvoted,
                         ]}>{option.text}</Text>
                       </View>
                     </View>
@@ -374,36 +376,47 @@ const styles = StyleSheet.create({
   pollOption: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#458FD0',
-    borderRadius: 8,
+    borderColor: '#E0E0E0',
+    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    backgroundColor: 'transparent',
     overflow: 'hidden',
   },
-  pollOptionVoted: {
+  pollOptionUnvoted: {
     borderColor: '#458FD0',
-    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    backgroundColor: 'transparent',
+  },
+  pollOptionVoted: {
+    borderWidth: 0,
+    position: 'relative',
+    overflow: 'hidden',
   },
   optionContent: {
     position: 'relative',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+    zIndex: 1,
   },
   optionProgress: {
     position: 'absolute',
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: '#458FD0',
-    borderRadius: 7,
+    backgroundColor: '#6C7278',
+    borderRadius: 20,
   },
   optionText: {
     fontSize: 14,
     color: '#101720',
     zIndex: 1,
-    textAlign: 'center',
   },
   optionTextVoted: {
     color: '#FFFFFF',
-    fontWeight: '500',
+    fontWeight: '600',
+  },
+  optionTextUnvoted: {
+    color: '#458FD0',
+    fontWeight: '600',
   },
   percentage: {
     fontSize: 14,
