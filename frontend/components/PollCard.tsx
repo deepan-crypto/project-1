@@ -64,6 +64,7 @@ export default function PollCard({
                     style={[
                       styles.optionText,
                       hasVoted && styles.optionTextVoted,
+                      !hasVoted && styles.optionTextUnvoted,
                     ]}
                   >
                     {option.text}{option.emoji ? ` ${option.emoji}` : ''}
