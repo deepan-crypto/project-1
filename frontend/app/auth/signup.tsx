@@ -83,6 +83,18 @@ export default function SignUpScreen() {
     setLoading(true);
 
     try {
+      // Parse date from DD/MM/YYYY to ISO format
+      let parsedDate = null;
+      if (dateOfBirth) {
+        const dateParts = dateOfBirth.split('/');
+        if (dateParts.length === 3) {
+          const day = parseInt(dateParts[0], 10);
+          const month = parseInt(dateParts[1], 10) - 1; // Month is 0-indexed
+          const year = parseInt(dateParts[2], 10);
+          parsedDate = new Date(year, month, day).toISOString();
+        }
+      }
+
       const response = await fetch('http://localhost:5000/api/auth/signup', {
         method: 'POST',
         headers: {
@@ -93,7 +105,7 @@ export default function SignUpScreen() {
           email,
           username,
           password,
-          dateOfBirth,
+          dateOfBirth: parsedDate,
           gender: selectedGender,
         }),
       });
