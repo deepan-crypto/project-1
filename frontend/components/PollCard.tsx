@@ -126,20 +126,22 @@ export default function PollCard({
       </View>
       {/* Footer with likes and share */}
       <View style={styles.footer}>
-        <TouchableOpacity
-          style={styles.likeButton}
-          onPress={handleLike}
-          disabled={liking}
-        >
-          <Heart
-            size={18}
-            color={isLiked ? "#FF4444" : "#687684"}
-            fill={isLiked ? "#FF4444" : "transparent"}
-          />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={handleViewLikes}>
-          <Text style={[styles.likesText, isLiked && styles.likedText]}>{likes} likes</Text>
-        </TouchableOpacity>
+        <View style={styles.footerLeft}>
+          <TouchableOpacity
+            style={styles.likeButton}
+            onPress={handleLike}
+            disabled={liking}
+          >
+            <Heart
+              size={18}
+              color={isLiked ? "#FF4444" : "#687684"}
+              fill={isLiked ? "#FF4444" : "transparent"}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={handleViewLikes}>
+            <Text style={[styles.likesText, isLiked && styles.likedText]}>{likes} likes</Text>
+          </TouchableOpacity>
+        </View>
         <View style={styles.footerRight}>
           <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
             <Share2 size={18} color="#687684" />
@@ -278,10 +280,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 4,
   },
+  footerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   likeButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
     padding: 4,
   },
   shareButton: {
