@@ -581,7 +581,9 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   pollOptionVoted: {
-    borderWidth: 0,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    backgroundColor: '#F5F5F5',
     position: 'relative',
     overflow: 'hidden',
   },
@@ -594,7 +596,7 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: '#6C7278',
+    backgroundColor: '#458FD0',
     borderRadius: 20,
   },
   optionText: {
@@ -603,7 +605,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   optionTextVoted: {
-    color: '#FFFFFF',
+    color: '#101720',
     fontWeight: '600',
   },
   optionTextUnvoted: {
@@ -612,7 +614,7 @@ const styles = StyleSheet.create({
   },
   percentage: {
     fontSize: 14,
-    color: '#6C7278',
+    color: '#101720',
     fontWeight: '500',
     marginLeft: 12,
     minWidth: 35,
