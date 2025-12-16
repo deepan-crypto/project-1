@@ -13,8 +13,8 @@ import { router } from 'expo-router';
 import { X } from 'lucide-react-native';
 
 export default function EditProfileScreen() {
-    const [username, setUsername] = useState('Abigail');
-    const [bio, setBio] = useState('Bicycle enthusiast. Love to talk about bicycles and cycling!');
+    const [username, setUsername] = useState('');
+    const [bio, setBio] = useState('');
 
     const handleSave = () => {
         // Save profile changes
@@ -27,11 +27,13 @@ export default function EditProfileScreen() {
 
     return (
         <View style={styles.container}>
-            <StatusBar barStyle="dark-content" />
+            <StatusBar barStyle="light-content" />
 
+            {/* Header with Close Button */}
             <View style={styles.header}>
+                <Text style={styles.headerTitle}>Profile edit</Text>
                 <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-                    <X size={24} color="#000" />
+                    <X size={24} color="#FFFFFF" />
                 </TouchableOpacity>
             </View>
 
@@ -40,18 +42,22 @@ export default function EditProfileScreen() {
                 contentContainerStyle={styles.content}
                 showsVerticalScrollIndicator={false}
             >
+                {/* Profile Image Section */}
                 <View style={styles.profileImageSection}>
-                    <Image
-                        source={{
-                            uri: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200',
-                        }}
-                        style={styles.profileImage}
-                    />
+                    <View style={styles.profileImageContainer}>
+                        <Image
+                            source={{
+                                uri: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200',
+                            }}
+                            style={styles.profileImage}
+                        />
+                    </View>
                     <TouchableOpacity>
                         <Text style={styles.changePhotoText}>Change profile picture</Text>
                     </TouchableOpacity>
                 </View>
 
+                {/* Form Section */}
                 <View style={styles.form}>
                     <View style={styles.inputGroup}>
                         <Text style={styles.label}>Username</Text>
@@ -59,8 +65,8 @@ export default function EditProfileScreen() {
                             style={styles.input}
                             value={username}
                             onChangeText={setUsername}
-                            placeholder="Enter username"
-                            placeholderTextColor="#999"
+                            placeholder=""
+                            placeholderTextColor="#666"
                         />
                     </View>
 
@@ -70,8 +76,8 @@ export default function EditProfileScreen() {
                             style={[styles.input, styles.bioInput]}
                             value={bio}
                             onChangeText={setBio}
-                            placeholder="Enter bio"
-                            placeholderTextColor="#999"
+                            placeholder=""
+                            placeholderTextColor="#666"
                             multiline={true}
                             numberOfLines={4}
                             textAlignVertical="top"
@@ -79,6 +85,7 @@ export default function EditProfileScreen() {
                     </View>
                 </View>
 
+                {/* Save Button */}
                 <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
                     <Text style={styles.saveButtonText}>Save</Text>
                 </TouchableOpacity>
@@ -90,14 +97,20 @@ export default function EditProfileScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#222222',
     },
     header: {
         flexDirection: 'row',
-        justifyContent: 'flex-end',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         paddingTop: 50,
         paddingHorizontal: 20,
-        paddingBottom: 10,
+        paddingBottom: 16,
+    },
+    headerTitle: {
+        fontSize: 16,
+        fontWeight: '500',
+        color: '#FFFFFF',
     },
     closeButton: {
         padding: 8,
@@ -108,53 +121,65 @@ const styles = StyleSheet.create({
     content: {
         paddingHorizontal: 20,
         paddingBottom: 40,
+        alignItems: 'center',
     },
     profileImageSection: {
         alignItems: 'center',
         marginBottom: 32,
     },
-    profileImage: {
-        width: 120,
-        height: 120,
-        borderRadius: 60,
+    profileImageContainer: {
+        width: 124,
+        height: 124,
+        borderRadius: 62,
+        borderWidth: 3,
+        borderColor: '#4098D2',
+        padding: 2,
         marginBottom: 12,
-        backgroundColor: '#E0E0E0',
+    },
+    profileImage: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 60,
+        backgroundColor: '#333333',
     },
     changePhotoText: {
-        color: '#458FD0',
+        color: '#4098D2',
         fontSize: 14,
         fontWeight: '600',
     },
     form: {
         gap: 24,
         marginBottom: 32,
+        width: '100%',
     },
     inputGroup: {
         gap: 8,
     },
     label: {
         fontSize: 14,
-        color: '#101720',
+        color: '#FFFFFF',
         fontWeight: '500',
     },
     input: {
         borderWidth: 1,
-        borderColor: '#E0E0E0',
+        borderColor: '#4098D2',
         borderRadius: 8,
         padding: 12,
         fontSize: 14,
-        color: '#101720',
-        backgroundColor: '#FFFFFF',
+        color: '#FFFFFF',
+        backgroundColor: '#000000',
+        height: 44,
     },
     bioInput: {
         height: 120,
         paddingTop: 12,
     },
     saveButton: {
-        backgroundColor: '#458FD0',
+        backgroundColor: '#4098D2',
         borderRadius: 8,
         paddingVertical: 14,
         alignItems: 'center',
+        width: '100%',
     },
     saveButtonText: {
         color: '#FFFFFF',
