@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,20 +10,109 @@ import {
   Platform,
   StatusBar,
   Image,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { router } from 'expo-router';
 import { X } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import API_BASE_URL from '@/config/api';
+import { authStorage } from '@/utils/authStorage';
 
 export default function PostsScreen() {
+  const [question, setQuestion] = useState('');
   const [thought1, setThought1] = useState('');
   const [thought2, setThought2] = useState('');
   const [thought3, setThought3] = useState('');
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handlePost = () => {
-    setThought1('');
-    setThought2('');
-    setThought3('');
+  // Load user data
+  useEffect(() => {
+    const loadUser = async () => {
+      const userData = await authStorage.getUser();
+      if (userData) {
+        setUser(userData);
+      }
+    };
+    loadUser();
+  }, []);
+
+  // Get profile image URL
+  const getProfileImageUrl = () => {
+    if (!user?.profilePicture) {
+      return 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100';
+    }
+    if (user.profilePicture.startsWith('http')) {
+      return user.profilePicture;
+    }
+    return `${API_BASE_URL.replace('/api', '')}${user.profilePicture}`;
+  };
+
+  const handlePost = async () => {
+    // Validate inputs
+    if (!thought1.trim()) {
+      Alert.alert('Error', 'Please enter at least one option');
+      return;
+    }
+
+    // Build options array (only include non-empty options)
+    const options = [thought1.trim()];
+    if (thought2.trim()) options.push(thought2.trim());
+    if (thought3.trim()) options.push(thought3.trim());
+
+    if (options.length < 2) {
+      Alert.alert('Error', 'Please enter at least 2 options for the poll');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const token = await authStorage.getToken();
+
+      if (!token) {
+        Alert.alert('Error', 'Please log in to create a poll');
+        router.replace('/auth/login');
+        return;
+      }
+
+      const response = await fetch(`${API_BASE_URL}/polls`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          question: question.trim() || 'What do you think?',
+          options: options,
+        }),
+      });
+
+      const data = await response.json();
+      console.log('Poll created:', data);
+
+      if (response.ok) {
+        Alert.alert('Success!', 'Your poll has been posted!', [
+          {
+            text: 'OK',
+            onPress: () => {
+              setQuestion('');
+              setThought1('');
+              setThought2('');
+              setThought3('');
+              router.replace('/(tabs)');
+            }
+          }
+        ]);
+      } else {
+        Alert.alert('Error', data.message || 'Failed to create poll');
+      }
+    } catch (error) {
+      console.error('Error creating poll:', error);
+      Alert.alert('Error', 'Network error. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleClose = () => {
@@ -48,12 +137,10 @@ export default function PostsScreen() {
         <View style={styles.headerContent}>
           <View style={styles.userInfo}>
             <Image
-              source={{
-                uri: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100',
-              }}
+              source={{ uri: getProfileImageUrl() }}
               style={styles.avatar}
             />
-            <Text style={styles.userName}>Abigail</Text>
+            <Text style={styles.userName}>{user?.fullName || 'User'}</Text>
           </View>
           <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
             <X size={24} color="#101720" />
@@ -70,55 +157,75 @@ export default function PostsScreen() {
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
         >
-          {/* Thought Inputs - No grey container */}
+          {/* Question Input */}
           <View style={styles.inputsContainer}>
-            {/* Thought 1 - Main input with "Say something!" placeholder */}
             <View style={styles.thoughtBox}>
-              <Text style={styles.thoughtLabel}>Thought 1</Text>
+              <Text style={styles.thoughtLabel}>Question (optional)</Text>
               <TextInput
                 style={styles.thoughtInput}
-                value={thought1}
-                onChangeText={setThought1}
-                placeholder="Say something!"
+                value={question}
+                onChangeText={setQuestion}
+                placeholder="What do you want to ask?"
                 placeholderTextColor="#6C7278"
                 multiline={true}
               />
             </View>
 
-            {/* Thought 2 */}
+            {/* Option 1 */}
             <View style={styles.thoughtBox}>
-              <Text style={styles.thoughtLabel}>Thought 2</Text>
+              <Text style={styles.thoughtLabel}>Option 1 *</Text>
+              <TextInput
+                style={styles.thoughtInput}
+                value={thought1}
+                onChangeText={setThought1}
+                placeholder="First option"
+                placeholderTextColor="#6C7278"
+                multiline={true}
+              />
+            </View>
+
+            {/* Option 2 */}
+            <View style={styles.thoughtBox}>
+              <Text style={styles.thoughtLabel}>Option 2 *</Text>
               <TextInput
                 style={styles.thoughtInput}
                 value={thought2}
                 onChangeText={setThought2}
-                placeholder=""
+                placeholder="Second option"
                 placeholderTextColor="#6C7278"
               />
             </View>
 
-            {/* Thought 3 */}
+            {/* Option 3 */}
             <View style={styles.thoughtBox}>
-              <Text style={styles.thoughtLabel}>Thought 3</Text>
+              <Text style={styles.thoughtLabel}>Option 3 (optional)</Text>
               <TextInput
                 style={styles.thoughtInput}
                 value={thought3}
                 onChangeText={setThought3}
-                placeholder=""
+                placeholder="Third option"
                 placeholderTextColor="#6C7278"
               />
             </View>
           </View>
 
           {/* Post Button with Gradient */}
-          <TouchableOpacity onPress={handlePost} style={styles.postButtonContainer}>
+          <TouchableOpacity
+            onPress={handlePost}
+            style={styles.postButtonContainer}
+            disabled={loading}
+          >
             <LinearGradient
               colors={['#458FD0', '#07F2DF']}
               start={{ x: 0.5, y: 0 }}
               end={{ x: 0.5, y: 1 }}
               style={styles.postButton}
             >
-              <Text style={styles.postButtonText}>Post</Text>
+              {loading ? (
+                <ActivityIndicator color="#FFFFFF" />
+              ) : (
+                <Text style={styles.postButtonText}>Post</Text>
+              )}
             </LinearGradient>
           </TouchableOpacity>
         </ScrollView>
