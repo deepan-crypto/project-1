@@ -1,4 +1,5 @@
 const Notification = require('../models/Notification');
+const FollowRequest = require('../models/FollowRequest');
 
 // @desc    Get user's notifications
 // @route   GET /api/notifications
@@ -14,20 +15,33 @@ const getNotifications = async (req, res, next) => {
             .skip(skip)
             .limit(limit)
             .populate('senderId', 'username fullName profilePicture')
-            .populate('pollId', 'question');
+            .populate('pollId', 'question')
+            .populate('followRequestId');
 
-        const formattedNotifications = notifications.map(notif => ({
-            id: notif._id,
-            user: {
-                name: notif.senderId.username,
-                avatar: notif.senderId.profilePicture,
-            },
-            action: notif.message,
-            time: formatTimeAgo(notif.createdAt),
-            read: notif.read,
-            type: notif.type,
-            createdAt: notif.createdAt,
-        }));
+        const formattedNotifications = notifications.map(notif => {
+            const base = {
+                id: notif._id,
+                user: {
+                    id: notif.senderId._id,
+                    name: notif.senderId.fullName || notif.senderId.username,
+                    username: notif.senderId.username,
+                    avatar: notif.senderId.profilePicture,
+                },
+                action: notif.message,
+                time: formatTimeAgo(notif.createdAt),
+                read: notif.read,
+                type: notif.type,
+                createdAt: notif.createdAt,
+            };
+
+            // Add follow request data if applicable
+            if (notif.type === 'follow_request' && notif.followRequestId) {
+                base.followRequestId = notif.followRequestId._id;
+                base.followRequestStatus = notif.followRequestId.status;
+            }
+
+            return base;
+        });
 
         res.status(200).json({
             success: true,
