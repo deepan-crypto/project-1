@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Poll = require('../models/Poll');
 const Notification = require('../models/Notification');
 const FollowRequest = require('../models/FollowRequest');
+const { emitNotification } = require('../utils/socketEmitter');
 
 // @desc    Get user profile by ID
 // @route   GET /api/users/profile/:userId
@@ -494,12 +495,29 @@ const sendFollowRequest = async (req, res, next) => {
         });
 
         // Create notification
-        await Notification.create({
+        const notification = await Notification.create({
             recipientId: targetUser._id,
             senderId: currentUser._id,
             type: 'follow_request',
             message: `${currentUser.username} wants to follow you`,
             followRequestId: followRequest._id,
+        });
+
+        // Emit real-time notification
+        emitNotification(targetUser._id, {
+            id: notification._id,
+            user: {
+                id: currentUser._id,
+                name: currentUser.fullName,
+                username: currentUser.username,
+                avatar: currentUser.profilePicture,
+            },
+            action: `wants to follow you`,
+            time: 'Just now',
+            read: false,
+            type: 'follow_request',
+            followRequestId: followRequest._id,
+            followRequestStatus: 'pending',
         });
 
         res.status(200).json({
@@ -553,11 +571,26 @@ const acceptFollowRequest = async (req, res, next) => {
         }
 
         // Create notification for sender
-        await Notification.create({
+        const notification = await Notification.create({
             recipientId: sender._id,
             senderId: recipient._id,
             type: 'follow',
             message: `${recipient.username} accepted your follow request`,
+        });
+
+        // Emit real-time notification
+        emitNotification(sender._id, {
+            id: notification._id,
+            user: {
+                id: recipient._id,
+                name: recipient.fullName,
+                username: recipient.username,
+                avatar: recipient.profilePicture,
+            },
+            action: `accepted your follow request`,
+            time: 'Just now',
+            read: false,
+            type: 'follow',
         });
 
         res.status(200).json({
