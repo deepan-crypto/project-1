@@ -12,7 +12,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
-import { Heart, Share2, ArrowRight, Trash2 } from 'lucide-react-native';
+import { Heart, Share2, ArrowRight, Trash2, Settings } from 'lucide-react-native';
 import { authStorage } from '@/utils/authStorage';
 import API_BASE_URL from '@/config/api';
 
@@ -29,6 +29,28 @@ export default function ProfileScreen() {
   const [user, setUser] = useState<any>(null);
   const [polls, setPolls] = useState<UserPoll[]>([]);
   const [loadingPolls, setLoadingPolls] = useState(true);
+  const [stats, setStats] = useState({ followersCount: 0, followingCount: 0 });
+
+  // Fetch user stats from API
+  const fetchUserStats = async (userId: string) => {
+    try {
+      const token = await authStorage.getToken();
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      const response = await fetch(`${API_BASE_URL}/users/${userId}/stats`, { headers });
+      const data = await response.json();
+      if (response.ok && data.stats) {
+        setStats({
+          followersCount: data.stats.followersCount || 0,
+          followingCount: data.stats.followingCount || 0,
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching user stats:', error);
+    }
+  };
 
   // Load user data from storage
   const loadUserData = useCallback(async () => {
@@ -37,8 +59,9 @@ export default function ProfileScreen() {
       console.log('Loaded user data:', userData);
       if (userData) {
         setUser(userData);
-        // Fetch user's polls
+        // Fetch user's polls and stats
         fetchUserPolls(userData.id);
+        fetchUserStats(userData.id);
       }
     } catch (error) {
       console.error('Error loading user data:', error);
@@ -233,17 +256,37 @@ export default function ProfileScreen() {
     }
   };
 
+  const handleSettings = () => {
+    router.push('/settings');
+  };
+
+  const handleFollowers = () => {
+    if (user?.id) {
+      router.push({ pathname: '/followers', params: { userId: user.id } });
+    }
+  };
+
+  const handleFollowing = () => {
+    if (user?.id) {
+      router.push({ pathname: '/following', params: { userId: user.id } });
+    }
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      {/* Logo Header */}
+      {/* Logo Header with Settings */}
       <View style={styles.logoHeader}>
+        <View style={styles.headerSpacer} />
         <Image
           source={require('../../assets/images/ican.png')}
           style={styles.logo}
           resizeMode="contain"
         />
+        <TouchableOpacity style={styles.settingsButton} onPress={handleSettings}>
+          <Settings size={24} color="#101720" />
+        </TouchableOpacity>
       </View>
 
       <ScrollView
@@ -264,12 +307,16 @@ export default function ProfileScreen() {
                 {user?.bio || 'No bio yet'}
               </Text>
               <View style={styles.statsRow}>
-                <Text style={styles.statsText}>
-                  <Text style={styles.statsNumber}>523</Text> Followers
-                </Text>
-                <Text style={styles.statsText}>
-                  <Text style={styles.statsNumber}>523</Text> Following
-                </Text>
+                <TouchableOpacity onPress={handleFollowers}>
+                  <Text style={styles.statsText}>
+                    <Text style={styles.statsNumber}>{stats.followersCount}</Text> Followers
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleFollowing}>
+                  <Text style={styles.statsText}>
+                    <Text style={styles.statsNumber}>{stats.followingCount}</Text> Following
+                  </Text>
+                </TouchableOpacity>
               </View>
             </View>
           </View>
@@ -407,10 +454,19 @@ const styles = StyleSheet.create({
   logoHeader: {
     paddingTop: 40,
     paddingBottom: 12,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
+  },
+  headerSpacer: {
+    width: 24,
+  },
+  settingsButton: {
+    padding: 4,
   },
   logo: {
     width: 30,
