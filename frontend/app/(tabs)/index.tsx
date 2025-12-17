@@ -15,6 +15,7 @@ import { useFocusEffect } from 'expo-router';
 import PollCard from '@/components/PollCard';
 import API_BASE_URL from '@/config/api';
 import { authStorage } from '@/utils/authStorage';
+import { useSocket } from '@/utils/useSocket';
 
 interface Poll {
   id: string;
@@ -40,6 +41,9 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
+  // Socket connection for real-time updates
+  const { socket, isConnected } = useSocket();
+
   // Load current user ID
   useEffect(() => {
     const loadUser = async () => {
@@ -50,6 +54,35 @@ export default function HomeScreen() {
     };
     loadUser();
   }, []);
+
+  // Listen for real-time poll updates
+  useEffect(() => {
+    if (!socket) return;
+
+    // Handle like count updates
+    const handleLikeUpdate = (data: { pollId: string; likesCount: number }) => {
+      console.log('Real-time like update:', data);
+      setPolls(prev => prev.map(poll =>
+        poll.id === data.pollId ? { ...poll, likes: data.likesCount } : poll
+      ));
+    };
+
+    // Handle vote/percentage updates
+    const handleVoteUpdate = (data: { pollId: string; options: any[] }) => {
+      console.log('Real-time vote update:', data);
+      setPolls(prev => prev.map(poll =>
+        poll.id === data.pollId ? { ...poll, options: data.options } : poll
+      ));
+    };
+
+    socket.on('poll_like_update', handleLikeUpdate);
+    socket.on('poll_vote_update', handleVoteUpdate);
+
+    return () => {
+      socket.off('poll_like_update', handleLikeUpdate);
+      socket.off('poll_vote_update', handleVoteUpdate);
+    };
+  }, [socket]);
 
   const fetchPolls = async () => {
     try {
