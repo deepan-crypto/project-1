@@ -213,12 +213,29 @@ const followUser = async (req, res, next) => {
             });
 
             // Create notification
-            await Notification.create({
+            const notification = await Notification.create({
                 recipientId: userToFollow._id,
                 senderId: currentUser._id,
                 type: 'follow_request',
                 message: `${currentUser.username} wants to follow you`,
                 followRequestId: followRequest._id,
+            });
+
+            // Emit real-time notification
+            emitNotification(userToFollow._id, {
+                id: notification._id,
+                user: {
+                    id: currentUser._id,
+                    name: currentUser.fullName,
+                    username: currentUser.username,
+                    avatar: currentUser.profilePicture,
+                },
+                action: 'wants to follow you',
+                time: 'Just now',
+                read: false,
+                type: 'follow_request',
+                followRequestId: followRequest._id,
+                followRequestStatus: 'pending',
             });
 
             return res.status(200).json({
@@ -236,11 +253,26 @@ const followUser = async (req, res, next) => {
         await userToFollow.save();
 
         // Create notification
-        await Notification.create({
+        const notification = await Notification.create({
             recipientId: userToFollow._id,
             senderId: currentUser._id,
             type: 'follow',
             message: `${currentUser.username} started following you`,
+        });
+
+        // Emit real-time notification
+        emitNotification(userToFollow._id, {
+            id: notification._id,
+            user: {
+                id: currentUser._id,
+                name: currentUser.fullName,
+                username: currentUser.username,
+                avatar: currentUser.profilePicture,
+            },
+            action: 'started following you',
+            time: 'Just now',
+            read: false,
+            type: 'follow',
         });
 
         res.status(200).json({

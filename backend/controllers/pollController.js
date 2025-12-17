@@ -397,6 +397,14 @@ const unlikePoll = async (req, res, next) => {
         );
         await poll.save();
 
+        // Emit like count update to all users viewing this poll
+        if (global.io) {
+            global.io.emit('poll_like_update', {
+                pollId: poll._id,
+                likesCount: poll.likes.length,
+            });
+        }
+
         res.status(200).json({
             success: true,
             message: 'Poll unliked successfully',
