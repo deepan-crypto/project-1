@@ -8,7 +8,7 @@
 
 // IMPORTANT: This IP address is auto-detected. Update if needed.
 const API_BASE_URL = __DEV__
-    ? 'http://172.17.10.111:5000/api'  // Your computer's IP address
+    ? 'http://172.17.2.170:5000/api'  // Your computer's IP address
     : 'https://your-production-api.com/api';
 
 export default API_BASE_URL;
