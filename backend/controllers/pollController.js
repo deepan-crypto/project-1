@@ -1,6 +1,7 @@
 const Poll = require('../models/Poll');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
+const { emitNotification, emitNotificationUpdate } = require('../utils/socketEmitter');
 
 // @desc    Create a new poll
 // @route   POST /api/polls
@@ -247,12 +248,41 @@ const votePoll = async (req, res, next) => {
 
         // Create notification for poll owner (only if first time voting)
         if (previousVoteIndex === -1 && poll.userId.toString() !== req.user._id.toString()) {
-            await Notification.create({
+            const notification = await Notification.create({
                 recipientId: poll.userId,
                 senderId: req.user._id,
                 type: 'vote',
                 pollId: poll._id,
                 message: `${req.user.username} voted on your poll`,
+            });
+
+            // Emit real-time notification to poll owner
+            emitNotification(poll.userId, {
+                id: notification._id,
+                user: {
+                    id: req.user._id,
+                    name: req.user.fullName || req.user.username,
+                    username: req.user.username,
+                    avatar: req.user.profilePicture,
+                },
+                action: 'voted on your poll',
+                time: 'Just now',
+                read: false,
+                type: 'vote',
+                pollId: poll._id,
+            });
+        }
+
+        // Emit vote update to all users viewing this poll
+        if (global.io) {
+            global.io.emit('poll_vote_update', {
+                pollId: poll._id,
+                options: poll.calculatePercentages().map((opt, idx) => ({
+                    id: idx,
+                    text: opt.text,
+                    emoji: opt.emoji,
+                    percentage: opt.percentage,
+                })),
             });
         }
 
@@ -300,12 +330,36 @@ const likePoll = async (req, res, next) => {
 
         // Create notification for poll owner
         if (poll.userId.toString() !== req.user._id.toString()) {
-            await Notification.create({
+            const notification = await Notification.create({
                 recipientId: poll.userId,
                 senderId: req.user._id,
                 type: 'like',
                 pollId: poll._id,
                 message: `${req.user.username} liked your poll`,
+            });
+
+            // Emit real-time notification to poll owner
+            emitNotification(poll.userId, {
+                id: notification._id,
+                user: {
+                    id: req.user._id,
+                    name: req.user.fullName || req.user.username,
+                    username: req.user.username,
+                    avatar: req.user.profilePicture,
+                },
+                action: 'liked your poll',
+                time: 'Just now',
+                read: false,
+                type: 'like',
+                pollId: poll._id,
+            });
+        }
+
+        // Emit like count update to all users viewing this poll
+        if (global.io) {
+            global.io.emit('poll_like_update', {
+                pollId: poll._id,
+                likesCount: poll.likes.length,
             });
         }
 
