@@ -73,6 +73,29 @@ export default function SettingsScreen() {
         }
     };
 
+    const handleLogout = () => {
+        Alert.alert(
+            'Logout',
+            'Are you sure you want to logout?',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                    text: 'Logout',
+                    style: 'destructive',
+                    onPress: async () => {
+                        try {
+                            await authStorage.clearAuth();
+                            router.replace('/');
+                        } catch (error) {
+                            console.error('Error logging out:', error);
+                            Alert.alert('Error', 'Failed to logout. Please try again.');
+                        }
+                    },
+                },
+            ]
+        );
+    };
+
     return (
         <View style={styles.container}>
             <StatusBar barStyle="dark-content" />
@@ -112,6 +135,15 @@ export default function SettingsScreen() {
                                 ios_backgroundColor="#E0E0E0"
                             />
                         </View>
+                    </View>
+
+                    {/* Account Section */}
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Account</Text>
+
+                        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+                            <Text style={styles.logoutButtonText}>Logout</Text>
+                        </TouchableOpacity>
                     </View>
                 </ScrollView>
             )}
@@ -189,5 +221,16 @@ const styles = StyleSheet.create({
         fontSize: 13,
         color: '#6C7278',
         lineHeight: 18,
+    },
+    logoutButton: {
+        backgroundColor: '#FF4444',
+        borderRadius: 12,
+        padding: 16,
+        alignItems: 'center',
+    },
+    logoutButtonText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        fontWeight: '600',
     },
 });
