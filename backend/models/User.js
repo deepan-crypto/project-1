@@ -45,6 +45,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200',
     },
+    isPrivate: {
+        type: Boolean,
+        default: false,
+    },
     followers: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
