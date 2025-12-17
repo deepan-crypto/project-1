@@ -14,6 +14,7 @@ import {
 import { router } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import { authStorage } from '@/utils/authStorage';
+import { disconnectSocket } from '@/utils/useSocket';
 import API_BASE_URL from '@/config/api';
 
 export default function SettingsScreen() {
@@ -84,6 +85,8 @@ export default function SettingsScreen() {
                     style: 'destructive',
                     onPress: async () => {
                         try {
+                            // Disconnect socket before clearing auth
+                            disconnectSocket();
                             await authStorage.clearAuth();
                             router.replace('/');
                         } catch (error) {
