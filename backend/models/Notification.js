@@ -13,12 +13,16 @@ const notificationSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['like', 'vote', 'follow', 'comment'],
+        enum: ['like', 'vote', 'follow', 'comment', 'follow_request'],
         required: true,
     },
     pollId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Poll',
+    },
+    followRequestId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'FollowRequest',
     },
     message: {
         type: String,
