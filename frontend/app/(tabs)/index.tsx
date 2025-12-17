@@ -11,8 +11,7 @@ import {
   RefreshControl,
   Alert,
 } from 'react-native';
-import { useFocusEffect, router } from 'expo-router';
-import { Search } from 'lucide-react-native';
+import { useFocusEffect } from 'expo-router';
 import PollCard from '@/components/PollCard';
 import API_BASE_URL from '@/config/api';
 import { authStorage } from '@/utils/authStorage';
@@ -212,20 +211,13 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      {/* Logo Header with Search */}
+      {/* Logo Header */}
       <View style={styles.logoHeader}>
-        <View style={styles.headerSpacer} />
         <Image
           source={require('../../assets/images/ican.png')}
           style={styles.logo}
           resizeMode="contain"
         />
-        <TouchableOpacity
-          style={styles.searchButton}
-          onPress={() => router.push('/search')}
-        >
-          <Search size={24} color="#101720" />
-        </TouchableOpacity>
       </View>
 
       {/* Poll Feed */}
@@ -271,19 +263,10 @@ const styles = StyleSheet.create({
   logoHeader: {
     paddingTop: 40,
     paddingBottom: 12,
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
-  },
-  headerSpacer: {
-    width: 24,
-  },
-  searchButton: {
-    padding: 4,
   },
   logo: {
     width: 30,
