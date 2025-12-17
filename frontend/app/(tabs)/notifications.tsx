@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import { authStorage } from '@/utils/authStorage';
+import { useSocket } from '@/utils/useSocket';
 import API_BASE_URL from '@/config/api';
 
 interface Notification {
@@ -36,6 +37,9 @@ export default function NotificationsScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  // Socket connection for real-time updates
+  const { socket, isConnected } = useSocket();
 
   const fetchNotifications = async () => {
     try {
@@ -66,6 +70,28 @@ export default function NotificationsScreen() {
   useEffect(() => {
     fetchNotifications();
   }, []);
+
+  // Listen for real-time notifications
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleNewNotification = (notification: Notification) => {
+      console.log('Received real-time notification:', notification);
+      // Add new notification to the top of the list
+      setNotifications(prev => {
+        // Check if notification already exists
+        const exists = prev.some(n => n.id === notification.id);
+        if (exists) return prev;
+        return [notification, ...prev];
+      });
+    };
+
+    socket.on('new_notification', handleNewNotification);
+
+    return () => {
+      socket.off('new_notification', handleNewNotification);
+    };
+  }, [socket]);
 
   useFocusEffect(
     useCallback(() => {
