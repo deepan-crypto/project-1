@@ -43,21 +43,52 @@ const createPoll = async (req, res, next) => {
 
 // @desc    Get all polls (feed)
 // @route   GET /api/polls
-// @access  Public
+// @access  Public (but filters private profile polls)
 const getAllPolls = async (req, res, next) => {
     try {
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 10;
         const skip = (page - 1) * limit;
 
+        // Get all polls and populate user info including isPrivate and followers
         const polls = await Poll.find()
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)
-            .populate('userId', 'username fullName profilePicture');
+            .populate('userId', 'username fullName profilePicture isPrivate followers');
+
+        // Filter polls: show only if profile is public OR user is follower OR user is owner
+        const currentUserId = req.user?._id?.toString();
+
+        const filteredPolls = polls.filter(poll => {
+            const pollOwner = poll.userId;
+
+            // If profile is not private, show poll
+            if (!pollOwner.isPrivate) {
+                return true;
+            }
+
+            // If current user is the poll owner, show poll
+            if (currentUserId && pollOwner._id.toString() === currentUserId) {
+                return true;
+            }
+
+            // If current user is a follower, show poll
+            if (currentUserId && pollOwner.followers) {
+                const isFollower = pollOwner.followers.some(
+                    followerId => followerId.toString() === currentUserId
+                );
+                if (isFollower) {
+                    return true;
+                }
+            }
+
+            // Private profile and not a follower, hide poll
+            return false;
+        });
 
         // Add percentages and check if current user voted
-        const pollsWithDetails = polls.map(poll => {
+        const pollsWithDetails = filteredPolls.map(poll => {
             const percentages = poll.calculatePercentages();
             const hasVoted = req.user
                 ? poll.options.some(opt => opt.votes.includes(req.user._id))
@@ -96,9 +127,48 @@ const getAllPolls = async (req, res, next) => {
 
 // @desc    Get user's polls
 // @route   GET /api/polls/user/:userId
-// @access  Public
+// @access  Public (but respects privacy settings)
 const getUserPolls = async (req, res, next) => {
     try {
+        // Get the profile owner
+        const profileOwner = await User.findById(req.params.userId);
+
+        if (!profileOwner) {
+            res.status(404);
+            throw new Error('User not found');
+        }
+
+        // Check if profile is private and if current user has access
+        if (profileOwner.isPrivate) {
+            // If not authenticated, deny access
+            if (!req.user) {
+                return res.status(200).json({
+                    success: true,
+                    polls: [],
+                    isPrivate: true,
+                    message: 'This account is private',
+                });
+            }
+
+            // If it's the profile owner themselves, allow access
+            const isOwner = req.user._id.toString() === profileOwner._id.toString();
+
+            // Check if current user is a follower
+            const isFollower = profileOwner.followers.some(
+                followerId => followerId.toString() === req.user._id.toString()
+            );
+
+            // If not owner and not follower, deny access
+            if (!isOwner && !isFollower) {
+                return res.status(200).json({
+                    success: true,
+                    polls: [],
+                    isPrivate: true,
+                    message: 'This account is private. Follow to see their polls.',
+                });
+            }
+        }
+
         const polls = await Poll.find({ userId: req.params.userId })
             .sort({ createdAt: -1 })
             .populate('userId', 'username fullName profilePicture');
