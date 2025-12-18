@@ -245,12 +245,15 @@ const followUser = async (req, res, next) => {
             });
         }
 
-        // Add to following and followers (public profile)
-        currentUser.following.push(userToFollow._id);
-        userToFollow.followers.push(currentUser._id);
-
-        await currentUser.save();
-        await userToFollow.save();
+        // Add to following and followers (public profile) - using $addToSet to prevent duplicates
+        await User.findByIdAndUpdate(
+            currentUser._id,
+            { $addToSet: { following: userToFollow._id } }
+        );
+        await User.findByIdAndUpdate(
+            userToFollow._id,
+            { $addToSet: { followers: currentUser._id } }
+        );
 
         // Create notification
         const notification = await Notification.create({
@@ -588,19 +591,18 @@ const acceptFollowRequest = async (req, res, next) => {
         followRequest.status = 'accepted';
         await followRequest.save();
 
-        // Add to following/followers
+        // Add to following/followers - using $addToSet to prevent duplicates
+        await User.findByIdAndUpdate(
+            followRequest.senderId,
+            { $addToSet: { following: followRequest.recipientId } }
+        );
+        await User.findByIdAndUpdate(
+            followRequest.recipientId,
+            { $addToSet: { followers: followRequest.senderId } }
+        );
+
         const sender = await User.findById(followRequest.senderId);
         const recipient = await User.findById(followRequest.recipientId);
-
-        if (!sender.following.includes(recipient._id)) {
-            sender.following.push(recipient._id);
-            await sender.save();
-        }
-
-        if (!recipient.followers.includes(sender._id)) {
-            recipient.followers.push(sender._id);
-            await recipient.save();
-        }
 
         // Create notification for sender
         const notification = await Notification.create({
