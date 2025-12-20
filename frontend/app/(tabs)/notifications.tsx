@@ -11,7 +11,8 @@ import {
   RefreshControl,
   Alert,
 } from 'react-native';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { ArrowLeft } from 'lucide-react-native';
 import { authStorage } from '@/utils/authStorage';
 import { useSocket } from '@/utils/useSocket';
 import API_BASE_URL from '@/config/api';
@@ -30,9 +31,15 @@ interface Notification {
   type: string;
   followRequestId?: string;
   followRequestStatus?: string;
+  createdAt: string;
+}
+
+interface GroupedNotifications {
+  [key: string]: Notification[];
 }
 
 export default function NotificationsScreen() {
+  const router = useRouter();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -77,9 +84,7 @@ export default function NotificationsScreen() {
 
     const handleNewNotification = (notification: Notification) => {
       console.log('Received real-time notification:', notification);
-      // Add new notification to the top of the list
       setNotifications(prev => {
-        // Check if notification already exists
         const exists = prev.some(n => n.id === notification.id);
         if (exists) return prev;
         return [notification, ...prev];
@@ -116,7 +121,6 @@ export default function NotificationsScreen() {
       });
 
       if (response.ok) {
-        // Update notification in state
         setNotifications(notifications.map(n =>
           n.id === notificationId
             ? { ...n, followRequestStatus: 'accepted' }
@@ -147,7 +151,6 @@ export default function NotificationsScreen() {
       });
 
       if (response.ok) {
-        // Update notification in state
         setNotifications(notifications.map(n =>
           n.id === notificationId
             ? { ...n, followRequestStatus: 'rejected' }
@@ -175,6 +178,41 @@ export default function NotificationsScreen() {
     return `${API_BASE_URL.replace('/api', '')}${avatar}`;
   };
 
+  // Group notifications by date
+  const groupNotificationsByDate = (notifications: Notification[]): GroupedNotifications => {
+    const grouped: GroupedNotifications = {};
+    const now = new Date();
+
+    notifications.forEach(notification => {
+      const notifDate = new Date(notification.createdAt);
+      const diffTime = Math.abs(now.getTime() - notifDate.getTime());
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+      let label = '';
+      if (diffDays === 0) {
+        label = 'Today';
+      } else if (diffDays === 1) {
+        label = 'Yesterday';
+      } else if (diffDays <= 7) {
+        label = 'This week';
+      } else if (diffDays <= 30) {
+        label = 'This month';
+      } else {
+        label = 'Earlier';
+      }
+
+      if (!grouped[label]) {
+        grouped[label] = [];
+      }
+      grouped[label].push(notification);
+    });
+
+    return grouped;
+  };
+
+  const groupedNotifications = groupNotificationsByDate(notifications);
+  const sectionOrder = ['Today', 'Yesterday', 'This week', 'This month', 'Earlier'];
+
   const renderFollowRequestActions = (notification: Notification) => {
     if (notification.type !== 'follow_request' || !notification.followRequestId) {
       return null;
@@ -184,58 +222,78 @@ export default function NotificationsScreen() {
 
     if (notification.followRequestStatus === 'accepted') {
       return (
-        <View style={styles.statusBadge}>
-          <Text style={styles.statusBadgeText}>Accepted</Text>
+        <View style={styles.actionButtons}>
+          <View style={styles.acceptedButton}>
+            <Text style={styles.acceptedButtonText}>Accepted</Text>
+          </View>
         </View>
       );
     }
 
     if (notification.followRequestStatus === 'rejected') {
       return (
-        <View style={[styles.statusBadge, styles.rejectedBadge]}>
-          <Text style={[styles.statusBadgeText, styles.rejectedText]}>Declined</Text>
+        <View style={styles.actionButtons}>
+          <View style={styles.rejectedButton}>
+            <Text style={styles.rejectedButtonText}>Declined</Text>
+          </View>
         </View>
       );
     }
 
     return (
-      <View style={styles.requestActions}>
+      <View style={styles.actionButtons}>
         <TouchableOpacity
-          style={styles.acceptButton}
+          style={styles.followButton}
           onPress={() => handleAcceptRequest(notification.followRequestId!, notification.id)}
           disabled={isLoading}
         >
           {isLoading ? (
             <ActivityIndicator size="small" color="#FFFFFF" />
           ) : (
-            <Text style={styles.acceptButtonText}>Accept</Text>
+            <Text style={styles.followButtonText}>Accept</Text>
           )}
         </TouchableOpacity>
         <TouchableOpacity
-          style={styles.rejectButton}
+          style={styles.declineButton}
           onPress={() => handleRejectRequest(notification.followRequestId!, notification.id)}
           disabled={isLoading}
         >
-          <Text style={styles.rejectButtonText}>Decline</Text>
+          <Text style={styles.declineButtonText}>Decline</Text>
         </TouchableOpacity>
       </View>
     );
+  };
+
+  // Format short time (6m, 2h, 1d)
+  const formatShortTime = (timeString: string): string => {
+    // timeString is already formatted like "37 minutes ago"
+    const parts = timeString.split(' ');
+    if (parts.length >= 2) {
+      const value = parts[0];
+      const unit = parts[1];
+
+      if (timeString.includes('just now')) return 'now';
+      if (unit.startsWith('minute')) return `${value}m`;
+      if (unit.startsWith('hour')) return `${value}h`;
+      if (unit.startsWith('day')) return `${value}d`;
+      if (unit.startsWith('week')) return `${value}w`;
+      if (unit.startsWith('month')) return `${value}mo`;
+      if (unit.startsWith('year')) return `${value}y`;
+    }
+    return timeString;
   };
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-      <View style={styles.logoHeader}>
-        <Image
-          source={require('../../assets/images/ican.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-      </View>
-
+      {/* Header */}
       <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+          <ArrowLeft size={24} color="#000000" />
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>Notifications</Text>
+        <View style={styles.placeholder} />
       </View>
 
       {loading ? (
@@ -250,29 +308,44 @@ export default function NotificationsScreen() {
       ) : (
         <ScrollView
           style={styles.scrollView}
-          contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-          {notifications.map((notification) => (
-            <View key={notification.id} style={styles.notificationCard}>
-              <Image
-                source={{ uri: getAvatarUrl(notification.user.avatar) }}
-                style={styles.avatar}
-              />
-              <View style={styles.notificationContent}>
-                <Text style={styles.notificationText}>
-                  <Text style={styles.userName}>{notification.user.name}</Text>
-                  {' '}
-                  {notification.action.replace(notification.user.username, '').trim()}
-                </Text>
-                <Text style={styles.time}>{notification.time}</Text>
-                {renderFollowRequestActions(notification)}
+          {sectionOrder.map(section => {
+            const sectionNotifications = groupedNotifications[section];
+            if (!sectionNotifications || sectionNotifications.length === 0) return null;
+
+            return (
+              <View key={section}>
+                <Text style={styles.sectionHeader}>{section}</Text>
+                {sectionNotifications.map((notification, index) => (
+                  <View key={notification.id}>
+                    <View style={styles.notificationItem}>
+                      <Image
+                        source={{ uri: getAvatarUrl(notification.user.avatar) }}
+                        style={styles.avatar}
+                      />
+                      <View style={styles.notificationContent}>
+                        <Text style={styles.notificationText}>
+                          <Text style={styles.userName}>{notification.user.name}</Text>
+                          {' '}
+                          <Text style={styles.actionText}>
+                            {notification.action.replace(notification.user.username, '').trim()}
+                          </Text>
+                          {' '}
+                          <Text style={styles.timestamp}>· {formatShortTime(notification.time)}</Text>
+                        </Text>
+                        {renderFollowRequestActions(notification)}
+                      </View>
+                    </View>
+                    {index < sectionNotifications.length - 1 && <View style={styles.divider} />}
+                  </View>
+                ))}
               </View>
-            </View>
-          ))}
+            );
+          })}
         </ScrollView>
       )}
     </View>
@@ -282,32 +355,31 @@ export default function NotificationsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
-  },
-  logoHeader: {
-    paddingTop: 40,
-    paddingBottom: 12,
-    alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
-  },
-  logo: {
-    width: 30,
-    height: 40,
   },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingTop: 50,
     paddingBottom: 16,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
   },
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+  },
   headerTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: '600',
-    color: '#101720',
+    color: '#000000',
+  },
+  placeholder: {
+    width: 40,
   },
   loadingContainer: {
     flex: 1,
@@ -323,7 +395,7 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#101720',
+    color: '#000000',
   },
   emptySubtext: {
     fontSize: 14,
@@ -334,20 +406,19 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  content: {
-    padding: 16,
+  sectionHeader: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#000000',
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 12,
   },
-  notificationCard: {
+  notificationItem: {
     flexDirection: 'row',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
   },
   avatar: {
     width: 40,
@@ -362,67 +433,88 @@ const styles = StyleSheet.create({
   },
   notificationText: {
     fontSize: 14,
-    color: '#687684',
-    marginBottom: 4,
+    lineHeight: 20,
   },
   userName: {
     fontWeight: '600',
-    color: '#101720',
+    color: '#000000',
   },
-  time: {
-    fontSize: 12,
-    color: '#6C7278',
+  actionText: {
+    color: '#000000',
   },
-  requestActions: {
+  timestamp: {
+    color: '#999999',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#EFEFEF',
+    marginLeft: 68,
+  },
+  actionButtons: {
     flexDirection: 'row',
-    marginTop: 10,
+    marginTop: 8,
     gap: 8,
   },
-  acceptButton: {
+  followButton: {
     backgroundColor: '#458FD0',
     borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingVertical: 7,
+    paddingHorizontal: 20,
     minWidth: 80,
     alignItems: 'center',
   },
-  acceptButtonText: {
+  followButtonText: {
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
   },
-  rejectButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
+  declineButton: {
+    backgroundColor: '#EFEFEF',
     borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingVertical: 7,
+    paddingHorizontal: 20,
     minWidth: 80,
     alignItems: 'center',
   },
-  rejectButtonText: {
+  declineButtonText: {
+    color: '#000000',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  acceptedButton: {
+    backgroundColor: '#EFEFEF',
+    borderRadius: 8,
+    paddingVertical: 7,
+    paddingHorizontal: 20,
+    alignItems: 'center',
+  },
+  acceptedButtonText: {
     color: '#6C7278',
     fontSize: 14,
     fontWeight: '600',
   },
-  statusBadge: {
-    backgroundColor: '#E8F5E9',
-    borderRadius: 6,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    alignSelf: 'flex-start',
-    marginTop: 8,
+  rejectedButton: {
+    backgroundColor: '#EFEFEF',
+    borderRadius: 8,
+    paddingVertical: 7,
+    paddingHorizontal: 20,
+    alignItems: 'center',
   },
-  statusBadgeText: {
-    color: '#2E7D32',
-    fontSize: 12,
+  rejectedButtonText: {
+    color: '#6C7278',
+    fontSize: 14,
     fontWeight: '600',
   },
-  rejectedBadge: {
-    backgroundColor: '#FFEBEE',
-  },
-  rejectedText: {
-    color: '#C62828',
-  },
 });
+
+
+interface Notification {
+  id: string;
+  user: {
+    id: string;
+    name: string;
+    username: string;
+    avatar: string;
+  };
+  action: string;
+  time: string;
