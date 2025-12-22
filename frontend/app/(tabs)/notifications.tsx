@@ -506,15 +506,3 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
-
-
-interface Notification {
-  id: string;
-  user: {
-    id: string;
-    name: string;
-    username: string;
-    avatar: string;
-  };
-  action: string;
-  time: string;

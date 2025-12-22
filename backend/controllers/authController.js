@@ -243,9 +243,65 @@ const resetPassword = async (req, res, next) => {
     }
 };
 
+// @desc    Google OAuth - Initiate
+// @route   GET /api/auth/google
+// @access  Public
+const googleAuth = (req, res, next) => {
+    // This will be handled by passport middleware in routes
+    // Just a placeholder for documentation
+};
+
+// @desc    Google OAuth - Callback
+// @route   GET /api/auth/google/callback
+// @access  Public
+const googleCallback = async (req, res, next) => {
+    try {
+        // User is attached to req.user by passport
+        if (!req.user) {
+            return res.status(401).json({
+                success: false,
+                message: 'Google authentication failed',
+            });
+        }
+
+        const user = req.user;
+
+        // Generate JWT token
+        const token = user.generateAuthToken();
+
+        // For mobile app, redirect to a custom URL scheme with the token
+        // The frontend will handle this URL and extract the token
+        const redirectUrl = `myapp://auth/callback?token=${token}&userId=${user._id}`;
+
+        // Alternatively, return JSON if called from API
+        if (req.query.mobile === 'true') {
+            return res.status(200).json({
+                success: true,
+                message: 'Google authentication successful',
+                token,
+                user: {
+                    id: user._id,
+                    fullName: user.fullName,
+                    email: user.email,
+                    username: user.username,
+                    profilePicture: user.profilePicture,
+                    bio: user.bio,
+                },
+            });
+        }
+
+        // Redirect to mobile app with token
+        res.redirect(redirectUrl);
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     signup,
     login,
     forgotPassword,
     resetPassword,
+    googleAuth,
+    googleCallback,
 };

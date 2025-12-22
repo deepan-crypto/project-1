@@ -9,11 +9,13 @@ import {
     ActivityIndicator,
     StatusBar,
     Alert,
+    FlatList,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import API_BASE_URL from '@/config/api';
 import { authStorage } from '@/utils/authStorage';
+import PollCard from '@/components/PollCard';
 
 interface UserProfile {
     id: string;
@@ -26,6 +28,25 @@ interface UserProfile {
     following: string[];
 }
 
+interface Poll {
+    _id: string;
+    question: string;
+    options: {
+        id: string;
+        text: string;
+        votes: string[];
+        emoji?: string;
+    }[];
+    user: {
+        _id: string;
+        fullName: string;
+        username: string;
+        profilePicture: string;
+    };
+    likes: string[];
+    createdAt: string;
+}
+
 export default function UserProfileScreen() {
     const { username } = useLocalSearchParams<{ username: string }>();
     const [user, setUser] = useState<UserProfile | null>(null);
@@ -35,6 +56,8 @@ export default function UserProfileScreen() {
     const [hasPendingRequest, setHasPendingRequest] = useState(false);
     const [actionLoading, setActionLoading] = useState(false);
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+    const [polls, setPolls] = useState<Poll[]>([]);
+    const [pollsLoading, setPollsLoading] = useState(false);
 
     useEffect(() => {
         const loadCurrentUser = async () => {
@@ -112,6 +135,34 @@ export default function UserProfileScreen() {
             console.error('Error checking pending request:', error);
         }
     };
+
+    useEffect(() => {
+        const fetchUserPolls = async () => {
+            if (!user?.id) return;
+
+            setPollsLoading(true);
+            try {
+                const token = await authStorage.getToken();
+                const headers: Record<string, string> = {};
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+
+                const response = await fetch(`${API_BASE_URL}/polls/user/${user.id}`, { headers });
+                const data = await response.json();
+
+                if (response.ok && data.polls) {
+                    setPolls(data.polls);
+                }
+            } catch (error) {
+                console.error('Error fetching user polls:', error);
+            } finally {
+                setPollsLoading(false);
+            }
+        };
+
+        fetchUserPolls();
+    }, [user?.id]);
 
     const handleFollow = async () => {
         if (!user) return;
@@ -281,10 +332,65 @@ export default function UserProfileScreen() {
                             <Text style={styles.statNumber}>{user.following?.length || 0}</Text>
                             <Text style={styles.statLabel}>Following</Text>
                         </View>
+                        <View style={styles.stat}>
+                            <Text style={styles.statNumber}>{polls.length}</Text>
+                            <Text style={styles.statLabel}>Polls</Text>
+                        </View>
                     </View>
 
                     {/* Follow Button */}
                     {renderFollowButton()}
+                </View>
+
+                {/* Polls Section */}
+                <View style={styles.pollsSection}>
+                    <View style={styles.pollsHeader}>
+                        <Text style={styles.pollsHeaderText}>Polls</Text>
+                    </View>
+
+                    {pollsLoading ? (
+                        <View style={styles.pollsLoadingContainer}>
+                            <ActivityIndicator size="large" color="#458FD0" />
+                        </View>
+                    ) : polls.length === 0 ? (
+                        <View style={styles.emptyPollsContainer}>
+                            <Text style={styles.emptyPollsText}>No polls yet</Text>
+                            <Text style={styles.emptyPollsSubtext}>
+                                {isOwnProfile ? "Create your first poll!" : `${user.fullName} hasn't created any polls yet`}
+                            </Text>
+                        </View>
+                    ) : (
+                        polls.map((poll) => (
+                            <View key={poll._id} style={styles.pollCardWrapper}>
+                                <PollCard
+                                    id={poll._id}
+                                    user={{
+                                        name: poll.user.fullName,
+                                        avatar: poll.user.profilePicture
+                                            ? poll.user.profilePicture.startsWith('http')
+                                                ? poll.user.profilePicture
+                                                : `${API_BASE_URL.replace('/api', '')}${poll.user.profilePicture}`
+                                            : 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200',
+                                    }}
+                                    question={poll.question}
+                                    options={poll.options.map((opt, idx) => {
+                                        const totalVotes = poll.options.reduce((sum, o) => sum + (o.votes?.length || 0), 0);
+                                        const percentage = totalVotes > 0 ? Math.round(((opt.votes?.length || 0) / totalVotes) * 100) : 0;
+                                        return {
+                                            id: opt.id || idx.toString(),
+                                            text: opt.text,
+                                            percentage,
+                                            emoji: opt.emoji,
+                                        };
+                                    })}
+                                    likes={poll.likes?.length || 0}
+                                    hasVoted={poll.options.some(opt => opt.votes?.includes(currentUserId || ''))}
+                                    isLiked={poll.likes?.includes(currentUserId || '')}
+                                    createdAt={poll.createdAt}
+                                />
+                            </View>
+                        ))
+                    )}
                 </View>
             </ScrollView>
         </View>
@@ -447,5 +553,45 @@ const styles = StyleSheet.create({
         color: '#6C7278',
         fontSize: 16,
         fontWeight: '600',
+    },
+    pollsSection: {
+        marginTop: 8,
+        paddingBottom: 20,
+    },
+    pollsHeader: {
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        borderTopWidth: 1,
+        borderTopColor: '#E5E5E5',
+        borderBottomWidth: 1,
+        borderBottomColor: '#E5E5E5',
+        backgroundColor: '#F9F9F9',
+    },
+    pollsHeaderText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#101720',
+    },
+    pollsLoadingContainer: {
+        padding: 40,
+        alignItems: 'center',
+    },
+    emptyPollsContainer: {
+        padding: 40,
+        alignItems: 'center',
+    },
+    emptyPollsText: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#101720',
+        marginBottom: 8,
+    },
+    emptyPollsSubtext: {
+        fontSize: 14,
+        color: '#6C7278',
+        textAlign: 'center',
+    },
+    pollCardWrapper: {
+        marginBottom: 0,
     },
 });

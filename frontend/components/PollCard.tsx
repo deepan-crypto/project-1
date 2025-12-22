@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Share, Alert } from 'react-native';
-import { Heart, Share2, Trash2 } from 'lucide-react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, Share } from 'react-native';
+import { Heart, Trash2 } from 'lucide-react-native';
+import SendIcon from './SendIcon';
 import { router } from 'expo-router';
 
 interface PollOption {
@@ -107,13 +108,19 @@ export default function PollCard({
     if (!id) return;
     try {
       const pollUrl = `myapp://poll/${id}`;
-      await Share.share({
-        message: `Check out this poll: "${question}"\n\n${pollUrl}`,
+      const result = await Share.share({
+        message: `Check out this poll: "${question}"\n\nVote now: ${pollUrl}`,
         title: 'Share Poll',
-        url: pollUrl,
       });
+
+      if (result.action === Share.sharedAction) {
+        console.log('Poll shared successfully');
+      } else if (result.action === Share.dismissedAction) {
+        console.log('Share dismissed');
+      }
     } catch (error) {
-      console.error('Error sharing:', error);
+      console.error('Error sharing poll:', error);
+      Alert.alert('Error', 'Failed to share poll. Please try again.');
     }
   };
 
@@ -199,7 +206,7 @@ export default function PollCard({
         </View>
         <View style={styles.footerRight}>
           <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
-            <Share2 size={18} color="#687684" />
+            <SendIcon size={18} color="#687684" />
           </TouchableOpacity>
           {onDelete && id && (
             <TouchableOpacity
