@@ -4,7 +4,7 @@
     "slug": "crypto-app",
     "version": "1.0.0",
     
-    // --- ADD THIS BLOCK ---
+    
     "android": {
       "package": "com.deepangokul.cryptoapp",
       "adaptiveIcon": {
@@ -12,7 +12,7 @@
         "backgroundColor": "#ffffff"
       }
     },
-    // ----------------------
+   
 
     "orientation": "portrait",
     "icon": "./assets/images/ican.png",
