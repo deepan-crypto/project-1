@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import API_BASE_URL from '@/config/api';
 import { authStorage } from '@/utils/authStorage';
+<<<<<<< HEAD
+=======
+import { signInWithGoogleBackend } from '@/utils/googleAuth';
+>>>>>>> master
 import {
   View,
   Text,
@@ -9,6 +13,12 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
+<<<<<<< HEAD
+=======
+  ActivityIndicator,
+  Alert,
+  Image,
+>>>>>>> master
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -79,6 +89,32 @@ export default function LoginScreen() {
     }
   };
 
+<<<<<<< HEAD
+=======
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    setErrors({});
+
+    try {
+      const result = await signInWithGoogleBackend();
+
+      if (result.success && result.token && result.user) {
+        // Store token and user data
+        await authStorage.setToken(result.token);
+        await authStorage.setUser(result.user);
+        router.replace('/(tabs)');
+      } else {
+        Alert.alert('Authentication Failed', result.error || 'Failed to sign in with Google');
+      }
+    } catch (error) {
+      console.error('Google Sign-In error:', error);
+      Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+>>>>>>> master
   return (
     <LinearGradient colors={['#45BFD0', '#2B9EB3']} style={styles.container}>
       <KeyboardAvoidingView
@@ -167,6 +203,35 @@ export default function LoginScreen() {
                   {loading ? 'Logging In...' : 'Log In'}
                 </Text>
               </TouchableOpacity>
+<<<<<<< HEAD
+=======
+
+              {/* OR Divider */}
+              <View style={styles.dividerContainer}>
+                <View style={styles.divider} />
+                <Text style={styles.dividerText}>OR</Text>
+                <View style={styles.divider} />
+              </View>
+
+              {/* Google Sign-In Button */}
+              <TouchableOpacity
+                style={[styles.googleButton, loading && styles.loginButtonDisabled]}
+                onPress={handleGoogleSignIn}
+                disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#666" />
+                ) : (
+                  <>
+                    <Image
+                      source={require('@/assets/images/google-logo.png')}
+                      style={styles.googleIcon}
+                    />
+                    <Text style={styles.googleButtonText}>Login with Google</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+>>>>>>> master
             </View>
           </View>
         </View>
@@ -314,4 +379,50 @@ const styles = StyleSheet.create({
   loginButtonDisabled: {
     opacity: 0.6,
   },
+<<<<<<< HEAD
+=======
+  dividerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 16,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#E0E0E0',
+  },
+  dividerText: {
+    marginHorizontal: 12,
+    color: '#999',
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  googleButton: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 4,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#dadce0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  googleIcon: {
+    width: 24,
+    height: 24,
+    marginRight: 12,
+  },
+  googleButtonText: {
+    color: '#3c4043',
+    fontSize: 14,
+    fontWeight: '500',
+    fontFamily: 'Roboto',
+  },
+>>>>>>> master
 });

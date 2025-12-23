@@ -3,6 +3,20 @@
     "name": "crypto-app",
     "slug": "crypto-app",
     "version": "1.0.0",
+<<<<<<< HEAD
+=======
+    
+    
+    "android": {
+      "package": "com.deepangokul.cryptoapp",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/ican.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
+   
+
+>>>>>>> master
     "orientation": "portrait",
     "icon": "./assets/images/ican.png",
     "scheme": "myapp",
@@ -24,6 +38,18 @@
     ],
     "experiments": {
       "typedRoutes": true
+<<<<<<< HEAD
     }
   }
 }
+=======
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "09787720-c92e-4247-943b-1dbe394d4a71"
+      }
+    }
+  }
+}
+>>>>>>> master

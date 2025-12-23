@@ -19,10 +19,17 @@ const app = express();
 // Create HTTP server for Socket.IO
 const server = http.createServer(app);
 
+<<<<<<< HEAD
 // Initialize Socket.IO
 const io = new Server(server, {
     cors: {
         origin: process.env.FRONTEND_URL || '*',
+=======
+// Initialize Socket.IO with secure CORS
+const io = new Server(server, {
+    cors: {
+        origin: process.env.FRONTEND_URL || 'http://localhost:8081',
+>>>>>>> master
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: true,
     },
@@ -37,12 +44,35 @@ io.on('connection', (socket) => {
 
     // User joins their personal room for notifications
     socket.on('join', (userId) => {
+<<<<<<< HEAD
         if (userId) {
             socket.join(userId);
             console.log(`User ${userId} joined their notification room`);
         }
     });
 
+=======
+        try {
+            // Validate userId before joining
+            if (userId && typeof userId === 'string' && userId.match(/^[0-9a-fA-F]{24}$/)) {
+                socket.join(userId);
+                console.log(`User ${userId} joined their notification room`);
+            } else {
+                console.error('Invalid userId provided for socket join:', userId);
+                socket.emit('error', { message: 'Invalid user ID' });
+            }
+        } catch (error) {
+            console.error('Error joining socket room:', error);
+            socket.emit('error', { message: 'Failed to join notification room' });
+        }
+    });
+
+    // Handle socket errors
+    socket.on('error', (error) => {
+        console.error('Socket error:', error);
+    });
+
+>>>>>>> master
     // Handle disconnection
     socket.on('disconnect', () => {
         console.log('User disconnected:', socket.id);
@@ -53,8 +83,20 @@ io.on('connection', (socket) => {
 connectDB();
 
 // Middleware
+<<<<<<< HEAD
 app.use(cors({
     origin: process.env.FRONTEND_URL || '*',
+=======
+// CORS configuration - secure by default
+const corsOrigin = process.env.FRONTEND_URL;
+if (!corsOrigin && process.env.NODE_ENV === 'production') {
+    console.error('FATAL: FRONTEND_URL environment variable is required in production mode');
+    process.exit(1);
+}
+
+app.use(cors({
+    origin: corsOrigin || 'http://localhost:8081', // Safe default for development only
+>>>>>>> master
     credentials: true,
 }));
 app.use(express.json());

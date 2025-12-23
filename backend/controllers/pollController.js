@@ -92,7 +92,14 @@ const getAllPolls = async (req, res, next) => {
         const pollsWithDetails = filteredPolls.map(poll => {
             const percentages = poll.calculatePercentages();
             const hasVoted = req.user
+<<<<<<< HEAD
                 ? poll.options.some(opt => opt.votes.includes(req.user._id))
+=======
+                ? poll.options.some(opt => opt.votes.some(v => v.toString() === req.user._id.toString()))
+                : false;
+            const isLiked = req.user
+                ? poll.likes.some(id => id.toString() === req.user._id.toString())
+>>>>>>> master
                 : false;
 
             return {
@@ -111,6 +118,10 @@ const getAllPolls = async (req, res, next) => {
                 })),
                 likes: poll.likes.length,
                 hasVoted,
+<<<<<<< HEAD
+=======
+                isLiked,
+>>>>>>> master
                 createdAt: poll.createdAt,
             };
         });
@@ -177,8 +188,24 @@ const getUserPolls = async (req, res, next) => {
         const pollsWithDetails = polls.map(poll => {
             const percentages = poll.calculatePercentages();
             const hasVoted = req.user
+<<<<<<< HEAD
                 ? poll.options.some(opt => opt.votes.includes(req.user._id))
                 : false;
+=======
+                ? poll.options.some(opt => opt.votes.some(v => v.toString() === req.user._id.toString()))
+                : false;
+            const isLiked = req.user
+                ? poll.likes.some(id => id.toString() === req.user._id.toString())
+                : false;
+
+            // Find which option the user voted for
+            let votedOptionIndex = -1;
+            if (req.user && hasVoted) {
+                votedOptionIndex = poll.options.findIndex(opt =>
+                    opt.votes.some(v => v.toString() === req.user._id.toString())
+                );
+            }
+>>>>>>> master
 
             return {
                 id: poll._id,
@@ -195,6 +222,105 @@ const getUserPolls = async (req, res, next) => {
                 })),
                 likes: poll.likes.length,
                 hasVoted,
+<<<<<<< HEAD
+=======
+                isLiked,
+                votedOptionIndex: votedOptionIndex >= 0 ? votedOptionIndex : undefined,
+                createdAt: poll.createdAt,
+            };
+        });
+
+        res.status(200).json({
+            success: true,
+            polls: pollsWithDetails,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Get polls that user has voted on
+// @route   GET /api/polls/user/:userId/voted
+// @access  Public (but respects privacy settings)
+const getUserVotedPolls = async (req, res, next) => {
+    try {
+        const targetUserId = req.params.userId;
+
+        // Find all polls where any option's votes array contains the user's ID
+        const polls = await Poll.find({
+            'options.votes': targetUserId
+        })
+            .sort({ createdAt: -1 })
+            .populate('userId', 'username fullName profilePicture isPrivate followers');
+
+        // Filter polls based on privacy settings
+        const currentUserId = req.user?._id?.toString();
+
+        const filteredPolls = polls.filter(poll => {
+            const pollOwner = poll.userId;
+
+            // If profile is not private, show poll
+            if (!pollOwner.isPrivate) {
+                return true;
+            }
+
+            // If current user is the poll owner, show poll
+            if (currentUserId && pollOwner._id.toString() === currentUserId) {
+                return true;
+            }
+
+            // If current user is a follower, show poll
+            if (currentUserId && pollOwner.followers) {
+                const isFollower = pollOwner.followers.some(
+                    followerId => followerId.toString() === currentUserId
+                );
+                if (isFollower) {
+                    return true;
+                }
+            }
+
+            // Private profile and not a follower, hide poll
+            return false;
+        });
+
+        const pollsWithDetails = filteredPolls.map(poll => {
+            const percentages = poll.calculatePercentages();
+            const hasVoted = req.user
+                ? poll.options.some(opt => opt.votes.some(v => v.toString() === req.user._id.toString()))
+                : poll.options.some(opt => opt.votes.some(v => v.toString() === targetUserId));
+            const isLiked = req.user
+                ? poll.likes.some(id => id.toString() === req.user._id.toString())
+                : false;
+
+            // Find which option the user voted for
+            let votedOptionIndex = -1;
+            if (hasVoted) {
+                const userId = req.user ? req.user._id.toString() : targetUserId;
+                votedOptionIndex = poll.options.findIndex(opt =>
+                    opt.votes.some(v => v.toString() === userId)
+                );
+            }
+
+            return {
+                id: poll._id,
+                userId: poll.userId._id,
+                user: {
+                    name: poll.userId.username,
+                    fullName: poll.userId.fullName,
+                    avatar: poll.userId.profilePicture,
+                },
+                question: poll.question,
+                options: percentages.map((opt, idx) => ({
+                    id: idx,
+                    text: opt.text,
+                    emoji: opt.emoji,
+                    percentage: opt.percentage,
+                })),
+                likes: poll.likes.length,
+                hasVoted,
+                isLiked,
+                votedOptionIndex: votedOptionIndex >= 0 ? votedOptionIndex : undefined,
+>>>>>>> master
                 createdAt: poll.createdAt,
             };
         });
@@ -430,7 +556,14 @@ const getPollDetails = async (req, res, next) => {
 
         const percentages = poll.calculatePercentages();
         const hasVoted = req.user
+<<<<<<< HEAD
             ? poll.options.some(opt => opt.votes.includes(req.user._id))
+=======
+            ? poll.options.some(opt => opt.votes.some(v => v.toString() === req.user._id.toString()))
+            : false;
+        const isLiked = req.user
+            ? poll.likes.some(id => id.toString() === req.user._id.toString())
+>>>>>>> master
             : false;
 
         res.status(200).json({
@@ -450,6 +583,10 @@ const getPollDetails = async (req, res, next) => {
                 })),
                 likes: poll.likes.length,
                 hasVoted,
+<<<<<<< HEAD
+=======
+                isLiked,
+>>>>>>> master
                 createdAt: poll.createdAt,
             },
         });
@@ -522,6 +659,10 @@ module.exports = {
     createPoll,
     getAllPolls,
     getUserPolls,
+<<<<<<< HEAD
+=======
+    getUserVotedPolls,
+>>>>>>> master
     votePoll,
     likePoll,
     unlikePoll,

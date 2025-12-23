@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import { View, Text, StyleSheet, TouchableOpacity, Image, Share, Alert } from 'react-native';
 import { Heart, Share2, Trash2 } from 'lucide-react-native';
+=======
+import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, Share } from 'react-native';
+import { Heart, Trash2 } from 'lucide-react-native';
+import SendIcon from './SendIcon';
+>>>>>>> master
 import { router } from 'expo-router';
 
 interface PollOption {
@@ -21,11 +27,34 @@ interface PollCardProps {
   likes: number;
   hasVoted?: boolean;
   isLiked?: boolean;
+<<<<<<< HEAD
+=======
+  createdAt?: string;
+>>>>>>> master
   onDelete?: (id: string) => void;
   onLike?: (id: string) => Promise<{ likes: number; liked: boolean }>;
   onVote?: (pollId: string, optionIndex: number) => Promise<{ options: PollOption[]; hasVoted: boolean }>;
 }
 
+<<<<<<< HEAD
+=======
+// Format time ago helper function
+const formatTimeAgo = (dateString?: string): string => {
+  if (!dateString) return '';
+
+  const now = new Date();
+  const date = new Date(dateString);
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+  if (seconds < 60) return 'Just now';
+  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+  if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+  if (seconds < 2592000) return `${Math.floor(seconds / 604800)}w ago`;
+  return `${Math.floor(seconds / 2592000)}mo ago`;
+};
+
+>>>>>>> master
 export default function PollCard({
   id,
   user,
@@ -34,6 +63,10 @@ export default function PollCard({
   likes: initialLikes,
   hasVoted: initialHasVoted = false,
   isLiked: initialIsLiked = false,
+<<<<<<< HEAD
+=======
+  createdAt,
+>>>>>>> master
   onDelete,
   onLike,
   onVote,
@@ -89,6 +122,7 @@ export default function PollCard({
     if (!id) return;
     try {
       const pollUrl = `myapp://poll/${id}`;
+<<<<<<< HEAD
       await Share.share({
         message: `Check out this poll: "${question}"\n\n${pollUrl}`,
         title: 'Share Poll',
@@ -96,6 +130,21 @@ export default function PollCard({
       });
     } catch (error) {
       console.error('Error sharing:', error);
+=======
+      const result = await Share.share({
+        message: `Check out this poll: "${question}"\n\nVote now: ${pollUrl}`,
+        title: 'Share Poll',
+      });
+
+      if (result.action === Share.sharedAction) {
+        console.log('Poll shared successfully');
+      } else if (result.action === Share.dismissedAction) {
+        console.log('Share dismissed');
+      }
+    } catch (error) {
+      console.error('Error sharing poll:', error);
+      Alert.alert('Error', 'Failed to share poll. Please try again.');
+>>>>>>> master
     }
   };
 
@@ -110,7 +159,14 @@ export default function PollCard({
       <View style={styles.header}>
         <Image source={{ uri: user.avatar }} style={styles.avatar} />
         <View style={styles.userInfo}>
+<<<<<<< HEAD
           <Text style={styles.userName}>{user.name}</Text>
+=======
+          <View style={styles.userHeader}>
+            <Text style={styles.userName}>{user.name}</Text>
+            {createdAt && <Text style={styles.timeAgo}>{formatTimeAgo(createdAt)}</Text>}
+          </View>
+>>>>>>> master
           <Text style={styles.question}>{question}</Text>
         </View>
       </View>
@@ -178,7 +234,11 @@ export default function PollCard({
         </View>
         <View style={styles.footerRight}>
           <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
+<<<<<<< HEAD
             <Share2 size={18} color="#687684" />
+=======
+            <SendIcon size={18} color="#687684" />
+>>>>>>> master
           </TouchableOpacity>
           {onDelete && id && (
             <TouchableOpacity
@@ -216,6 +276,15 @@ const styles = StyleSheet.create({
   userInfo: {
     flex: 1,
   },
+<<<<<<< HEAD
+=======
+  userHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+>>>>>>> master
   userName: {
     fontSize: 14,
     fontWeight: '600',

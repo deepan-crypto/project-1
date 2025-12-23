@@ -33,6 +33,11 @@ interface Poll {
   }[];
   likes: number;
   hasVoted: boolean;
+<<<<<<< HEAD
+=======
+  isLiked?: boolean;
+  createdAt?: string;
+>>>>>>> master
 }
 
 export default function HomeScreen() {
@@ -110,6 +115,11 @@ export default function HomeScreen() {
           options: poll.options,
           likes: poll.likes,
           hasVoted: poll.hasVoted,
+<<<<<<< HEAD
+=======
+          isLiked: poll.isLiked,
+          createdAt: poll.createdAt,
+>>>>>>> master
         }));
         setPolls(transformedPolls);
       }

@@ -421,6 +421,10 @@ const getUserByUsername = async (req, res, next) => {
                 username: user.username,
                 bio: user.bio,
                 profilePicture: user.profilePicture,
+<<<<<<< HEAD
+=======
+                isPrivate: user.isPrivate,
+>>>>>>> master
                 followers: user.followers,
                 following: user.following,
             },

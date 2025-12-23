@@ -22,13 +22,31 @@ interface UserPoll {
   options: { text: string; percentage: number }[];
   likes: number;
   hasVoted: boolean;
+<<<<<<< HEAD
   createdAt: string;
+=======
+  isLiked?: boolean;
+  votedOptionIndex?: number;
+  createdAt: string;
+  user?: {
+    name: string;
+    fullName?: string;
+    avatar: string;
+  };
+>>>>>>> master
 }
 
 export default function ProfileScreen() {
   const [user, setUser] = useState<any>(null);
   const [polls, setPolls] = useState<UserPoll[]>([]);
+<<<<<<< HEAD
   const [loadingPolls, setLoadingPolls] = useState(true);
+=======
+  const [votedPolls, setVotedPolls] = useState<UserPoll[]>([]);
+  const [allPolls, setAllPolls] = useState<(UserPoll & { isOwn: boolean })[]>([]);
+  const [loadingPolls, setLoadingPolls] = useState(true);
+  const [loadingVotedPolls, setLoadingVotedPolls] = useState(true);
+>>>>>>> master
   const [stats, setStats] = useState({ followersCount: 0, followingCount: 0 });
 
   // Fetch user stats from API
@@ -59,8 +77,14 @@ export default function ProfileScreen() {
       console.log('Loaded user data:', userData);
       if (userData) {
         setUser(userData);
+<<<<<<< HEAD
         // Fetch user's polls and stats
         fetchUserPolls(userData.id);
+=======
+        // Fetch user's polls, voted polls, and stats
+        fetchUserPolls(userData.id);
+        fetchVotedPolls(userData.id);
+>>>>>>> master
         fetchUserStats(userData.id);
       }
     } catch (error) {
@@ -82,6 +106,11 @@ export default function ProfileScreen() {
 
       if (response.ok && data.polls) {
         setPolls(data.polls);
+<<<<<<< HEAD
+=======
+        // Combine and sort polls after both are loaded
+        combinePolls(data.polls, votedPolls);
+>>>>>>> master
       }
     } catch (error) {
       console.error('Error fetching user polls:', error);
@@ -90,6 +119,43 @@ export default function ProfileScreen() {
     }
   };
 
+<<<<<<< HEAD
+=======
+  // Fetch polls the user has voted on
+  const fetchVotedPolls = async (userId: string) => {
+    try {
+      setLoadingVotedPolls(true);
+      const token = await authStorage.getToken();
+      const headers: Record<string, string> = {};
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+      const response = await fetch(`${API_BASE_URL}/polls/user/${userId}/voted`, { headers });
+      const data = await response.json();
+
+      if (response.ok && data.polls) {
+        setVotedPolls(data.polls);
+        // Combine and sort polls after both are loaded
+        combinePolls(polls, data.polls);
+      }
+    } catch (error) {
+      console.error('Error fetching voted polls:', error);
+    } finally {
+      setLoadingVotedPolls(false);
+    }
+  };
+
+  // Combine own polls and voted polls into single array
+  const combinePolls = (ownPolls: UserPoll[], voted: UserPoll[]) => {
+    const ownPollsWithFlag = ownPolls.map(p => ({ ...p, isOwn: true }));
+    const votedPollsWithFlag = voted.map(p => ({ ...p, isOwn: false }));
+    const combined = [...ownPollsWithFlag, ...votedPollsWithFlag];
+    // Sort by creation date, newest first
+    combined.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    setAllPolls(combined);
+  };
+
+>>>>>>> master
   // Format time ago
   const formatTimeAgo = (dateString: string) => {
     const now = new Date();
@@ -186,6 +252,7 @@ export default function ProfileScreen() {
   };
 
   // Handle like poll
+<<<<<<< HEAD
   const handleLikePoll = async (pollId: string) => {
     try {
       const token = await authStorage.getToken();
@@ -206,6 +273,56 @@ export default function ProfileScreen() {
       }
     } catch (error) {
       console.error('Error liking poll:', error);
+=======
+  const handleLikePoll = async (pollId: string): Promise<{ likes: number; liked: boolean }> => {
+    const token = await authStorage.getToken();
+    if (!token) {
+      Alert.alert('Error', 'Please log in to like polls');
+      throw new Error('Not authenticated');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/polls/${pollId}/like`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      // Update poll in all states
+      setPolls(polls.map(p =>
+        p.id === pollId ? { ...p, likes: data.likesCount, isLiked: true } : p
+      ));
+      setVotedPolls(votedPolls.map(p =>
+        p.id === pollId ? { ...p, likes: data.likesCount, isLiked: true } : p
+      ));
+      setAllPolls(allPolls.map(p =>
+        p.id === pollId ? { ...p, likes: data.likesCount, isLiked: true } : p
+      ));
+      return { likes: data.likesCount, liked: true };
+    } else {
+      // If already liked, try to unlike
+      if (data.message?.includes('already liked')) {
+        const unlikeResponse = await fetch(`${API_BASE_URL}/polls/${pollId}/unlike`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` },
+        });
+        const unlikeData = await unlikeResponse.json();
+        if (unlikeResponse.ok) {
+          setPolls(polls.map(p =>
+            p.id === pollId ? { ...p, likes: unlikeData.likesCount, isLiked: false } : p
+          ));
+          setVotedPolls(votedPolls.map(p =>
+            p.id === pollId ? { ...p, likes: unlikeData.likesCount, isLiked: false } : p
+          ));
+          setAllPolls(allPolls.map(p =>
+            p.id === pollId ? { ...p, likes: unlikeData.likesCount, isLiked: false } : p
+          ));
+          return { likes: unlikeData.likesCount, liked: false };
+        }
+      }
+      throw new Error(data.message || 'Failed to like poll');
+>>>>>>> master
     }
   };
 
@@ -229,10 +346,20 @@ export default function ProfileScreen() {
     const data = await response.json();
 
     if (response.ok && data.options) {
+<<<<<<< HEAD
       // Update poll in state with new options
       setPolls(polls.map(p =>
         p.id === pollId ? { ...p, options: data.options, hasVoted: true } : p
       ));
+=======
+      // Update poll in both states
+      setPolls(polls.map(p =>
+        p.id === pollId ? { ...p, options: data.options, hasVoted: true } : p
+      ));
+      setVotedPolls(votedPolls.map(p =>
+        p.id === pollId ? { ...p, options: data.options, hasVoted: true } : p
+      ));
+>>>>>>> master
       return {
         options: data.options,
         hasVoted: true
@@ -332,41 +459,80 @@ export default function ProfileScreen() {
           </View>
         </View>
 
+<<<<<<< HEAD
         {/* Polls Section */}
         <View style={styles.pollsSection}>
           {loadingPolls ? (
+=======
+
+
+        {/* Polls Section - Single Column */}
+        <View style={styles.pollsSection}>
+          {(loadingPolls || loadingVotedPolls) ? (
+>>>>>>> master
             <View style={styles.pollsLoading}>
               <ActivityIndicator size="small" color="#458FD0" />
               <Text style={styles.pollsLoadingText}>Loading polls...</Text>
             </View>
+<<<<<<< HEAD
           ) : polls.length === 0 ? (
+=======
+          ) : allPolls.length === 0 ? (
+>>>>>>> master
             <View style={styles.noPollsContainer}>
               <Text style={styles.noPollsText}>No polls yet</Text>
               <Text style={styles.noPollsSubtext}>Create your first poll!</Text>
             </View>
           ) : (
+<<<<<<< HEAD
             polls.map((poll: UserPoll) => (
               <View key={poll.id} style={styles.pollCard}>
+=======
+            allPolls.map((poll) => (
+              <View key={poll.id} style={styles.pollCard}>
+                {/* You voted label - appears above entire poll */}
+                {!poll.isOwn && poll.hasVoted && (
+                  <Text style={styles.votedLabelTop}>You voted</Text>
+                )}
+
+>>>>>>> master
                 {/* Poll Header with User Info */}
                 <View style={styles.pollHeader}>
                   <View style={styles.pollUserInfo}>
                     <Image
+<<<<<<< HEAD
                       source={{ uri: getProfileImageUrl() }}
                       style={styles.smallAvatar}
                     />
                     <View style={styles.pollTextInfo}>
                       <Text style={styles.pollUserName}>{user?.fullName || 'User'}</Text>
+=======
+                      source={{
+                        uri: poll.isOwn
+                          ? getProfileImageUrl()
+                          : (poll.user?.avatar ? (poll.user.avatar.startsWith('http') ? poll.user.avatar : `${API_BASE_URL.replace('/api', '')}${poll.user.avatar}`) : 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200')
+                      }}
+                      style={styles.smallAvatar}
+                    />
+                    <View style={styles.pollTextInfo}>
+                      <Text style={styles.pollUserName}>
+                        {poll.isOwn ? (user?.fullName || 'User') : (poll.user?.fullName || poll.user?.name || 'User')}
+                      </Text>
+>>>>>>> master
                       <Text style={styles.pollQuestion}>{poll.question}</Text>
                     </View>
                   </View>
                   <Text style={styles.pollTime}>{formatTimeAgo(poll.createdAt)}</Text>
                 </View>
 
+<<<<<<< HEAD
                 {/* Voted Label */}
                 {poll.hasVoted && (
                   <Text style={styles.votedLabel}>You voted</Text>
                 )}
 
+=======
+>>>>>>> master
                 {/* Poll Options */}
                 <View style={styles.pollOptions}>
                   {poll.options.map((option: { text: string; percentage: number }, index: number) => (
@@ -383,6 +549,11 @@ export default function ProfileScreen() {
                           <View
                             style={[
                               styles.optionProgress,
+<<<<<<< HEAD
+=======
+                              // Blue color for the option the user voted for
+                              !poll.isOwn && poll.votedOptionIndex === index && styles.optionProgressBlue,
+>>>>>>> master
                               { width: `${option.percentage}%` },
                             ]}
                           />
@@ -400,6 +571,7 @@ export default function ProfileScreen() {
                   ))}
                 </View>
 
+<<<<<<< HEAD
                 {/* Poll Footer with Actions */}
                 <View style={styles.pollFooter}>
                   <View style={styles.footerLeft}>
@@ -429,6 +601,61 @@ export default function ProfileScreen() {
               </View>
             ))
           )}
+=======
+                {/* Poll Footer with Actions - Hide likes on own polls */}
+                {!poll.isOwn && (
+                  <View style={styles.pollFooter}>
+                    <View style={styles.footerLeft}>
+                      <TouchableOpacity
+                        style={styles.actionButton}
+                        onPress={() => handleLikePoll(poll.id)}
+                      >
+                        <Heart
+                          size={18}
+                          color={poll.isLiked ? "#FF4444" : "#6C7278"}
+                          fill={poll.isLiked ? "#FF4444" : "transparent"}
+                        />
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => router.push(`/poll/${poll.id}/likes`)}>
+                        <Text style={[styles.likesCount, poll.isLiked && styles.likedText]}>{poll.likes} likes</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={styles.footerRight}>
+                      <TouchableOpacity
+                        style={styles.actionButton}
+                        onPress={() => handleSharePoll(poll.id, poll.question)}
+                      >
+                        <Share2 size={18} color="#6C7278" />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+
+                {/* Delete button for own polls */}
+                {poll.isOwn && (
+                  <View style={styles.pollFooter}>
+                    <View style={styles.footerLeft} />
+                    <View style={styles.footerRight}>
+                      <TouchableOpacity
+                        style={styles.actionButton}
+                        onPress={() => handleSharePoll(poll.id, poll.question)}
+                      >
+                        <Share2 size={18} color="#6C7278" />
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.actionButton}
+                        onPress={() => handleDeletePoll(poll.id)}
+                      >
+                        <Trash2 size={18} color="#FF4444" />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+              </View>
+            ))
+          )
+          }
+>>>>>>> master
         </View>
       </ScrollView>
     </View>
@@ -555,6 +782,36 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     lineHeight: 22.4,
   },
+<<<<<<< HEAD
+=======
+  // Tabs Styles
+  tabsContainer: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+    backgroundColor: '#FFFFFF',
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  activeTab: {
+    borderBottomColor: '#458FD0',
+  },
+  tabText: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#6C7278',
+  },
+  activeTabText: {
+    color: '#458FD0',
+    fontWeight: '600',
+  },
+>>>>>>> master
   // Polls Section Styles
   pollsSection: {
     paddingHorizontal: 0,
@@ -607,8 +864,18 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#458FD0',
     fontWeight: '600',
+<<<<<<< HEAD
     marginBottom: 8,
     marginLeft: 50,
+=======
+    marginBottom: 2,
+  },
+  votedLabelTop: {
+    fontSize: 12,
+    color: '#458FD0',
+    fontWeight: '600',
+    marginBottom: 8,
+>>>>>>> master
   },
   pollOptions: {
     gap: 8,
@@ -649,9 +916,18 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
+<<<<<<< HEAD
     backgroundColor: '#458FD0',
     borderRadius: 20,
   },
+=======
+    backgroundColor: '#6C7278',
+    borderRadius: 20,
+  },
+  optionProgressBlue: {
+    backgroundColor: '#458FD0',
+  },
+>>>>>>> master
   optionText: {
     fontSize: 14,
     color: '#101720',
@@ -697,6 +973,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6C7278',
   },
+<<<<<<< HEAD
+=======
+  likedText: {
+    color: '#FF4444',
+  },
+>>>>>>> master
   pollsLoading: {
     padding: 20,
     alignItems: 'center',
