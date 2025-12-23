@@ -1,24 +1,12 @@
 const express = require('express');
 const router = express.Router();
-<<<<<<< HEAD
-=======
 const passport = require('../config/passportConfig');
 const { authLimiter } = require('../middleware/rateLimiter');
->>>>>>> master
 const {
     signup,
     login,
     forgotPassword,
     resetPassword,
-<<<<<<< HEAD
-} = require('../controllers/authController');
-
-// Authentication routes
-router.post('/signup', signup);
-router.post('/login', login);
-router.post('/forgot-password', forgotPassword);
-router.post('/reset-password', resetPassword);
-=======
     googleCallback,
 } = require('../controllers/authController');
 
@@ -50,6 +38,5 @@ router.get(
 
 // Mobile flow - exchange auth code for token
 router.post('/google/callback', googleCallback);
->>>>>>> master
 
 module.exports = router;

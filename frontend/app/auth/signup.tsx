@@ -1,10 +1,7 @@
 import { useState } from 'react';
 import API_BASE_URL from '@/config/api';
 import { authStorage } from '@/utils/authStorage';
-<<<<<<< HEAD
-=======
 import { signInWithGoogleBackend } from '@/utils/googleAuth';
->>>>>>> master
 import {
   View,
   Text,
@@ -15,12 +12,9 @@ import {
   KeyboardAvoidingView,
   Platform,
   Modal,
-<<<<<<< HEAD
-=======
   ActivityIndicator,
   Alert,
   Image,
->>>>>>> master
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -146,8 +140,6 @@ export default function SignUpScreen() {
     }
   };
 
-<<<<<<< HEAD
-=======
   const handleGoogleSignIn = async () => {
     setLoading(true);
     setErrors({});
@@ -171,7 +163,6 @@ export default function SignUpScreen() {
     }
   };
 
->>>>>>> master
   return (
     <LinearGradient colors={['#45BFD0', '#2B9EB3']} style={styles.container}>
       <KeyboardAvoidingView
@@ -302,8 +293,6 @@ export default function SignUpScreen() {
                   {loading ? 'Signing Up...' : 'Sign Up'}
                 </Text>
               </TouchableOpacity>
-<<<<<<< HEAD
-=======
 
               {/* OR Divider */}
               <View style={styles.dividerContainer}>
@@ -330,7 +319,6 @@ export default function SignUpScreen() {
                   </>
                 )}
               </TouchableOpacity>
->>>>>>> master
             </View>
           </View>
         </ScrollView>
@@ -554,8 +542,6 @@ const styles = StyleSheet.create({
   signUpButtonDisabled: {
     opacity: 0.6,
   },
-<<<<<<< HEAD
-=======
   dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -599,5 +585,4 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontFamily: 'Roboto',
   },
->>>>>>> master
 });

@@ -8,12 +8,6 @@ import {
     TouchableOpacity,
     ActivityIndicator,
     StatusBar,
-<<<<<<< HEAD
-} from 'react-native';
-import { useLocalSearchParams, router } from 'expo-router';
-import { ArrowLeft, Heart, Share2 } from 'lucide-react-native';
-import API_BASE_URL from '@/config/api';
-=======
     Alert,
     FlatList,
 } from 'react-native';
@@ -22,7 +16,6 @@ import { ArrowLeft } from 'lucide-react-native';
 import API_BASE_URL from '@/config/api';
 import { authStorage } from '@/utils/authStorage';
 import PollCard from '@/components/PollCard';
->>>>>>> master
 
 interface UserProfile {
     id: string;
@@ -30,16 +23,11 @@ interface UserProfile {
     fullName: string;
     bio: string;
     profilePicture: string;
-<<<<<<< HEAD
-=======
     isPrivate: boolean;
->>>>>>> master
     followers: string[];
     following: string[];
 }
 
-<<<<<<< HEAD
-=======
 interface Poll {
     _id: string;
     question: string;
@@ -59,14 +47,11 @@ interface Poll {
     createdAt: string;
 }
 
->>>>>>> master
 export default function UserProfileScreen() {
     const { username } = useLocalSearchParams<{ username: string }>();
     const [user, setUser] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-<<<<<<< HEAD
-=======
     const [isFollowing, setIsFollowing] = useState(false);
     const [hasPendingRequest, setHasPendingRequest] = useState(false);
     const [actionLoading, setActionLoading] = useState(false);
@@ -83,15 +68,10 @@ export default function UserProfileScreen() {
         };
         loadCurrentUser();
     }, []);
->>>>>>> master
 
     useEffect(() => {
         const fetchUserProfile = async () => {
             try {
-<<<<<<< HEAD
-                console.log('Fetching profile for username:', username);
-                const response = await fetch(`${API_BASE_URL}/users/username/${username}`);
-=======
                 const token = await authStorage.getToken();
                 const headers: Record<string, string> = {};
                 if (token) {
@@ -100,13 +80,10 @@ export default function UserProfileScreen() {
 
                 console.log('Fetching profile for username:', username);
                 const response = await fetch(`${API_BASE_URL}/users/username/${username}`, { headers });
->>>>>>> master
                 const data = await response.json();
 
                 if (response.ok && data.user) {
                     setUser(data.user);
-<<<<<<< HEAD
-=======
 
                     // Check if current user follows this user
                     const currentUser = await authStorage.getUser();
@@ -120,7 +97,6 @@ export default function UserProfileScreen() {
                     if (data.user.isPrivate && currentUser && !data.user.followers?.includes(currentUser.id)) {
                         await checkPendingRequest(data.user.id);
                     }
->>>>>>> master
                 } else {
                     setError(data.message || 'User not found');
                 }
@@ -137,8 +113,6 @@ export default function UserProfileScreen() {
         }
     }, [username]);
 
-<<<<<<< HEAD
-=======
     const checkPendingRequest = async (userId: string) => {
         try {
             const token = await authStorage.getToken();
@@ -253,7 +227,6 @@ export default function UserProfileScreen() {
         }
     };
 
->>>>>>> master
     const getProfileImageUrl = () => {
         if (!user?.profilePicture) {
             return 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200';
@@ -264,8 +237,6 @@ export default function UserProfileScreen() {
         return `${API_BASE_URL.replace('/api', '')}${user.profilePicture}`;
     };
 
-<<<<<<< HEAD
-=======
     const isOwnProfile = currentUserId && user?.id === currentUserId;
 
     const renderFollowButton = () => {
@@ -304,7 +275,6 @@ export default function UserProfileScreen() {
         );
     };
 
->>>>>>> master
     if (loading) {
         return (
             <View style={styles.loadingContainer}>
@@ -345,14 +315,10 @@ export default function UserProfileScreen() {
                         source={{ uri: getProfileImageUrl() }}
                         style={styles.profileImage}
                     />
-<<<<<<< HEAD
-                    <Text style={styles.name}>{user.fullName}</Text>
-=======
                     <View style={styles.nameRow}>
                         <Text style={styles.name}>{user.fullName}</Text>
                         {user.isPrivate && <Text style={styles.privateBadge}>🔒</Text>}
                     </View>
->>>>>>> master
                     <Text style={styles.username}>@{user.username}</Text>
                     {user.bio && <Text style={styles.bio}>{user.bio}</Text>}
 
@@ -366,14 +332,6 @@ export default function UserProfileScreen() {
                             <Text style={styles.statNumber}>{user.following?.length || 0}</Text>
                             <Text style={styles.statLabel}>Following</Text>
                         </View>
-<<<<<<< HEAD
-                    </View>
-
-                    {/* Follow Button (placeholder) */}
-                    <TouchableOpacity style={styles.followButton}>
-                        <Text style={styles.followButtonText}>Follow</Text>
-                    </TouchableOpacity>
-=======
                         <View style={styles.stat}>
                             <Text style={styles.statNumber}>{polls.length}</Text>
                             <Text style={styles.statLabel}>Polls</Text>
@@ -433,7 +391,6 @@ export default function UserProfileScreen() {
                             </View>
                         ))
                     )}
->>>>>>> master
                 </View>
             </ScrollView>
         </View>
@@ -509,26 +466,19 @@ const styles = StyleSheet.create({
         borderWidth: 3,
         borderColor: '#458FD0',
     },
-<<<<<<< HEAD
-=======
     nameRow: {
         flexDirection: 'row',
         alignItems: 'center',
         marginTop: 16,
     },
->>>>>>> master
     name: {
         fontSize: 24,
         fontWeight: 'bold',
         color: '#101720',
-<<<<<<< HEAD
-        marginTop: 16,
-=======
     },
     privateBadge: {
         marginLeft: 8,
         fontSize: 16,
->>>>>>> master
     },
     username: {
         fontSize: 16,
@@ -566,19 +516,14 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
         borderRadius: 8,
         marginTop: 24,
-<<<<<<< HEAD
-=======
         minWidth: 120,
         alignItems: 'center',
->>>>>>> master
     },
     followButtonText: {
         color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '600',
     },
-<<<<<<< HEAD
-=======
     followingButton: {
         backgroundColor: 'transparent',
         borderWidth: 1,
@@ -649,5 +594,4 @@ const styles = StyleSheet.create({
     pollCardWrapper: {
         marginBottom: 0,
     },
->>>>>>> master
 });

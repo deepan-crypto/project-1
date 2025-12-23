@@ -7,27 +7,16 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
-<<<<<<< HEAD
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
-=======
   ActivityIndicator,
   Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import API_BASE_URL from '@/config/api';
->>>>>>> master
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
   const [email, setEmail] = useState('');
-<<<<<<< HEAD
-
-  const handleSendResetLink = () => {
-    router.push('/auth/reset-password-sent');
-=======
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
@@ -81,7 +70,6 @@ export default function ForgotPasswordScreen() {
     } finally {
       setLoading(false);
     }
->>>>>>> master
   };
 
   return (
@@ -98,12 +86,6 @@ export default function ForgotPasswordScreen() {
             </Text>
 
             <View style={styles.form}>
-<<<<<<< HEAD
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Email address</Text>
-                <TextInput
-                  style={styles.input}
-=======
               {errors.general && (
                 <View style={styles.errorContainer}>
                   <Text style={styles.errorText}>{errors.general}</Text>
@@ -114,7 +96,6 @@ export default function ForgotPasswordScreen() {
                 <Text style={styles.label}>Email address</Text>
                 <TextInput
                   style={[styles.input, errors.email && styles.inputError]}
->>>>>>> master
                   value={email}
                   onChangeText={setEmail}
                   placeholder="youremail@example.com"
@@ -122,15 +103,6 @@ export default function ForgotPasswordScreen() {
                   keyboardType="email-address"
                   autoCapitalize="none"
                 />
-<<<<<<< HEAD
-              </View>
-
-              <TouchableOpacity
-                style={styles.sendButton}
-                onPress={handleSendResetLink}
-              >
-                <Text style={styles.sendButtonText}>Send Reset Link</Text>
-=======
                 {errors.email && <Text style={styles.fieldError}>{errors.email}</Text>}
               </View>
 
@@ -142,7 +114,6 @@ export default function ForgotPasswordScreen() {
                 <Text style={styles.sendButtonText}>
                   {loading ? 'Sending...' : 'Send Reset Link'}
                 </Text>
->>>>>>> master
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -231,8 +202,6 @@ const styles = StyleSheet.create({
     color: '#666',
     fontSize: 14,
   },
-<<<<<<< HEAD
-=======
   errorContainer: {
     backgroundColor: '#ffebee',
     borderRadius: 8,
@@ -256,5 +225,4 @@ const styles = StyleSheet.create({
   sendButtonDisabled: {
     opacity: 0.6,
   },
->>>>>>> master
 });

@@ -34,23 +34,10 @@ const signup = async (req, res, next) => {
             throw new Error('Username must be at least 3 characters long');
         }
 
-<<<<<<< HEAD
-        // Validate password strength (8+ chars, uppercase, lowercase, number, special char)
-        if (password.length < 8) {
-            res.status(400);
-            throw new Error('Password must be at least 8 characters long');
-        }
-
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]/;
-        if (!passwordRegex.test(password)) {
-            res.status(400);
-            throw new Error('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&#)');
-=======
         // Validate password strength (minimum 6 characters)
         if (password.length < 6) {
             res.status(400);
             throw new Error('Password must be at least 6 characters long');
->>>>>>> master
         }
 
         // Validate date of birth if provided
@@ -250,8 +237,6 @@ const resetPassword = async (req, res, next) => {
     }
 };
 
-<<<<<<< HEAD
-=======
 // @desc    Google OAuth - Initiate
 // @route   GET /api/auth/google
 // @access  Public
@@ -336,15 +321,11 @@ const googleCallback = async (req, res, next) => {
     }
 };
 
->>>>>>> master
 module.exports = {
     signup,
     login,
     forgotPassword,
     resetPassword,
-<<<<<<< HEAD
-=======
     googleAuth,
     googleCallback,
->>>>>>> master
 };

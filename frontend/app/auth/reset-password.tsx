@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { useState } from 'react';
-=======
 import { useState, useEffect } from 'react';
->>>>>>> master
 import {
   View,
   Text,
@@ -11,21 +7,6 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
-<<<<<<< HEAD
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Eye, EyeOff } from 'lucide-react-native';
-
-export default function ResetPasswordScreen() {
-  const router = useRouter();
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-
-  const handleUpdatePassword = () => {
-    router.replace('/auth/login');
-=======
   Alert,
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -127,7 +108,6 @@ export default function ResetPasswordScreen() {
     } finally {
       setLoading(false);
     }
->>>>>>> master
   };
 
   return (
@@ -141,18 +121,6 @@ export default function ResetPasswordScreen() {
             <Text style={styles.title}>Reset Account Password</Text>
 
             <View style={styles.form}>
-<<<<<<< HEAD
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Create New Password</Text>
-                <TextInput
-                  style={styles.input}
-                  value={newPassword}
-                  onChangeText={setNewPassword}
-                  placeholder="LOISBECKET"
-                  placeholderTextColor="#999"
-                  secureTextEntry={!showPassword}
-                />
-=======
               {errors.general && (
                 <View style={styles.errorContainer}>
                   <Text style={styles.errorText}>{errors.general}</Text>
@@ -170,25 +138,16 @@ export default function ResetPasswordScreen() {
                   secureTextEntry={!showPassword}
                 />
                 {errors.newPassword && <Text style={styles.fieldError}>{errors.newPassword}</Text>}
->>>>>>> master
               </View>
 
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Confirm Password</Text>
-<<<<<<< HEAD
-                <View style={styles.passwordContainer}>
-=======
                 <View style={[styles.passwordContainer, errors.confirmPassword && styles.inputError]}>
->>>>>>> master
                   <TextInput
                     style={styles.passwordInput}
                     value={confirmPassword}
                     onChangeText={setConfirmPassword}
-<<<<<<< HEAD
-                    placeholder="••••••••"
-=======
                     placeholder="Confirm your password"
->>>>>>> master
                     placeholderTextColor="#999"
                     secureTextEntry={!showPassword}
                   />
@@ -203,15 +162,6 @@ export default function ResetPasswordScreen() {
                     )}
                   </TouchableOpacity>
                 </View>
-<<<<<<< HEAD
-              </View>
-
-              <TouchableOpacity
-                style={styles.updateButton}
-                onPress={handleUpdatePassword}
-              >
-                <Text style={styles.updateButtonText}>Update Password</Text>
-=======
                 {errors.confirmPassword && <Text style={styles.fieldError}>{errors.confirmPassword}</Text>}
               </View>
 
@@ -223,7 +173,6 @@ export default function ResetPasswordScreen() {
                 <Text style={styles.updateButtonText}>
                   {loading ? 'Updating...' : 'Update Password'}
                 </Text>
->>>>>>> master
               </TouchableOpacity>
             </View>
           </View>
@@ -306,8 +255,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-<<<<<<< HEAD
-=======
   errorContainer: {
     backgroundColor: '#ffebee',
     borderRadius: 8,
@@ -331,5 +278,4 @@ const styles = StyleSheet.create({
   updateButtonDisabled: {
     opacity: 0.6,
   },
->>>>>>> master
 });

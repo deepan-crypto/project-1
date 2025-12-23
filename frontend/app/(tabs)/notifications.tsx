@@ -11,12 +11,8 @@ import {
   RefreshControl,
   Alert,
 } from 'react-native';
-<<<<<<< HEAD
-import { useFocusEffect } from 'expo-router';
-=======
 import { useFocusEffect, useRouter } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
->>>>>>> master
 import { authStorage } from '@/utils/authStorage';
 import { useSocket } from '@/utils/useSocket';
 import API_BASE_URL from '@/config/api';
@@ -35,11 +31,6 @@ interface Notification {
   type: string;
   followRequestId?: string;
   followRequestStatus?: string;
-<<<<<<< HEAD
-}
-
-export default function NotificationsScreen() {
-=======
   createdAt: string;
 }
 
@@ -49,7 +40,6 @@ interface GroupedNotifications {
 
 export default function NotificationsScreen() {
   const router = useRouter();
->>>>>>> master
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -94,13 +84,7 @@ export default function NotificationsScreen() {
 
     const handleNewNotification = (notification: Notification) => {
       console.log('Received real-time notification:', notification);
-<<<<<<< HEAD
-      // Add new notification to the top of the list
       setNotifications(prev => {
-        // Check if notification already exists
-=======
-      setNotifications(prev => {
->>>>>>> master
         const exists = prev.some(n => n.id === notification.id);
         if (exists) return prev;
         return [notification, ...prev];
@@ -137,10 +121,6 @@ export default function NotificationsScreen() {
       });
 
       if (response.ok) {
-<<<<<<< HEAD
-        // Update notification in state
-=======
->>>>>>> master
         setNotifications(notifications.map(n =>
           n.id === notificationId
             ? { ...n, followRequestStatus: 'accepted' }
@@ -171,10 +151,6 @@ export default function NotificationsScreen() {
       });
 
       if (response.ok) {
-<<<<<<< HEAD
-        // Update notification in state
-=======
->>>>>>> master
         setNotifications(notifications.map(n =>
           n.id === notificationId
             ? { ...n, followRequestStatus: 'rejected' }
@@ -202,8 +178,6 @@ export default function NotificationsScreen() {
     return `${API_BASE_URL.replace('/api', '')}${avatar}`;
   };
 
-<<<<<<< HEAD
-=======
   // Group notifications by date
   const groupNotificationsByDate = (notifications: Notification[]): GroupedNotifications => {
     const grouped: GroupedNotifications = {};
@@ -239,7 +213,6 @@ export default function NotificationsScreen() {
   const groupedNotifications = groupNotificationsByDate(notifications);
   const sectionOrder = ['Today', 'Yesterday', 'This week', 'This month', 'Earlier'];
 
->>>>>>> master
   const renderFollowRequestActions = (notification: Notification) => {
     if (notification.type !== 'follow_request' || !notification.followRequestId) {
       return null;
@@ -249,61 +222,34 @@ export default function NotificationsScreen() {
 
     if (notification.followRequestStatus === 'accepted') {
       return (
-<<<<<<< HEAD
-        <View style={styles.statusBadge}>
-          <Text style={styles.statusBadgeText}>Accepted</Text>
-=======
         <View style={styles.actionButtons}>
           <View style={styles.acceptedButton}>
             <Text style={styles.acceptedButtonText}>Accepted</Text>
           </View>
->>>>>>> master
         </View>
       );
     }
 
     if (notification.followRequestStatus === 'rejected') {
       return (
-<<<<<<< HEAD
-        <View style={[styles.statusBadge, styles.rejectedBadge]}>
-          <Text style={[styles.statusBadgeText, styles.rejectedText]}>Declined</Text>
-=======
         <View style={styles.actionButtons}>
           <View style={styles.rejectedButton}>
             <Text style={styles.rejectedButtonText}>Declined</Text>
           </View>
->>>>>>> master
         </View>
       );
     }
 
     return (
-<<<<<<< HEAD
-      <View style={styles.requestActions}>
-        <TouchableOpacity
-          style={styles.acceptButton}
-=======
       <View style={styles.actionButtons}>
         <TouchableOpacity
           style={styles.followButton}
->>>>>>> master
           onPress={() => handleAcceptRequest(notification.followRequestId!, notification.id)}
           disabled={isLoading}
         >
           {isLoading ? (
             <ActivityIndicator size="small" color="#FFFFFF" />
           ) : (
-<<<<<<< HEAD
-            <Text style={styles.acceptButtonText}>Accept</Text>
-          )}
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.rejectButton}
-          onPress={() => handleRejectRequest(notification.followRequestId!, notification.id)}
-          disabled={isLoading}
-        >
-          <Text style={styles.rejectButtonText}>Decline</Text>
-=======
             <Text style={styles.followButtonText}>Accept</Text>
           )}
         </TouchableOpacity>
@@ -313,14 +259,11 @@ export default function NotificationsScreen() {
           disabled={isLoading}
         >
           <Text style={styles.declineButtonText}>Decline</Text>
->>>>>>> master
         </TouchableOpacity>
       </View>
     );
   };
 
-<<<<<<< HEAD
-=======
   // Format short time (6m, 2h, 1d)
   const formatShortTime = (timeString: string): string => {
     // timeString is already formatted like "37 minutes ago"
@@ -340,23 +283,10 @@ export default function NotificationsScreen() {
     return timeString;
   };
 
->>>>>>> master
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" />
 
-<<<<<<< HEAD
-      <View style={styles.logoHeader}>
-        <Image
-          source={require('../../assets/images/ican.png')}
-          style={styles.logo}
-          resizeMode="contain"
-        />
-      </View>
-
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Notifications</Text>
-=======
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
@@ -364,7 +294,6 @@ export default function NotificationsScreen() {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Notifications</Text>
         <View style={styles.placeholder} />
->>>>>>> master
       </View>
 
       {loading ? (
@@ -379,34 +308,11 @@ export default function NotificationsScreen() {
       ) : (
         <ScrollView
           style={styles.scrollView}
-<<<<<<< HEAD
-          contentContainerStyle={styles.content}
-=======
->>>>>>> master
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
           }
         >
-<<<<<<< HEAD
-          {notifications.map((notification) => (
-            <View key={notification.id} style={styles.notificationCard}>
-              <Image
-                source={{ uri: getAvatarUrl(notification.user.avatar) }}
-                style={styles.avatar}
-              />
-              <View style={styles.notificationContent}>
-                <Text style={styles.notificationText}>
-                  <Text style={styles.userName}>{notification.user.name}</Text>
-                  {' '}
-                  {notification.action.replace(notification.user.username, '').trim()}
-                </Text>
-                <Text style={styles.time}>{notification.time}</Text>
-                {renderFollowRequestActions(notification)}
-              </View>
-            </View>
-          ))}
-=======
           {sectionOrder.map(section => {
             const sectionNotifications = groupedNotifications[section];
             if (!sectionNotifications || sectionNotifications.length === 0) return null;
@@ -440,7 +346,6 @@ export default function NotificationsScreen() {
               </View>
             );
           })}
->>>>>>> master
         </ScrollView>
       )}
     </View>
@@ -450,25 +355,6 @@ export default function NotificationsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-<<<<<<< HEAD
-    backgroundColor: '#F5F5F5',
-  },
-  logoHeader: {
-    paddingTop: 40,
-    paddingBottom: 12,
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
-  },
-  logo: {
-    width: 30,
-    height: 40,
-  },
-  header: {
-    paddingHorizontal: 20,
-    paddingTop: 12,
-=======
     backgroundColor: '#FFFFFF',
   },
   header: {
@@ -477,18 +363,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingTop: 50,
->>>>>>> master
     paddingBottom: 16,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
     borderBottomColor: '#E0E0E0',
   },
-<<<<<<< HEAD
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '600',
-    color: '#101720',
-=======
   backButton: {
     width: 40,
     height: 40,
@@ -501,7 +380,6 @@ const styles = StyleSheet.create({
   },
   placeholder: {
     width: 40,
->>>>>>> master
   },
   loadingContainer: {
     flex: 1,
@@ -517,11 +395,7 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 18,
     fontWeight: '600',
-<<<<<<< HEAD
-    color: '#101720',
-=======
     color: '#000000',
->>>>>>> master
   },
   emptySubtext: {
     fontSize: 14,
@@ -532,22 +406,6 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-<<<<<<< HEAD
-  content: {
-    padding: 16,
-  },
-  notificationCard: {
-    flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-=======
   sectionHeader: {
     fontSize: 15,
     fontWeight: '600',
@@ -561,7 +419,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     backgroundColor: '#FFFFFF',
->>>>>>> master
   },
   avatar: {
     width: 40,
@@ -576,33 +433,6 @@ const styles = StyleSheet.create({
   },
   notificationText: {
     fontSize: 14,
-<<<<<<< HEAD
-    color: '#687684',
-    marginBottom: 4,
-  },
-  userName: {
-    fontWeight: '600',
-    color: '#101720',
-  },
-  time: {
-    fontSize: 12,
-    color: '#6C7278',
-  },
-  requestActions: {
-    flexDirection: 'row',
-    marginTop: 10,
-    gap: 8,
-  },
-  acceptButton: {
-    backgroundColor: '#458FD0',
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    minWidth: 80,
-    alignItems: 'center',
-  },
-  acceptButtonText: {
-=======
     lineHeight: 20,
   },
   userName: {
@@ -634,24 +464,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   followButtonText: {
->>>>>>> master
     color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
   },
-<<<<<<< HEAD
-  rejectButton: {
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    minWidth: 80,
-    alignItems: 'center',
-  },
-  rejectButtonText: {
-=======
   declineButton: {
     backgroundColor: '#EFEFEF',
     borderRadius: 8,
@@ -673,32 +489,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   acceptedButtonText: {
->>>>>>> master
     color: '#6C7278',
     fontSize: 14,
     fontWeight: '600',
   },
-<<<<<<< HEAD
-  statusBadge: {
-    backgroundColor: '#E8F5E9',
-    borderRadius: 6,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    alignSelf: 'flex-start',
-    marginTop: 8,
-  },
-  statusBadgeText: {
-    color: '#2E7D32',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  rejectedBadge: {
-    backgroundColor: '#FFEBEE',
-  },
-  rejectedText: {
-    color: '#C62828',
-  },
-=======
   rejectedButton: {
     backgroundColor: '#EFEFEF',
     borderRadius: 8,
@@ -711,5 +505,4 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
->>>>>>> master
 });

@@ -19,17 +19,10 @@ const app = express();
 // Create HTTP server for Socket.IO
 const server = http.createServer(app);
 
-<<<<<<< HEAD
-// Initialize Socket.IO
-const io = new Server(server, {
-    cors: {
-        origin: process.env.FRONTEND_URL || '*',
-=======
 // Initialize Socket.IO with secure CORS
 const io = new Server(server, {
     cors: {
         origin: process.env.FRONTEND_URL || 'http://localhost:8081',
->>>>>>> master
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: true,
     },
@@ -44,14 +37,6 @@ io.on('connection', (socket) => {
 
     // User joins their personal room for notifications
     socket.on('join', (userId) => {
-<<<<<<< HEAD
-        if (userId) {
-            socket.join(userId);
-            console.log(`User ${userId} joined their notification room`);
-        }
-    });
-
-=======
         try {
             // Validate userId before joining
             if (userId && typeof userId === 'string' && userId.match(/^[0-9a-fA-F]{24}$/)) {
@@ -72,7 +57,6 @@ io.on('connection', (socket) => {
         console.error('Socket error:', error);
     });
 
->>>>>>> master
     // Handle disconnection
     socket.on('disconnect', () => {
         console.log('User disconnected:', socket.id);
@@ -83,10 +67,6 @@ io.on('connection', (socket) => {
 connectDB();
 
 // Middleware
-<<<<<<< HEAD
-app.use(cors({
-    origin: process.env.FRONTEND_URL || '*',
-=======
 // CORS configuration - secure by default
 const corsOrigin = process.env.FRONTEND_URL;
 if (!corsOrigin && process.env.NODE_ENV === 'production') {
@@ -96,7 +76,6 @@ if (!corsOrigin && process.env.NODE_ENV === 'production') {
 
 app.use(cors({
     origin: corsOrigin || 'http://localhost:8081', // Safe default for development only
->>>>>>> master
     credentials: true,
 }));
 app.use(express.json());

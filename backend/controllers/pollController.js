@@ -92,14 +92,10 @@ const getAllPolls = async (req, res, next) => {
         const pollsWithDetails = filteredPolls.map(poll => {
             const percentages = poll.calculatePercentages();
             const hasVoted = req.user
-<<<<<<< HEAD
-                ? poll.options.some(opt => opt.votes.includes(req.user._id))
-=======
                 ? poll.options.some(opt => opt.votes.some(v => v.toString() === req.user._id.toString()))
                 : false;
             const isLiked = req.user
-                ? poll.likes.some(id => id.toString() === req.user._id.toString())
->>>>>>> master
+                ? poll.likes.some(like => like.userId.toString() === req.user._id.toString())
                 : false;
 
             return {
@@ -118,10 +114,7 @@ const getAllPolls = async (req, res, next) => {
                 })),
                 likes: poll.likes.length,
                 hasVoted,
-<<<<<<< HEAD
-=======
                 isLiked,
->>>>>>> master
                 createdAt: poll.createdAt,
             };
         });
@@ -188,14 +181,10 @@ const getUserPolls = async (req, res, next) => {
         const pollsWithDetails = polls.map(poll => {
             const percentages = poll.calculatePercentages();
             const hasVoted = req.user
-<<<<<<< HEAD
-                ? poll.options.some(opt => opt.votes.includes(req.user._id))
-                : false;
-=======
                 ? poll.options.some(opt => opt.votes.some(v => v.toString() === req.user._id.toString()))
                 : false;
             const isLiked = req.user
-                ? poll.likes.some(id => id.toString() === req.user._id.toString())
+                ? poll.likes.some(like => like.userId.toString() === req.user._id.toString())
                 : false;
 
             // Find which option the user voted for
@@ -205,7 +194,6 @@ const getUserPolls = async (req, res, next) => {
                     opt.votes.some(v => v.toString() === req.user._id.toString())
                 );
             }
->>>>>>> master
 
             return {
                 id: poll._id,
@@ -222,8 +210,6 @@ const getUserPolls = async (req, res, next) => {
                 })),
                 likes: poll.likes.length,
                 hasVoted,
-<<<<<<< HEAD
-=======
                 isLiked,
                 votedOptionIndex: votedOptionIndex >= 0 ? votedOptionIndex : undefined,
                 createdAt: poll.createdAt,
@@ -289,7 +275,7 @@ const getUserVotedPolls = async (req, res, next) => {
                 ? poll.options.some(opt => opt.votes.some(v => v.toString() === req.user._id.toString()))
                 : poll.options.some(opt => opt.votes.some(v => v.toString() === targetUserId));
             const isLiked = req.user
-                ? poll.likes.some(id => id.toString() === req.user._id.toString())
+                ? poll.likes.some(like => like.userId.toString() === req.user._id.toString())
                 : false;
 
             // Find which option the user voted for
@@ -320,7 +306,6 @@ const getUserVotedPolls = async (req, res, next) => {
                 hasVoted,
                 isLiked,
                 votedOptionIndex: votedOptionIndex >= 0 ? votedOptionIndex : undefined,
->>>>>>> master
                 createdAt: poll.createdAt,
             };
         });
@@ -445,13 +430,16 @@ const likePoll = async (req, res, next) => {
         }
 
         // Check if already liked
-        if (poll.likes.includes(req.user._id)) {
+        if (poll.likes.some(like => like.userId.toString() === req.user._id.toString())) {
             res.status(400);
             throw new Error('You have already liked this poll');
         }
 
         // Add like
-        poll.likes.push(req.user._id);
+        poll.likes.push({
+            userId: req.user._id,
+            likedAt: new Date(),
+        });
         await poll.save();
 
         // Create notification for poll owner
@@ -512,14 +500,14 @@ const unlikePoll = async (req, res, next) => {
         }
 
         // Check if liked
-        if (!poll.likes.includes(req.user._id)) {
+        if (!poll.likes.some(like => like.userId.toString() === req.user._id.toString())) {
             res.status(400);
             throw new Error('You have not liked this poll');
         }
 
         // Remove like
         poll.likes = poll.likes.filter(
-            id => id.toString() !== req.user._id.toString()
+            like => like.userId.toString() !== req.user._id.toString()
         );
         await poll.save();
 
@@ -556,14 +544,10 @@ const getPollDetails = async (req, res, next) => {
 
         const percentages = poll.calculatePercentages();
         const hasVoted = req.user
-<<<<<<< HEAD
-            ? poll.options.some(opt => opt.votes.includes(req.user._id))
-=======
             ? poll.options.some(opt => opt.votes.some(v => v.toString() === req.user._id.toString()))
             : false;
         const isLiked = req.user
-            ? poll.likes.some(id => id.toString() === req.user._id.toString())
->>>>>>> master
+            ? poll.likes.some(like => like.userId.toString() === req.user._id.toString())
             : false;
 
         res.status(200).json({
@@ -583,10 +567,7 @@ const getPollDetails = async (req, res, next) => {
                 })),
                 likes: poll.likes.length,
                 hasVoted,
-<<<<<<< HEAD
-=======
                 isLiked,
->>>>>>> master
                 createdAt: poll.createdAt,
             },
         });
@@ -631,19 +612,23 @@ const deletePoll = async (req, res, next) => {
 const getPollLikes = async (req, res, next) => {
     try {
         const poll = await Poll.findById(req.params.pollId)
-            .populate('likes', 'username fullName profilePicture');
+            .populate('likes.userId', 'username fullName profilePicture');
 
         if (!poll) {
             res.status(404);
             throw new Error('Poll not found');
         }
 
-        const likedBy = poll.likes.map(user => ({
-            id: user._id,
-            username: user.username,
-            fullName: user.fullName,
-            profilePicture: user.profilePicture,
+        const likedBy = poll.likes.map(like => ({
+            id: like.userId._id,
+            username: like.userId.username,
+            fullName: like.userId.fullName,
+            profilePicture: like.userId.profilePicture,
+            likedAt: like.likedAt,
         }));
+
+        // Sort by most recent first
+        likedBy.sort((a, b) => new Date(b.likedAt) - new Date(a.likedAt));
 
         res.status(200).json({
             success: true,
@@ -659,10 +644,7 @@ module.exports = {
     createPoll,
     getAllPolls,
     getUserPolls,
-<<<<<<< HEAD
-=======
     getUserVotedPolls,
->>>>>>> master
     votePoll,
     likePoll,
     unlikePoll,

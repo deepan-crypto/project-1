@@ -1,10 +1,7 @@
 import { useState } from 'react';
 import API_BASE_URL from '@/config/api';
 import { authStorage } from '@/utils/authStorage';
-<<<<<<< HEAD
-=======
 import { signInWithGoogleBackend } from '@/utils/googleAuth';
->>>>>>> master
 import {
   View,
   Text,
@@ -13,12 +10,9 @@ import {
   TouchableOpacity,
   KeyboardAvoidingView,
   Platform,
-<<<<<<< HEAD
-=======
   ActivityIndicator,
   Alert,
   Image,
->>>>>>> master
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -89,8 +83,6 @@ export default function LoginScreen() {
     }
   };
 
-<<<<<<< HEAD
-=======
   const handleGoogleSignIn = async () => {
     setLoading(true);
     setErrors({});
@@ -114,7 +106,6 @@ export default function LoginScreen() {
     }
   };
 
->>>>>>> master
   return (
     <LinearGradient colors={['#45BFD0', '#2B9EB3']} style={styles.container}>
       <KeyboardAvoidingView
@@ -203,8 +194,6 @@ export default function LoginScreen() {
                   {loading ? 'Logging In...' : 'Log In'}
                 </Text>
               </TouchableOpacity>
-<<<<<<< HEAD
-=======
 
               {/* OR Divider */}
               <View style={styles.dividerContainer}>
@@ -231,7 +220,6 @@ export default function LoginScreen() {
                   </>
                 )}
               </TouchableOpacity>
->>>>>>> master
             </View>
           </View>
         </View>
@@ -379,8 +367,6 @@ const styles = StyleSheet.create({
   loginButtonDisabled: {
     opacity: 0.6,
   },
-<<<<<<< HEAD
-=======
   dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -424,5 +410,4 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     fontFamily: 'Roboto',
   },
->>>>>>> master
 });

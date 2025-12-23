@@ -25,12 +25,6 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-<<<<<<< HEAD
-        required: [true, 'Password is required'],
-        minlength: [6, 'Password must be at least 6 characters'],
-        select: false, // Don't include password in queries by default
-    },
-=======
         required: function () {
             return this.authProvider === 'local';
         },
@@ -51,7 +45,6 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
->>>>>>> master
     dateOfBirth: {
         type: Date,
     },

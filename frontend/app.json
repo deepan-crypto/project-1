@@ -3,8 +3,6 @@
     "name": "crypto-app",
     "slug": "crypto-app",
     "version": "1.0.0",
-<<<<<<< HEAD
-=======
     
     
     "android": {
@@ -16,7 +14,6 @@
     },
    
 
->>>>>>> master
     "orientation": "portrait",
     "icon": "./assets/images/ican.png",
     "scheme": "myapp",
@@ -38,11 +35,6 @@
     ],
     "experiments": {
       "typedRoutes": true
-<<<<<<< HEAD
-    }
-  }
-}
-=======
     },
     "extra": {
       "router": {},
@@ -52,4 +44,3 @@
     }
   }
 }
->>>>>>> master

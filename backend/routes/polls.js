@@ -5,10 +5,7 @@ const {
     createPoll,
     getAllPolls,
     getUserPolls,
-<<<<<<< HEAD
-=======
     getUserVotedPolls,
->>>>>>> master
     votePoll,
     likePoll,
     unlikePoll,
@@ -21,10 +18,7 @@ const {
 router.post('/', protect, createPoll);
 router.get('/', optionalAuth, getAllPolls);
 router.get('/user/:userId', optionalAuth, getUserPolls);
-<<<<<<< HEAD
-=======
 router.get('/user/:userId/voted', optionalAuth, getUserVotedPolls);
->>>>>>> master
 router.get('/:pollId', getPollDetails);
 router.delete('/:pollId', protect, deletePoll);
 

@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-import { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
-=======
 import { useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions, PanResponder, Animated } from 'react-native';
->>>>>>> master
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -28,23 +23,6 @@ const onboardingData = [
 export default function OnboardingScreen() {
   const [currentPage, setCurrentPage] = useState(0);
   const router = useRouter();
-<<<<<<< HEAD
-
-  const handleNext = () => {
-    if (currentPage < onboardingData.length - 1) {
-      setCurrentPage(currentPage + 1);
-    } else {
-      router.replace('/auth/signup');
-    }
-  };
-
-  const handleSkip = () => {
-    router.replace('/auth/signup');
-  };
-
-  return (
-    <LinearGradient colors={['#07F2DF', '#458FD0']} style={styles.container}>
-=======
   const pan = useRef(new Animated.Value(0)).current;
 
   // Create PanResponder to handle swipes across the entire screen
@@ -86,7 +64,6 @@ export default function OnboardingScreen() {
       style={styles.container}
       {...panResponder.panHandlers}
     >
->>>>>>> master
       <View style={styles.content}>
         <Text style={styles.title}>{onboardingData[currentPage].title}</Text>
         {onboardingData[currentPage].subtitle ? (
@@ -127,18 +104,6 @@ export default function OnboardingScreen() {
           ))}
         </View>
 
-<<<<<<< HEAD
-        <View style={styles.buttons}>
-          <TouchableOpacity onPress={handleSkip} style={styles.skipButton}>
-            <Text style={styles.skipText}>Skip</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleNext} style={styles.nextButton}>
-            <Text style={styles.nextText}>
-              {currentPage === onboardingData.length - 1 ? 'Get Started' : 'Next'}
-            </Text>
-          </TouchableOpacity>
-        </View>
-=======
         {/* Show Sign Up button only on last page, otherwise show swipe hint */}
         {isLastPage ? (
           <View style={styles.signupContainer}>
@@ -151,7 +116,6 @@ export default function OnboardingScreen() {
             <Text style={styles.swipeHintText}>Swipe to continue</Text>
           </View>
         )}
->>>>>>> master
       </View>
     </LinearGradient>
   );
@@ -204,11 +168,8 @@ const styles = StyleSheet.create({
   footer: {
     paddingBottom: 60,
     paddingHorizontal: 20,
-<<<<<<< HEAD
-=======
     // Ensure footer doesn't block gestures but buttons are clickable
     zIndex: 10,
->>>>>>> master
   },
   pagination: {
     flexDirection: 'row',
@@ -225,29 +186,6 @@ const styles = StyleSheet.create({
   paginationDotActive: {
     backgroundColor: '#FFFFFF',
   },
-<<<<<<< HEAD
-  buttons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  skipButton: {
-    padding: 12,
-  },
-  skipText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontFamily: 'Poppins_500Medium',
-    fontWeight: '500',
-  },
-  nextButton: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 32,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  nextText: {
-=======
   signupContainer: {
     alignItems: 'center',
     width: '100%',
@@ -259,14 +197,11 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   signupText: {
->>>>>>> master
     color: '#45BFD0',
     fontSize: 16,
     fontFamily: 'Poppins_500Medium',
     fontWeight: '500',
   },
-<<<<<<< HEAD
-=======
   swipeHint: {
     alignItems: 'center',
     height: 44, // Placeholder height to prevent layout jump
@@ -278,5 +213,4 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins_500Medium',
     fontWeight: '500',
   },
->>>>>>> master
 });

@@ -18,6 +18,7 @@ interface LikedUser {
     username: string;
     fullName: string;
     profilePicture: string;
+    likedAt: string;
 }
 
 export default function PollLikesScreen() {
@@ -61,6 +62,31 @@ export default function PollLikesScreen() {
         return `${API_BASE_URL.replace('/api', '')}${profilePicture}`;
     };
 
+    const getTimeAgo = (timestamp: string) => {
+        const now = new Date();
+        const likedTime = new Date(timestamp);
+        const diffInSeconds = Math.floor((now.getTime() - likedTime.getTime()) / 1000);
+
+        if (diffInSeconds < 60) {
+            return 'Just now';
+        } else if (diffInSeconds < 3600) {
+            const minutes = Math.floor(diffInSeconds / 60);
+            return `${minutes}m ago`;
+        } else if (diffInSeconds < 86400) {
+            const hours = Math.floor(diffInSeconds / 3600);
+            return `${hours}h ago`;
+        } else if (diffInSeconds < 604800) {
+            const days = Math.floor(diffInSeconds / 86400);
+            return `${days}d ago`;
+        } else if (diffInSeconds < 2592000) {
+            const weeks = Math.floor(diffInSeconds / 604800);
+            return `${weeks}w ago`;
+        } else {
+            const months = Math.floor(diffInSeconds / 2592000);
+            return `${months}mo ago`;
+        }
+    };
+
     const renderUser = ({ item }: { item: LikedUser }) => (
         <TouchableOpacity
             style={styles.userRow}
@@ -71,7 +97,10 @@ export default function PollLikesScreen() {
                 style={styles.avatar}
             />
             <View style={styles.userInfo}>
-                <Text style={styles.fullName}>{item.fullName}</Text>
+                <View style={styles.userNameRow}>
+                    <Text style={styles.fullName}>{item.fullName}</Text>
+                    <Text style={styles.timeText}>{getTimeAgo(item.likedAt)}</Text>
+                </View>
                 <Text style={styles.username}>@{item.username}</Text>
             </View>
         </TouchableOpacity>
@@ -200,10 +229,19 @@ const styles = StyleSheet.create({
     userInfo: {
         flex: 1,
     },
+    userNameRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
     fullName: {
         fontSize: 16,
         fontWeight: '600',
         color: '#101720',
+    },
+    timeText: {
+        fontSize: 12,
+        color: '#687684',
     },
     username: {
         fontSize: 14,
