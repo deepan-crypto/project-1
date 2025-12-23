@@ -575,9 +575,9 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   googleIcon: {
-    width: 18,
-    height: 18,
-    marginRight: 10,
+    width: 24,
+    height: 24,
+    marginRight: 12,
   },
   googleButtonText: {
     color: '#3c4043',

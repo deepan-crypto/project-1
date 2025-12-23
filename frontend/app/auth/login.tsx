@@ -216,7 +216,7 @@ export default function LoginScreen() {
                       source={require('@/assets/images/google-logo.png')}
                       style={styles.googleIcon}
                     />
-                    <Text style={styles.googleButtonText}>Sign in with Google</Text>
+                    <Text style={styles.googleButtonText}>Login with Google</Text>
                   </>
                 )}
               </TouchableOpacity>
@@ -400,9 +400,9 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   googleIcon: {
-    width: 18,
-    height: 18,
-    marginRight: 10,
+    width: 24,
+    height: 24,
+    marginRight: 12,
   },
   googleButtonText: {
     color: '#3c4043',
