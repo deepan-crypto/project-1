@@ -63,6 +63,10 @@ export default function PollLikesScreen() {
     };
 
     const getTimeAgo = (timestamp: string) => {
+        if (!timestamp) {
+            return 'Some time ago'; // Fallback for old likes without timestamp
+        }
+
         const now = new Date();
         const likedTime = new Date(timestamp);
         const diffInSeconds = Math.floor((now.getTime() - likedTime.getTime()) / 1000);
