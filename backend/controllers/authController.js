@@ -34,16 +34,10 @@ const signup = async (req, res, next) => {
             throw new Error('Username must be at least 3 characters long');
         }
 
-        // Validate password strength (8+ chars, uppercase, lowercase, number, special char)
-        if (password.length < 8) {
+        // Validate password strength (minimum 6 characters)
+        if (password.length < 6) {
             res.status(400);
-            throw new Error('Password must be at least 8 characters long');
-        }
-
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]/;
-        if (!passwordRegex.test(password)) {
-            res.status(400);
-            throw new Error('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character (@$!%*?&#)');
+            throw new Error('Password must be at least 6 characters long');
         }
 
         // Validate date of birth if provided
@@ -252,10 +246,40 @@ const googleAuth = (req, res, next) => {
 };
 
 // @desc    Google OAuth - Callback
-// @route   GET /api/auth/google/callback
+// @route   GET/POST /api/auth/google/callback
 // @access  Public
 const googleCallback = async (req, res, next) => {
     try {
+        // Handle POST request from mobile (direct code exchange)
+        if (req.method === 'POST') {
+            // For mobile flow, return JSON directly
+            // User is attached by passport or needs to be fetched
+            if (!req.user) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Google authentication failed',
+                });
+            }
+
+            const user = req.user;
+            const token = user.generateAuthToken();
+
+            return res.status(200).json({
+                success: true,
+                message: 'Google authentication successful',
+                token,
+                user: {
+                    id: user._id,
+                    fullName: user.fullName,
+                    email: user.email,
+                    username: user.username,
+                    profilePicture: user.profilePicture,
+                    bio: user.bio,
+                },
+            });
+        }
+
+        // Handle GET request (web browser flow)
         // User is attached to req.user by passport
         if (!req.user) {
             return res.status(401).json({
@@ -274,7 +298,7 @@ const googleCallback = async (req, res, next) => {
         const redirectUrl = `myapp://auth/callback?token=${token}&userId=${user._id}`;
 
         // Alternatively, return JSON if called from API
-        if (req.query.mobile === 'true') {
+        if (req.query.mobile === 'true' || req.body.mobile === 'true') {
             return res.status(200).json({
                 success: true,
                 message: 'Google authentication successful',

@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('../config/passportConfig');
+const { authLimiter } = require('../middleware/rateLimiter');
 const {
     signup,
     login,
@@ -9,13 +10,14 @@ const {
     googleCallback,
 } = require('../controllers/authController');
 
-// Authentication routes
-router.post('/signup', signup);
-router.post('/login', login);
-router.post('/forgot-password', forgotPassword);
-router.post('/reset-password', resetPassword);
+// Authentication routes with rate limiting
+router.post('/signup', authLimiter, signup);
+router.post('/login', authLimiter, login);
+router.post('/forgot-password', authLimiter, forgotPassword);
+router.post('/reset-password', authLimiter, resetPassword);
 
 // Google OAuth routes
+// Web flow - opens browser
 router.get(
     '/google',
     passport.authenticate('google', {
@@ -24,6 +26,7 @@ router.get(
     })
 );
 
+// Browser callback (used by web flow)
 router.get(
     '/google/callback',
     passport.authenticate('google', {
@@ -32,5 +35,8 @@ router.get(
     }),
     googleCallback
 );
+
+// Mobile flow - exchange auth code for token
+router.post('/google/callback', googleCallback);
 
 module.exports = router;
