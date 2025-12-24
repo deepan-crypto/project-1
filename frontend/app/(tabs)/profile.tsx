@@ -495,6 +495,7 @@ export default function ProfileScreen() {
                           styles.optionText,
                           poll.hasVoted && styles.optionTextVoted,
                           !poll.hasVoted && styles.optionTextUnvoted,
+                          !poll.isOwn && poll.votedOptionIndex === index && styles.optionTextBlue,
                         ]}>{option.text}</Text>
                       </TouchableOpacity>
                       {poll.hasVoted && (
@@ -519,7 +520,7 @@ export default function ProfileScreen() {
                         />
                       </TouchableOpacity>
                       <TouchableOpacity onPress={() => router.push(`/poll/${poll.id}/likes`)}>
-                        <Text style={[styles.likesCount, poll.isLiked && styles.likedText]}>{poll.likes} likes</Text>
+                        <Text style={styles.likesCount}>{poll.likes}</Text>
                       </TouchableOpacity>
                     </View>
                     <View style={styles.footerRight}>
@@ -813,7 +814,7 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: '#6C7278',
+    backgroundColor: '#9CA3AB',
     borderRadius: 20,
   },
   optionProgressBlue: {
@@ -823,6 +824,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#101720',
     zIndex: 1,
+    textAlign: 'center',
   },
   optionTextVoted: {
     color: '#6C7278',
@@ -830,6 +832,10 @@ const styles = StyleSheet.create({
   },
   optionTextUnvoted: {
     color: '#458FD0',
+    fontWeight: '600',
+  },
+  optionTextBlue: {
+    color: '#FFFFFF',
     fontWeight: '600',
   },
   percentage: {

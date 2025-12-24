@@ -444,6 +444,10 @@ const likePoll = async (req, res, next) => {
             userId: req.user._id,
             likedAt: new Date(),
         });
+
+        // Clean up any invalid likes (likes without userId) before saving
+        poll.likes = poll.likes.filter(like => like.userId);
+
         await poll.save();
 
         // Create notification for poll owner

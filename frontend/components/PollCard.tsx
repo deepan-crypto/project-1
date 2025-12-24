@@ -201,7 +201,7 @@ export default function PollCard({
             />
           </TouchableOpacity>
           <TouchableOpacity onPress={handleViewLikes}>
-            <Text style={[styles.likesText, isLiked && styles.likedText]}>{likes} likes</Text>
+            <Text style={styles.likesText}>{likes}</Text>
           </TouchableOpacity>
         </View>
         <View style={styles.footerRight}>
@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: '#6C7278',
+    backgroundColor: '#9CA3AB',
     borderRadius: 20,
   },
   optionContent: {
