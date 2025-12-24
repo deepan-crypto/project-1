@@ -216,9 +216,7 @@ export default function PostsScreen() {
             disabled={loading}
           >
             <LinearGradient
-              colors={['#458FD0', '#07F2DF']}
-              start={{ x: 0.5, y: 0 }}
-              end={{ x: 0.5, y: 1 }}
+              colors={['rgba(255, 255, 255, 0.12)', 'rgba(255, 255, 255, 0)']}
               style={styles.postButton}
             >
               {loading ? (

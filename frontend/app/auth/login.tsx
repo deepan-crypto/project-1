@@ -186,13 +186,18 @@ export default function LoginScreen() {
               </View>
 
               <TouchableOpacity
-                style={[styles.loginButton, loading && styles.loginButtonDisabled]}
+                style={[styles.loginButtonContainer, loading && styles.loginButtonDisabled]}
                 onPress={handleLogin}
                 disabled={loading}
               >
-                <Text style={styles.loginButtonText}>
-                  {loading ? 'Logging In...' : 'Log In'}
-                </Text>
+                <LinearGradient
+                  colors={['rgba(255, 255, 255, 0.12)', 'rgba(255, 255, 255, 0)']}
+                  style={styles.loginButton}
+                >
+                  <Text style={styles.loginButtonText}>
+                    {loading ? 'Logging In...' : 'Log In'}
+                  </Text>
+                </LinearGradient>
               </TouchableOpacity>
 
               {/* OR Divider */}
@@ -332,12 +337,14 @@ const styles = StyleSheet.create({
     color: '#45BFD0',
     fontWeight: '600',
   },
+  loginButtonContainer: {
+    marginTop: 8,
+  },
   loginButton: {
-    backgroundColor: '#45BFD0',
+    backgroundColor: '#4098D2',
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',
-    marginTop: 8,
   },
   loginButtonText: {
     color: '#FFFFFF',

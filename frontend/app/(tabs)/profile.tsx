@@ -779,8 +779,8 @@ const styles = StyleSheet.create({
   },
   pollOptionVoted: {
     borderWidth: 1,
-    borderColor: '#6C7278',
-    backgroundColor: '#F5F5F5',
+    borderColor: '#E0E0E0',
+    backgroundColor: '#E8E8E8',
     position: 'relative',
     overflow: 'hidden',
   },
@@ -793,7 +793,7 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: '#6C7278',
+    backgroundColor: '#A0A0A0',
     borderRadius: 20,
   },
   optionProgressBlue: {
@@ -805,7 +805,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   optionTextVoted: {
-    color: '#101720',
+    color: '#FFFFFF',
     fontWeight: '600',
   },
   optionTextUnvoted: {
@@ -814,7 +814,7 @@ const styles = StyleSheet.create({
   },
   percentage: {
     fontSize: 14,
-    color: '#101720',
+    color: '#B0B0B0',
     fontWeight: '500',
     marginLeft: 12,
     minWidth: 35,
@@ -842,7 +842,7 @@ const styles = StyleSheet.create({
   },
   likesCount: {
     fontSize: 14,
-    color: '#6C7278',
+    color: '#B0B0B0',
   },
   likedText: {
     color: '#FF4444',

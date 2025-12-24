@@ -285,13 +285,18 @@ export default function SignUpScreen() {
               </View>
 
               <TouchableOpacity
-                style={[styles.signUpButton, loading && styles.signUpButtonDisabled]}
+                style={[styles.signUpButtonContainer, loading && styles.signUpButtonDisabled]}
                 onPress={handleSignUp}
                 disabled={loading}
               >
-                <Text style={styles.signUpButtonText}>
-                  {loading ? 'Signing Up...' : 'Sign Up'}
-                </Text>
+                <LinearGradient
+                  colors={['rgba(255, 255, 255, 0.12)', 'rgba(255, 255, 255, 0)']}
+                  style={styles.signUpButton}
+                >
+                  <Text style={styles.signUpButtonText}>
+                    {loading ? 'Signing Up...' : 'Sign Up'}
+                  </Text>
+                </LinearGradient>
               </TouchableOpacity>
 
               {/* OR Divider */}
@@ -453,12 +458,14 @@ const styles = StyleSheet.create({
   dropdownTextSelected: {
     color: '#000',
   },
+  signUpButtonContainer: {
+    marginTop: 8,
+  },
   signUpButton: {
-    backgroundColor: '#45BFD0',
+    backgroundColor: '#4098D2',
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',
-    marginTop: 8,
   },
   signUpButtonText: {
     color: '#FFFFFF',

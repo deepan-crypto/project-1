@@ -292,14 +292,14 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#E0E0E0',
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#E8E8E8',
   },
   progressBar: {
     position: 'absolute',
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: '#6C7278',
+    backgroundColor: '#A0A0A0',
     borderRadius: 20,
   },
   optionContent: {
@@ -314,7 +314,7 @@ const styles = StyleSheet.create({
     color: '#101720',
   },
   optionTextVoted: {
-    color: '#101720',
+    color: '#FFFFFF',
     fontWeight: '600',
   },
   optionTextUnvoted: {
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
   },
   optionPercentageVoted: {
     fontSize: 14,
-    color: '#101720',
+    color: '#B0B0B0',
     fontWeight: '600',
     marginLeft: 12,
     minWidth: 40,
@@ -350,7 +350,7 @@ const styles = StyleSheet.create({
   },
   likesText: {
     fontSize: 14,
-    color: '#3f87ceff',
+    color: '#B0B0B0',
   },
   likedText: {
     color: '#FF4444',

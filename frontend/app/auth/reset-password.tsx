@@ -166,13 +166,18 @@ export default function ResetPasswordScreen() {
               </View>
 
               <TouchableOpacity
-                style={[styles.updateButton, loading && styles.updateButtonDisabled]}
+                style={[styles.updateButtonContainer, loading && styles.updateButtonDisabled]}
                 onPress={handleUpdatePassword}
                 disabled={loading}
               >
-                <Text style={styles.updateButtonText}>
-                  {loading ? 'Updating...' : 'Update Password'}
-                </Text>
+                <LinearGradient
+                  colors={['rgba(255, 255, 255, 0.12)', 'rgba(255, 255, 255, 0)']}
+                  style={styles.updateButton}
+                >
+                  <Text style={styles.updateButtonText}>
+                    {loading ? 'Updating...' : 'Update Password'}
+                  </Text>
+                </LinearGradient>
               </TouchableOpacity>
             </View>
           </View>
@@ -243,12 +248,14 @@ const styles = StyleSheet.create({
   eyeIcon: {
     padding: 14,
   },
+  updateButtonContainer: {
+    marginTop: 8,
+  },
   updateButton: {
-    backgroundColor: '#45BFD0',
+    backgroundColor: '#4098D2',
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',
-    marginTop: 8,
   },
   updateButtonText: {
     color: '#FFFFFF',

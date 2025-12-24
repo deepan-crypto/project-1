@@ -107,13 +107,18 @@ export default function ForgotPasswordScreen() {
               </View>
 
               <TouchableOpacity
-                style={[styles.sendButton, loading && styles.sendButtonDisabled]}
+                style={[styles.sendButtonContainer, loading && styles.sendButtonDisabled]}
                 onPress={handleSendResetLink}
                 disabled={loading}
               >
-                <Text style={styles.sendButtonText}>
-                  {loading ? 'Sending...' : 'Send Reset Link'}
-                </Text>
+                <LinearGradient
+                  colors={['rgba(255, 255, 255, 0.12)', 'rgba(255, 255, 255, 0)']}
+                  style={styles.sendButton}
+                >
+                  <Text style={styles.sendButtonText}>
+                    {loading ? 'Sending...' : 'Send Reset Link'}
+                  </Text>
+                </LinearGradient>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -182,12 +187,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#000',
   },
+  sendButtonContainer: {
+    marginTop: 8,
+  },
   sendButton: {
-    backgroundColor: '#45BFD0',
+    backgroundColor: '#4098D2',
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',
-    marginTop: 8,
   },
   sendButtonText: {
     color: '#FFFFFF',
