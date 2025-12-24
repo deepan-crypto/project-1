@@ -81,6 +81,7 @@ export default function ProfileScreen() {
 
   // Fetch user's polls from API
   const fetchUserPolls = async (userId: string) => {
+    console.log('===== FETCHING USER POLLS =====', userId);
     try {
       setLoadingPolls(true);
       const token = await authStorage.getToken();
@@ -88,13 +89,20 @@ export default function ProfileScreen() {
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
+      console.log('Fetching user polls from:', `${API_BASE_URL}/polls/user/${userId}`);
       const response = await fetch(`${API_BASE_URL}/polls/user/${userId}`, { headers });
       const data = await response.json();
 
+      console.log('User polls response status:', response.status);
+      console.log('User polls data:', JSON.stringify(data, null, 2));
+
       if (response.ok && data.polls) {
+        console.log('Number of user polls received:', data.polls.length);
         setPolls(data.polls);
         // Combine and sort polls after both are loaded
         combinePolls(data.polls, votedPolls);
+      } else {
+        console.error('Failed to fetch user polls:', data);
       }
     } catch (error) {
       console.error('Error fetching user polls:', error);
@@ -105,6 +113,7 @@ export default function ProfileScreen() {
 
   // Fetch polls the user has voted on
   const fetchVotedPolls = async (userId: string) => {
+    console.log('===== FETCHING VOTED POLLS =====', userId);
     try {
       setLoadingVotedPolls(true);
       const token = await authStorage.getToken();
@@ -112,13 +121,20 @@ export default function ProfileScreen() {
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
+      console.log('Fetching voted polls from:', `${API_BASE_URL}/polls/user/${userId}/voted`);
       const response = await fetch(`${API_BASE_URL}/polls/user/${userId}/voted`, { headers });
       const data = await response.json();
 
+      console.log('Voted polls response status:', response.status);
+      console.log('Voted polls data:', JSON.stringify(data, null, 2));
+
       if (response.ok && data.polls) {
+        console.log('Number of voted polls received:', data.polls.length);
         setVotedPolls(data.polls);
         // Combine and sort polls after both are loaded
         combinePolls(polls, data.polls);
+      } else {
+        console.error('Failed to fetch voted polls:', data);
       }
     } catch (error) {
       console.error('Error fetching voted polls:', error);
@@ -780,20 +796,24 @@ const styles = StyleSheet.create({
   pollOptionVoted: {
     borderWidth: 1,
     borderColor: '#E0E0E0',
-    backgroundColor: '#E8E8E8',
+    backgroundColor: '#F5F5F5',
     position: 'relative',
     overflow: 'hidden',
   },
   optionContent: {
     position: 'relative',
     zIndex: 1,
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   optionProgress: {
     position: 'absolute',
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: '#A0A0A0',
+    backgroundColor: '#6C7278',
     borderRadius: 20,
   },
   optionProgressBlue: {
@@ -805,7 +825,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   optionTextVoted: {
-    color: '#FFFFFF',
+    color: '#6C7278',
     fontWeight: '600',
   },
   optionTextUnvoted: {
@@ -814,7 +834,7 @@ const styles = StyleSheet.create({
   },
   percentage: {
     fontSize: 14,
-    color: '#B0B0B0',
+    color: '#6C7278',
     fontWeight: '500',
     marginLeft: 12,
     minWidth: 35,

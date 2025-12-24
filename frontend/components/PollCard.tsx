@@ -292,29 +292,29 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: '#E0E0E0',
-    backgroundColor: '#E8E8E8',
+    backgroundColor: '#F5F5F5',
   },
   progressBar: {
     position: 'absolute',
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: '#A0A0A0',
+    backgroundColor: '#6C7278',
     borderRadius: 20,
   },
   optionContent: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
     zIndex: 1,
   },
   optionText: {
     fontSize: 14,
-    color: '#101720',
+    color: '#6C7278',
   },
   optionTextVoted: {
-    color: '#FFFFFF',
+    color: '#6C7278',
     fontWeight: '600',
   },
   optionTextUnvoted: {
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
   },
   optionPercentageVoted: {
     fontSize: 14,
-    color: '#B0B0B0',
+    color: '#6C7278',
     fontWeight: '600',
     marginLeft: 12,
     minWidth: 40,

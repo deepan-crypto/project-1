@@ -95,7 +95,7 @@ const getAllPolls = async (req, res, next) => {
                 ? poll.options.some(opt => opt.votes.some(v => v.toString() === req.user._id.toString()))
                 : false;
             const isLiked = req.user
-                ? poll.likes.some(like => like.userId.toString() === req.user._id.toString())
+                ? poll.likes.some(like => like.userId && like.userId.toString() === req.user._id.toString())
                 : false;
 
             return {
@@ -184,7 +184,7 @@ const getUserPolls = async (req, res, next) => {
                 ? poll.options.some(opt => opt.votes.some(v => v.toString() === req.user._id.toString()))
                 : false;
             const isLiked = req.user
-                ? poll.likes.some(like => like.userId.toString() === req.user._id.toString())
+                ? poll.likes.some(like => like.userId && like.userId.toString() === req.user._id.toString())
                 : false;
 
             // Find which option the user voted for
@@ -275,7 +275,7 @@ const getUserVotedPolls = async (req, res, next) => {
                 ? poll.options.some(opt => opt.votes.some(v => v.toString() === req.user._id.toString()))
                 : poll.options.some(opt => opt.votes.some(v => v.toString() === targetUserId));
             const isLiked = req.user
-                ? poll.likes.some(like => like.userId.toString() === req.user._id.toString())
+                ? poll.likes.some(like => like.userId && like.userId.toString() === req.user._id.toString())
                 : false;
 
             // Find which option the user voted for
@@ -355,6 +355,10 @@ const votePoll = async (req, res, next) => {
         // Add new vote
         poll.options[optionIndex].votes.push(req.user._id);
         poll.options[optionIndex].voteCount += 1;
+
+        // Clean up any invalid likes (likes without userId) before saving
+        poll.likes = poll.likes.filter(like => like.userId);
+
         await poll.save();
 
         // Create notification for poll owner (only if first time voting)
@@ -430,7 +434,7 @@ const likePoll = async (req, res, next) => {
         }
 
         // Check if already liked
-        if (poll.likes.some(like => like.userId.toString() === req.user._id.toString())) {
+        if (poll.likes.some(like => like.userId && like.userId.toString() === req.user._id.toString())) {
             res.status(400);
             throw new Error('You have already liked this poll');
         }
@@ -500,14 +504,14 @@ const unlikePoll = async (req, res, next) => {
         }
 
         // Check if liked
-        if (!poll.likes.some(like => like.userId.toString() === req.user._id.toString())) {
+        if (!poll.likes.some(like => like.userId && like.userId.toString() === req.user._id.toString())) {
             res.status(400);
             throw new Error('You have not liked this poll');
         }
 
         // Remove like
         poll.likes = poll.likes.filter(
-            like => like.userId.toString() !== req.user._id.toString()
+            like => like.userId && like.userId.toString() !== req.user._id.toString()
         );
         await poll.save();
 
@@ -547,7 +551,7 @@ const getPollDetails = async (req, res, next) => {
             ? poll.options.some(opt => opt.votes.some(v => v.toString() === req.user._id.toString()))
             : false;
         const isLiked = req.user
-            ? poll.likes.some(like => like.userId.toString() === req.user._id.toString())
+            ? poll.likes.some(like => like.userId && like.userId.toString() === req.user._id.toString())
             : false;
 
         res.status(200).json({

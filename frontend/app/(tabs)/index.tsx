@@ -87,6 +87,7 @@ export default function HomeScreen() {
   }, [socket]);
 
   const fetchPolls = async () => {
+    console.log('===== FETCHPOLLS FUNCTION CALLED =====');
     try {
       const token = await authStorage.getToken();
       const headers: Record<string, string> = {};
@@ -94,10 +95,15 @@ export default function HomeScreen() {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
+      console.log('Fetching polls from:', `${API_BASE_URL}/polls`);
       const response = await fetch(`${API_BASE_URL}/polls`, { headers });
       const data = await response.json();
 
+      console.log('Response status:', response.status);
+      console.log('Response data:', JSON.stringify(data, null, 2));
+
       if (response.ok && data.polls) {
+        console.log('Number of polls received:', data.polls.length);
         // Transform API data to match PollCard props
         const transformedPolls = data.polls.map((poll: any) => ({
           id: poll.id,
@@ -115,7 +121,10 @@ export default function HomeScreen() {
           isLiked: poll.isLiked,
           createdAt: poll.createdAt,
         }));
+        console.log('Transformed polls:', transformedPolls.length);
         setPolls(transformedPolls);
+      } else {
+        console.error('Failed to fetch polls:', data);
       }
     } catch (error) {
       console.error('Error fetching polls:', error);

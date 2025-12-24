@@ -100,7 +100,7 @@ export default function PostsScreen() {
               setThought1('');
               setThought2('');
               setThought3('');
-              router.replace('/(tabs)');
+              router.push('/(tabs)');
             }
           }
         ]);
