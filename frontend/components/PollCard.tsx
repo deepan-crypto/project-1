@@ -275,12 +275,14 @@ const styles = StyleSheet.create({
   },
   option: {
     flex: 1,
-    borderRadius: 20,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    height: 28,
+    borderRadius: 4,
+    paddingVertical: 5,
+    paddingHorizontal: 12,
     borderWidth: 1,
     borderColor: '#E0E0E0',
     backgroundColor: 'transparent',
+    justifyContent: 'center',
   },
   optionUnvoted: {
     borderColor: '#458FD0',
@@ -293,6 +295,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E0E0E0',
     backgroundColor: '#F5F5F5',
+    borderRadius: 4,
   },
   progressBar: {
     position: 'absolute',
@@ -300,7 +303,7 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     backgroundColor: '#9CA3AB',
-    borderRadius: 20,
+    borderRadius: 4,
   },
   optionContent: {
     flexDirection: 'row',

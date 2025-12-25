@@ -145,11 +145,38 @@ export default function ProfileScreen() {
 
   // Combine own polls and voted polls into single array
   const combinePolls = (ownPolls: UserPoll[], voted: UserPoll[]) => {
-    const ownPollsWithFlag = ownPolls.map(p => ({ ...p, isOwn: true }));
-    const votedPollsWithFlag = voted.map(p => ({ ...p, isOwn: false }));
-    const combined = [...ownPollsWithFlag, ...votedPollsWithFlag];
-    // Sort by creation date, newest first
+    console.log('===== COMBINING POLLS =====');
+    console.log('Own polls:', ownPolls.length, ownPolls.map(p => ({ id: p.id, question: p.question })));
+    console.log('Voted polls:', voted.length, voted.map(p => ({ id: p.id, question: p.question, userName: p.user?.name })));
+
+    // Use a Map to deduplicate polls by ID
+    const pollMap = new Map<string, UserPoll & { isOwn: boolean }>();
+
+    // Add own polls first (they take priority)
+    ownPolls.forEach(poll => {
+      pollMap.set(poll.id, { ...poll, isOwn: true });
+    });
+
+    // Add voted polls only if they're not already in the map
+    voted.forEach(poll => {
+      if (!pollMap.has(poll.id)) {
+        pollMap.set(poll.id, { ...poll, isOwn: false });
+      }
+    });
+
+    // Convert Map to array and sort by creation date, newest first
+    const combined = Array.from(pollMap.values());
     combined.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    console.log('Combined polls:', combined.length);
+    console.log('Poll details:', combined.map(p => ({
+      id: p.id,
+      question: p.question,
+      isOwn: p.isOwn,
+      hasVoted: p.hasVoted,
+      votedOptionIndex: p.votedOptionIndex
+    })));
+
     setAllPolls(combined);
   };
 
@@ -781,13 +808,15 @@ const styles = StyleSheet.create({
   },
   pollOption: {
     flex: 1,
+    height: 28,
     borderWidth: 1,
     borderColor: '#E0E0E0',
-    borderRadius: 20,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
+    borderRadius: 4,
+    paddingVertical: 5,
+    paddingHorizontal: 12,
     backgroundColor: 'transparent',
     overflow: 'hidden',
+    justifyContent: 'center',
   },
   pollOptionUnvoted: {
     borderColor: '#458FD0',
@@ -800,6 +829,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5F5F5',
     position: 'relative',
     overflow: 'hidden',
+    borderRadius: 4,
   },
   optionContent: {
     position: 'relative',
@@ -815,7 +845,7 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     backgroundColor: '#9CA3AB',
-    borderRadius: 20,
+    borderRadius: 4,
   },
   optionProgressBlue: {
     backgroundColor: '#458FD0',
