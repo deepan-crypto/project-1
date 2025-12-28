@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
   },
   option: {
     flex: 1,
-    height: 28,
+    height: 30,
     borderRadius: 4,
     paddingVertical: 5,
     paddingHorizontal: 12,
