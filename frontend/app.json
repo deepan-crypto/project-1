@@ -3,17 +3,20 @@
     "name": "crypto-app",
     "slug": "crypto-app",
     "version": "1.0.0",
-    
-    
     "android": {
       "package": "com.deepangokul.cryptoapp",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/ican.png",
         "backgroundColor": "#ffffff"
+      },
+      "permissions": [
+        "NOTIFICATIONS"
+      ],
+      "notification": {
+        "icon": "./assets/images/ican.png",
+        "color": "#458FD0"
       }
     },
-   
-
     "orientation": "portrait",
     "icon": "./assets/images/ican.png",
     "scheme": "myapp",
@@ -31,7 +34,14 @@
       "expo-router",
       "expo-font",
       "expo-web-browser",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/ican.png",
+          "color": "#458FD0"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

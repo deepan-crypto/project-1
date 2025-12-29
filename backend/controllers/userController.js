@@ -3,6 +3,7 @@ const Poll = require('../models/Poll');
 const Notification = require('../models/Notification');
 const FollowRequest = require('../models/FollowRequest');
 const { emitNotification } = require('../utils/socketEmitter');
+const { sendPushNotification } = require('../utils/pushNotificationService');
 
 // @desc    Get user profile by ID
 // @route   GET /api/users/profile/:userId
@@ -238,6 +239,22 @@ const followUser = async (req, res, next) => {
                 followRequestStatus: 'pending',
             });
 
+            // Send push notification
+            try {
+                await sendPushNotification(
+                    userToFollow._id,
+                    'Follow Request',
+                    `${currentUser.username} wants to follow you`,
+                    {
+                        type: 'follow_request',
+                        followRequestId: followRequest._id.toString(),
+                        senderId: currentUser._id.toString(),
+                    }
+                );
+            } catch (error) {
+                console.error('Error sending push notification:', error);
+            }
+
             return res.status(200).json({
                 success: true,
                 message: 'Follow request sent',
@@ -277,6 +294,21 @@ const followUser = async (req, res, next) => {
             read: false,
             type: 'follow',
         });
+
+        // Send push notification for new follower
+        try {
+            await sendPushNotification(
+                userToFollow._id,
+                'New Follower',
+                `${currentUser.username} started following you`,
+                {
+                    type: 'follow',
+                    senderId: currentUser._id.toString(),
+                }
+            );
+        } catch (error) {
+            console.error('Error sending push notification:', error);
+        }
 
         res.status(200).json({
             success: true,
@@ -556,6 +588,22 @@ const sendFollowRequest = async (req, res, next) => {
             followRequestStatus: 'pending',
         });
 
+        // Send push notification
+        try {
+            await sendPushNotification(
+                targetUser._id,
+                'Follow Request',
+                `${currentUser.username} wants to follow you`,
+                {
+                    type: 'follow_request',
+                    followRequestId: followRequest._id.toString(),
+                    senderId: currentUser._id.toString(),
+                }
+            );
+        } catch (error) {
+            console.error('Error sending push notification:', error);
+        }
+
         res.status(200).json({
             success: true,
             message: 'Follow request sent',
@@ -627,6 +675,21 @@ const acceptFollowRequest = async (req, res, next) => {
             read: false,
             type: 'follow',
         });
+
+        // Send push notification when request is accepted
+        try {
+            await sendPushNotification(
+                sender._id,
+                'Follow Request Accepted',
+                `${recipient.username} accepted your follow request`,
+                {
+                    type: 'follow_accepted',
+                    senderId: recipient._id.toString(),
+                }
+            );
+        } catch (error) {
+            console.error('Error sending push notification:', error);
+        }
 
         res.status(200).json({
             success: true,
@@ -755,6 +818,40 @@ const getSettings = async (req, res, next) => {
     }
 };
 
+// @desc    Register push notification token
+// @route   POST /api/users/register-push-token
+// @access  Private
+const registerPushToken = async (req, res, next) => {
+    try {
+        const { pushToken } = req.body;
+
+        if (!pushToken || typeof pushToken !== 'string') {
+            res.status(400);
+            throw new Error('Valid push token is required');
+        }
+
+        const user = await User.findById(req.user._id);
+
+        if (!user) {
+            res.status(404);
+            throw new Error('User not found');
+        }
+
+        // Add token if not already registered (using $addToSet to avoid duplicates)
+        await User.findByIdAndUpdate(
+            req.user._id,
+            { $addToSet: { pushTokens: pushToken } }
+        );
+
+        res.status(200).json({
+            success: true,
+            message: 'Push token registered successfully',
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getUserProfile,
     getCurrentUser,
@@ -773,4 +870,5 @@ module.exports = {
     getFollowRequests,
     updatePrivacySettings,
     getSettings,
+    registerPushToken,
 };

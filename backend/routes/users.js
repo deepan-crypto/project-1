@@ -20,6 +20,7 @@ const {
     getFollowRequests,
     updatePrivacySettings,
     getSettings,
+    registerPushToken,
 } = require('../controllers/userController');
 
 // User search
@@ -35,6 +36,9 @@ router.post('/upload-avatar', protect, upload.single('avatar'), uploadAvatar);
 // Settings routes
 router.get('/settings', protect, getSettings);
 router.put('/settings/privacy', protect, updatePrivacySettings);
+
+// Push notification routes
+router.post('/register-push-token', protect, registerPushToken);
 
 // Follow request routes
 router.get('/follow-requests', protect, getFollowRequests);

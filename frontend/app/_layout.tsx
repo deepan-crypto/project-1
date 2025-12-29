@@ -5,11 +5,15 @@ import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, Poppins_700Bold } from '@expo-google-fonts/poppins';
 import { OpenSans_300Light, OpenSans_400Regular, OpenSans_600SemiBold } from '@expo-google-fonts/open-sans';
 import * as SplashScreen from 'expo-splash-screen';
+import { usePushNotifications } from '@/utils/usePushNotifications';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   useFrameworkReady();
+
+  // Initialize push notifications
+  usePushNotifications();
 
   const [fontsLoaded] = useFonts({
     Poppins_400Regular,

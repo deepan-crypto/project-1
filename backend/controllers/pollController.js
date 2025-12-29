@@ -2,6 +2,7 @@ const Poll = require('../models/Poll');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
 const { emitNotification, emitNotificationUpdate } = require('../utils/socketEmitter');
+const { sendPushNotification } = require('../utils/pushNotificationService');
 
 // @desc    Create a new poll
 // @route   POST /api/polls
@@ -386,6 +387,23 @@ const votePoll = async (req, res, next) => {
                 type: 'vote',
                 pollId: poll._id,
             });
+
+            // Send push notification
+            try {
+                await sendPushNotification(
+                    poll.userId,
+                    'New Vote',
+                    `${req.user.username} voted on your poll`,
+                    {
+                        type: 'poll_vote',
+                        pollId: poll._id.toString(),
+                        senderId: req.user._id.toString(),
+                    }
+                );
+            } catch (error) {
+                console.error('Error sending push notification:', error);
+                // Don't fail the request if push notification fails
+            }
         }
 
         // Emit vote update to all users viewing this poll
@@ -475,6 +493,23 @@ const likePoll = async (req, res, next) => {
                 type: 'like',
                 pollId: poll._id,
             });
+
+            // Send push notification
+            try {
+                await sendPushNotification(
+                    poll.userId,
+                    'New Like',
+                    `${req.user.username} liked your poll`,
+                    {
+                        type: 'poll_like',
+                        pollId: poll._id.toString(),
+                        senderId: req.user._id.toString(),
+                    }
+                );
+            } catch (error) {
+                console.error('Error sending push notification:', error);
+                // Don't fail the request if push notification fails
+            }
         }
 
         // Emit like count update to all users viewing this poll
