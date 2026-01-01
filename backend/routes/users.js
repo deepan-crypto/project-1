@@ -21,6 +21,8 @@ const {
     updatePrivacySettings,
     getSettings,
     registerPushToken,
+    changePassword,
+    deleteAccount,
 } = require('../controllers/userController');
 
 // User search
@@ -36,6 +38,8 @@ router.post('/upload-avatar', protect, upload.single('avatar'), uploadAvatar);
 // Settings routes
 router.get('/settings', protect, getSettings);
 router.put('/settings/privacy', protect, updatePrivacySettings);
+router.put('/change-password', protect, changePassword);
+router.delete('/account', protect, deleteAccount);
 
 // Push notification routes
 router.post('/register-push-token', protect, registerPushToken);

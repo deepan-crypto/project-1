@@ -852,6 +852,126 @@ const registerPushToken = async (req, res, next) => {
     }
 };
 
+// @desc    Change user password
+// @route   PUT /api/users/change-password
+// @access  Private
+const changePassword = async (req, res, next) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+
+        // Validate input
+        if (!currentPassword || !newPassword) {
+            res.status(400);
+            throw new Error('Please provide current password and new password');
+        }
+
+        // Validate new password length
+        if (newPassword.length < 6) {
+            res.status(400);
+            throw new Error('New password must be at least 6 characters long');
+        }
+
+        // Get user with password field
+        const user = await User.findById(req.user._id).select('+password');
+
+        if (!user) {
+            res.status(404);
+            throw new Error('User not found');
+        }
+
+        // Check if user is using Google OAuth
+        if (user.authProvider === 'google') {
+            res.status(400);
+            throw new Error('Cannot change password for Google authenticated accounts. Please manage your password through Google.');
+        }
+
+        // Verify current password
+        const isPasswordMatch = await user.comparePassword(currentPassword);
+        if (!isPasswordMatch) {
+            res.status(401);
+            throw new Error('Current password is incorrect');
+        }
+
+        // Update password (will be hashed by pre-save hook)
+        user.password = newPassword;
+        await user.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Password changed successfully',
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Delete user account
+// @route   DELETE /api/users/account
+// @access  Private
+const deleteAccount = async (req, res, next) => {
+    try {
+        const userId = req.user._id;
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            res.status(404);
+            throw new Error('User not found');
+        }
+
+        // Delete all user's polls
+        await Poll.deleteMany({ userId });
+
+        // Remove user's votes from all polls
+        await Poll.updateMany(
+            { 'votes.userId': userId },
+            { $pull: { votes: { userId } } }
+        );
+
+        // Remove user's likes from all polls
+        await Poll.updateMany(
+            { 'likes.userId': userId },
+            { $pull: { likes: { userId } } }
+        );
+
+        // Delete all notifications related to this user (sent and received)
+        await Notification.deleteMany({
+            $or: [
+                { recipientId: userId },
+                { senderId: userId }
+            ]
+        });
+
+        // Delete all follow requests (sent and received)
+        await FollowRequest.deleteMany({
+            $or: [
+                { senderId: userId },
+                { recipientId: userId }
+            ]
+        });
+
+        // Remove user from followers/following arrays of other users
+        await User.updateMany(
+            { followers: userId },
+            { $pull: { followers: userId } }
+        );
+        await User.updateMany(
+            { following: userId },
+            { $pull: { following: userId } }
+        );
+
+        // Finally, delete the user account
+        await User.findByIdAndDelete(userId);
+
+        res.status(200).json({
+            success: true,
+            message: 'Account deleted successfully',
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getUserProfile,
     getCurrentUser,
@@ -871,4 +991,6 @@ module.exports = {
     updatePrivacySettings,
     getSettings,
     registerPushToken,
+    changePassword,
+    deleteAccount,
 };
