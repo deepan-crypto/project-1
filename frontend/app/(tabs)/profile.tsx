@@ -536,55 +536,44 @@ export default function ProfileScreen() {
                   ))}
                 </View>
 
-                {/* Poll Footer with Actions - Hide likes on own polls */}
-                {!poll.isOwn && (
-                  <View style={styles.pollFooter}>
-                    <View style={styles.footerLeft}>
-                      <TouchableOpacity
-                        style={styles.actionButton}
-                        onPress={() => handleLikePoll(poll.id)}
-                      >
-                        <Heart
-                          size={18}
-                          color={poll.isLiked ? "#FF4444" : "#6C7278"}
-                          fill={poll.isLiked ? "#FF4444" : "transparent"}
-                        />
-                      </TouchableOpacity>
-                      <TouchableOpacity onPress={() => router.push(`/poll/${poll.id}/likes`)}>
-                        <Text style={styles.likesCount}>{poll.likes}</Text>
-                      </TouchableOpacity>
-                    </View>
-                    <View style={styles.footerRight}>
-                      <TouchableOpacity
-                        style={styles.actionButton}
-                        onPress={() => handleSharePoll(poll.id, poll.question)}
-                      >
-                        <Share2 size={18} color="#6C7278" />
-                      </TouchableOpacity>
-                    </View>
+                {/* Poll Footer with Actions - Show likes for all polls */}
+                <View style={styles.pollFooter}>
+                  <View style={styles.footerLeft}>
+                    {/* Heart icon - show for all polls, but only interactive for non-own polls */}
+                    <TouchableOpacity
+                      style={styles.actionButton}
+                      onPress={() => !poll.isOwn && handleLikePoll(poll.id)}
+                      disabled={poll.isOwn}
+                    >
+                      <Heart
+                        size={18}
+                        color={poll.isLiked ? "#FF4444" : "#6C7278"}
+                        fill={poll.isLiked ? "#FF4444" : "transparent"}
+                      />
+                    </TouchableOpacity>
+                    {/* Likes count - for all polls */}
+                    <TouchableOpacity onPress={() => router.push(`/poll/${poll.id}/likes`)}>
+                      <Text style={styles.likesCount}>{poll.likes}</Text>
+                    </TouchableOpacity>
                   </View>
-                )}
-
-                {/* Delete button for own polls */}
-                {poll.isOwn && (
-                  <View style={styles.pollFooter}>
-                    <View style={styles.footerLeft} />
-                    <View style={styles.footerRight}>
-                      <TouchableOpacity
-                        style={styles.actionButton}
-                        onPress={() => handleSharePoll(poll.id, poll.question)}
-                      >
-                        <Share2 size={18} color="#6C7278" />
-                      </TouchableOpacity>
+                  <View style={styles.footerRight}>
+                    <TouchableOpacity
+                      style={styles.actionButton}
+                      onPress={() => handleSharePoll(poll.id, poll.question)}
+                    >
+                      <Share2 size={18} color="#6C7278" />
+                    </TouchableOpacity>
+                    {/* Delete button - only for own polls */}
+                    {poll.isOwn && (
                       <TouchableOpacity
                         style={styles.actionButton}
                         onPress={() => handleDeletePoll(poll.id)}
                       >
                         <Trash2 size={18} color="#FF4444" />
                       </TouchableOpacity>
-                    </View>
+                    )}
                   </View>
-                )}
+                </View>
               </View>
             ))
           )
