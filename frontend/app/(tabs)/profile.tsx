@@ -502,38 +502,47 @@ export default function ProfileScreen() {
 
                 {/* Poll Options */}
                 <View style={styles.pollOptions}>
-                  {poll.options.map((option: { text: string; percentage: number }, index: number) => (
-                    <View key={index} style={styles.pollOptionRow}>
-                      <TouchableOpacity
-                        style={[
-                          styles.pollOption,
-                          poll.hasVoted && styles.pollOptionVoted,
-                          !poll.hasVoted && styles.pollOptionUnvoted,
-                        ]}
-                        onPress={() => handleVotePoll(poll.id, index)}
-                      >
+                  {poll.options.map((option: { text: string; percentage: number }, index: number) => {
+                    // Determine text color based on whether fill has reached the text
+                    // If percentage >= 50%, the fill has likely reached the center text
+                    const textReachedByFill = poll.hasVoted && option.percentage >= 50;
+
+                    return (
+                      <View key={index} style={styles.pollOptionRow}>
+                        <TouchableOpacity
+                          style={[
+                            styles.pollOption,
+                            poll.hasVoted && styles.pollOptionVoted,
+                            !poll.hasVoted && styles.pollOptionUnvoted,
+                            // Blue border for the option the user voted for
+                            !poll.isOwn && poll.votedOptionIndex === index && styles.pollOptionVotedBlue,
+                          ]}
+                          onPress={() => handleVotePoll(poll.id, index)}
+                        >
+                          {poll.hasVoted && (
+                            <View
+                              style={[
+                                styles.optionProgress,
+                                // Blue color for the option the user voted for
+                                !poll.isOwn && poll.votedOptionIndex === index && styles.optionProgressBlue,
+                                { width: `${option.percentage}%` },
+                              ]}
+                            />
+                          )}
+                          <Text style={[
+                            styles.optionText,
+                            poll.hasVoted && styles.optionTextVoted,
+                            !poll.hasVoted && styles.optionTextUnvoted,
+                            !poll.isOwn && poll.votedOptionIndex === index && styles.optionTextBlue,
+                            textReachedByFill && !(!poll.isOwn && poll.votedOptionIndex === index) && styles.optionTextWhite,
+                          ]}>{option.text}</Text>
+                        </TouchableOpacity>
                         {poll.hasVoted && (
-                          <View
-                            style={[
-                              styles.optionProgress,
-                              // Blue color for the option the user voted for
-                              !poll.isOwn && poll.votedOptionIndex === index && styles.optionProgressBlue,
-                              { width: `${option.percentage}%` },
-                            ]}
-                          />
+                          <Text style={styles.percentage}>{option.percentage}%</Text>
                         )}
-                        <Text style={[
-                          styles.optionText,
-                          poll.hasVoted && styles.optionTextVoted,
-                          !poll.hasVoted && styles.optionTextUnvoted,
-                          !poll.isOwn && poll.votedOptionIndex === index && styles.optionTextBlue,
-                        ]}>{option.text}</Text>
-                      </TouchableOpacity>
-                      {poll.hasVoted && (
-                        <Text style={styles.percentage}>{option.percentage}%</Text>
-                      )}
-                    </View>
-                  ))}
+                      </View>
+                    );
+                  })}
                 </View>
 
                 {/* Poll Footer with Actions - Show likes for all polls */}
@@ -818,11 +827,14 @@ const styles = StyleSheet.create({
   },
   pollOptionVoted: {
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: '#6C7278',
     backgroundColor: '#F5F5F5',
     position: 'relative',
     overflow: 'hidden',
     borderRadius: 4,
+  },
+  pollOptionVotedBlue: {
+    borderColor: '#458FD0',
   },
   optionContent: {
     position: 'relative',
@@ -837,7 +849,7 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: '#9CA3AB',
+    backgroundColor: '#6C7278',
     borderRadius: 4,
   },
   optionProgressBlue: {
@@ -858,6 +870,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   optionTextBlue: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  optionTextWhite: {
     color: '#FFFFFF',
     fontWeight: '600',
   },

@@ -146,6 +146,10 @@ export default function PollCard({
       {/* Poll Options */}
       <View style={styles.optionsContainer}>
         {options.map((option, index) => {
+          // Determine text color based on whether fill has reached the text
+          // If percentage >= 50%, the fill has likely reached the center text
+          const textReachedByFill = hasVoted && option.percentage >= 50;
+
           return (
             <View key={option.id || index} style={styles.optionRow}>
               <TouchableOpacity
@@ -171,6 +175,7 @@ export default function PollCard({
                       styles.optionText,
                       hasVoted && styles.optionTextVoted,
                       !hasVoted && styles.optionTextUnvoted,
+                      textReachedByFill && styles.optionTextWhite,
                     ]}
                   >
                     {option.text}{option.emoji ? ` ${option.emoji}` : ''}
@@ -293,7 +298,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#E0E0E0',
+    borderColor: '#6C7278',
     backgroundColor: '#F5F5F5',
     borderRadius: 4,
   },
@@ -302,7 +307,7 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    backgroundColor: '#9CA3AB',
+    backgroundColor: '#6C7278',
     borderRadius: 4,
   },
   optionContent: {
@@ -322,6 +327,10 @@ const styles = StyleSheet.create({
   },
   optionTextUnvoted: {
     color: '#458FD0',
+    fontWeight: '600',
+  },
+  optionTextWhite: {
+    color: '#FFFFFF',
     fontWeight: '600',
   },
   optionPercentageVoted: {
