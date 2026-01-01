@@ -99,8 +99,6 @@ export default function ProfileScreen() {
       if (response.ok && data.polls) {
         console.log('Number of user polls received:', data.polls.length);
         setPolls(data.polls);
-        // Combine and sort polls after both are loaded
-        combinePolls(data.polls, votedPolls);
       } else {
         console.error('Failed to fetch user polls:', data);
       }
@@ -131,8 +129,6 @@ export default function ProfileScreen() {
       if (response.ok && data.polls) {
         console.log('Number of voted polls received:', data.polls.length);
         setVotedPolls(data.polls);
-        // Combine and sort polls after both are loaded
-        combinePolls(polls, data.polls);
       } else {
         console.error('Failed to fetch voted polls:', data);
       }
@@ -142,6 +138,14 @@ export default function ProfileScreen() {
       setLoadingVotedPolls(false);
     }
   };
+
+  // Combine polls whenever either polls or votedPolls changes
+  useEffect(() => {
+    // Only combine if both have finished loading
+    if (!loadingPolls && !loadingVotedPolls) {
+      combinePolls(polls, votedPolls);
+    }
+  }, [polls, votedPolls, loadingPolls, loadingVotedPolls]);
 
   // Combine own polls and voted polls into single array
   const combinePolls = (ownPolls: UserPoll[], voted: UserPoll[]) => {
