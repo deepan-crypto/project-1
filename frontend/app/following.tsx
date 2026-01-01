@@ -9,9 +9,10 @@ import {
     TouchableOpacity,
     ActivityIndicator,
     Alert,
+    TextInput,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft } from 'lucide-react-native';
+import { ArrowLeft, Search, X } from 'lucide-react-native';
 import { authStorage } from '@/utils/authStorage';
 import API_BASE_URL from '@/config/api';
 
@@ -25,9 +26,11 @@ interface Following {
 export default function FollowingScreen() {
     const { userId } = useLocalSearchParams<{ userId: string }>();
     const [following, setFollowing] = useState<Following[]>([]);
+    const [filteredFollowing, setFilteredFollowing] = useState<Following[]>([]);
     const [loading, setLoading] = useState(true);
     const [unfollowing, setUnfollowing] = useState<string | null>(null);
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         loadCurrentUser();
@@ -35,6 +38,10 @@ export default function FollowingScreen() {
             fetchFollowing();
         }
     }, [userId]);
+
+    useEffect(() => {
+        filterFollowing();
+    }, [searchQuery, following]);
 
     const loadCurrentUser = async () => {
         const user = await authStorage.getUser();
@@ -56,12 +63,32 @@ export default function FollowingScreen() {
 
             if (response.ok && data.following) {
                 setFollowing(data.following);
+                setFilteredFollowing(data.following);
             }
         } catch (error) {
             console.error('Error fetching following:', error);
         } finally {
             setLoading(false);
         }
+    };
+
+    const filterFollowing = () => {
+        if (!searchQuery.trim()) {
+            setFilteredFollowing(following);
+            return;
+        }
+
+        const query = searchQuery.toLowerCase().trim();
+        const filtered = following.filter(
+            (user) =>
+                user.fullName.toLowerCase().includes(query) ||
+                user.username.toLowerCase().includes(query)
+        );
+        setFilteredFollowing(filtered);
+    };
+
+    const clearSearch = () => {
+        setSearchQuery('');
     };
 
     const handleUnfollow = async (targetUserId: string) => {
@@ -132,6 +159,27 @@ export default function FollowingScreen() {
                 <View style={styles.headerSpacer} />
             </View>
 
+            {/* Search Bar */}
+            <View style={styles.searchContainer}>
+                <View style={styles.searchInputWrapper}>
+                    <Search size={20} color="#6C7278" style={styles.searchIcon} />
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder="Search following..."
+                        placeholderTextColor="#999"
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                    />
+                    {searchQuery.length > 0 && (
+                        <TouchableOpacity onPress={clearSearch} style={styles.clearButton}>
+                            <X size={18} color="#6C7278" />
+                        </TouchableOpacity>
+                    )}
+                </View>
+            </View>
+
             {loading ? (
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#458FD0" />
@@ -141,9 +189,14 @@ export default function FollowingScreen() {
                     <Text style={styles.emptyText}>Not following anyone</Text>
                     <Text style={styles.emptySubtext}>When you follow people, they'll appear here</Text>
                 </View>
+            ) : filteredFollowing.length === 0 ? (
+                <View style={styles.emptyContainer}>
+                    <Text style={styles.emptyText}>No results found</Text>
+                    <Text style={styles.emptySubtext}>Try searching with a different name or username</Text>
+                </View>
             ) : (
                 <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
-                    {following.map((user) => (
+                    {filteredFollowing.map((user) => (
                         <View key={user._id} style={styles.userCard}>
                             <TouchableOpacity
                                 style={styles.userCardContent}
@@ -205,6 +258,36 @@ const styles = StyleSheet.create({
     },
     headerSpacer: {
         width: 32,
+    },
+    searchContainer: {
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        backgroundColor: '#FFFFFF',
+        borderBottomWidth: 1,
+        borderBottomColor: '#E0E0E0',
+    },
+    searchInputWrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#F5F5F5',
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+    },
+    searchIcon: {
+        marginRight: 8,
+    },
+    searchInput: {
+        flex: 1,
+        fontSize: 16,
+        color: '#101720',
+        padding: 0,
+    },
+    clearButton: {
+        padding: 4,
+        marginLeft: 4,
     },
     loadingContainer: {
         flex: 1,

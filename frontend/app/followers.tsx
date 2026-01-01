@@ -9,9 +9,10 @@ import {
     TouchableOpacity,
     ActivityIndicator,
     Alert,
+    TextInput,
 } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft } from 'lucide-react-native';
+import { ArrowLeft, Search, X } from 'lucide-react-native';
 import { authStorage } from '@/utils/authStorage';
 import API_BASE_URL from '@/config/api';
 
@@ -25,8 +26,10 @@ interface Follower {
 export default function FollowersScreen() {
     const { userId } = useLocalSearchParams<{ userId: string }>();
     const [followers, setFollowers] = useState<Follower[]>([]);
+    const [filteredFollowers, setFilteredFollowers] = useState<Follower[]>([]);
     const [loading, setLoading] = useState(true);
     const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         loadCurrentUser();
@@ -34,6 +37,10 @@ export default function FollowersScreen() {
             fetchFollowers();
         }
     }, [userId]);
+
+    useEffect(() => {
+        filterFollowers();
+    }, [searchQuery, followers]);
 
     const loadCurrentUser = async () => {
         const user = await authStorage.getUser();
@@ -55,12 +62,32 @@ export default function FollowersScreen() {
 
             if (response.ok && data.followers) {
                 setFollowers(data.followers);
+                setFilteredFollowers(data.followers);
             }
         } catch (error) {
             console.error('Error fetching followers:', error);
         } finally {
             setLoading(false);
         }
+    };
+
+    const filterFollowers = () => {
+        if (!searchQuery.trim()) {
+            setFilteredFollowers(followers);
+            return;
+        }
+
+        const query = searchQuery.toLowerCase().trim();
+        const filtered = followers.filter(
+            (follower) =>
+                follower.fullName.toLowerCase().includes(query) ||
+                follower.username.toLowerCase().includes(query)
+        );
+        setFilteredFollowers(filtered);
+    };
+
+    const clearSearch = () => {
+        setSearchQuery('');
     };
 
     const getProfileImageUrl = (profilePicture: string) => {
@@ -90,6 +117,27 @@ export default function FollowersScreen() {
                 <View style={styles.headerSpacer} />
             </View>
 
+            {/* Search Bar */}
+            <View style={styles.searchContainer}>
+                <View style={styles.searchInputWrapper}>
+                    <Search size={20} color="#6C7278" style={styles.searchIcon} />
+                    <TextInput
+                        style={styles.searchInput}
+                        placeholder="Search followers..."
+                        placeholderTextColor="#999"
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                        autoCapitalize="none"
+                        autoCorrect={false}
+                    />
+                    {searchQuery.length > 0 && (
+                        <TouchableOpacity onPress={clearSearch} style={styles.clearButton}>
+                            <X size={18} color="#6C7278" />
+                        </TouchableOpacity>
+                    )}
+                </View>
+            </View>
+
             {loading ? (
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#458FD0" />
@@ -99,9 +147,14 @@ export default function FollowersScreen() {
                     <Text style={styles.emptyText}>No followers yet</Text>
                     <Text style={styles.emptySubtext}>When people follow you, they'll appear here</Text>
                 </View>
+            ) : filteredFollowers.length === 0 ? (
+                <View style={styles.emptyContainer}>
+                    <Text style={styles.emptyText}>No results found</Text>
+                    <Text style={styles.emptySubtext}>Try searching with a different name or username</Text>
+                </View>
             ) : (
                 <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
-                    {followers.map((follower) => (
+                    {filteredFollowers.map((follower) => (
                         <TouchableOpacity
                             key={follower._id}
                             style={styles.userCard}
@@ -149,6 +202,36 @@ const styles = StyleSheet.create({
     },
     headerSpacer: {
         width: 32,
+    },
+    searchContainer: {
+        paddingHorizontal: 16,
+        paddingVertical: 12,
+        backgroundColor: '#FFFFFF',
+        borderBottomWidth: 1,
+        borderBottomColor: '#E0E0E0',
+    },
+    searchInputWrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#F5F5F5',
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        paddingHorizontal: 12,
+        paddingVertical: 10,
+    },
+    searchIcon: {
+        marginRight: 8,
+    },
+    searchInput: {
+        flex: 1,
+        fontSize: 16,
+        color: '#101720',
+        padding: 0,
+    },
+    clearButton: {
+        padding: 4,
+        marginLeft: 4,
     },
     loadingContainer: {
         flex: 1,
