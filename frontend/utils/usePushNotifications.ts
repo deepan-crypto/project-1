@@ -5,19 +5,25 @@ import Constants from 'expo-constants';
 import { authStorage } from './authStorage';
 import API_BASE_URL from '@/config/api';
 
-// Configure how notifications are handled when the app is in foreground
-Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldPlaySound: true,
-        shouldSetBadge: true,
-        shouldShowBanner: true,
-        shouldShowList: true,
-    }),
-});
+// Check if we're running in Expo Go
+const isExpoGo = Constants.appOwnership === 'expo';
+
+// Only configure notification handler if not in Expo Go
+if (!isExpoGo) {
+    Notifications.setNotificationHandler({
+        handleNotification: async () => ({
+            shouldShowAlert: true,
+            shouldPlaySound: true,
+            shouldSetBadge: true,
+            shouldShowBanner: true,
+            shouldShowList: true,
+        }),
+    });
+}
 
 /**
  * Custom hook for managing push notifications
+ * Note: Push notifications require a development build and won't work in Expo Go
  */
 export const usePushNotifications = () => {
     const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
@@ -26,6 +32,12 @@ export const usePushNotifications = () => {
     const responseListener = useRef<Notifications.EventSubscription | undefined>(undefined);
 
     useEffect(() => {
+        // Skip push notification setup in Expo Go
+        if (isExpoGo) {
+            console.log('⚠️ Push notifications are not available in Expo Go. Build a development build to enable push notifications.');
+            return;
+        }
+
         // Register for push notifications
         registerForPushNotificationsAsync().then(async token => {
             if (token) {
@@ -80,6 +92,11 @@ async function registerForPushNotificationsAsync(): Promise<string | null> {
     let token: string | null = null;
 
     try {
+        // Don't attempt in Expo Go
+        if (isExpoGo) {
+            return null;
+        }
+
         // Check existing permissions
         const { status: existingStatus } = await Notifications.getPermissionsAsync();
         let finalStatus = existingStatus;
@@ -168,6 +185,10 @@ function handleNotificationResponse(response: Notifications.NotificationResponse
  * Clear all notifications
  */
 export async function clearAllNotifications(): Promise<void> {
+    if (isExpoGo) {
+        console.log('Clear notifications not available in Expo Go');
+        return;
+    }
     await Notifications.dismissAllNotificationsAsync();
 }
 
@@ -175,5 +196,9 @@ export async function clearAllNotifications(): Promise<void> {
  * Set badge count
  */
 export async function setBadgeCount(count: number): Promise<void> {
+    if (isExpoGo) {
+        console.log('Badge count not available in Expo Go');
+        return;
+    }
     await Notifications.setBadgeCountAsync(count);
 }
