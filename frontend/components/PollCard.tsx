@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, Share } from 'react-native';
 import { Heart, Trash2 } from 'lucide-react-native';
 import SendIcon from './SendIcon';

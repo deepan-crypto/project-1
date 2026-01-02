@@ -9,7 +9,17 @@
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
     "android": "expo run:android",
-    "ios": "expo run:ios"
+    "ios": "expo run:ios",
+    "eas:configure": "eas build:configure",
+    "eas:build:android": "eas build -p android --profile production",
+    "eas:build:android:preview": "eas build -p android --profile preview",
+    "prebuild": "expo prebuild",
+    "assemble:android": "cd android && ./gradlew assembleRelease",
+    "build:apk-local": "npm run prebuild && npm run assemble:android",
+    "create-local-properties": "node -e \"const fs=require('fs');const path=require('path');const sdk=process.env.ANDROID_HOME||process.env.HOME+'/Android/Sdk';const dest=path.join('android','local.properties');fs.writeFileSync(dest,'sdk.dir='+sdk);console.log('wrote '+dest+' -> sdk.dir='+sdk)\"",
+    "gradle-assemble": "cd android && ./gradlew assembleRelease",
+    "gradle-assemble-log": "cd android && ./gradlew assembleRelease --stacktrace --info > ../gradle-build.log 2>&1",
+    "gradle-diagnose": "npm run create-local-properties && npm run gradle-assemble-log"
   },
   "dependencies": {
     "@expo-google-fonts/open-sans": "^0.4.2",
@@ -55,6 +65,8 @@
   "devDependencies": {
     "@babel/core": "^7.25.2",
     "@types/react": "~19.1.10",
+    "babel-plugin-module-resolver": "^5.0.2",
+    "eas-cli": "^3.14.2",
     "typescript": "~5.9.2"
   }
 }
