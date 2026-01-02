@@ -12,7 +12,6 @@ SplashScreen.preventAutoHideAsync();
 export default function RootLayout() {
   useFrameworkReady();
 
-  // Initialize push notifications
   usePushNotifications();
 
   const [fontsLoaded] = useFonts({
