@@ -22,7 +22,10 @@ const server = http.createServer(app);
 // Initialize Socket.IO with secure CORS
 const io = new Server(server, {
     cors: {
-        origin: process.env.FRONTEND_URL || 'http://localhost:8081',
+        origin: [
+            process.env.FRONTEND_URL || 'http://localhost:8081',
+            process.env.ADMIN_PANEL_URL || 'http://localhost:5173',
+        ],
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: true,
     },
@@ -69,13 +72,31 @@ connectDB();
 // Middleware
 // CORS configuration - secure by default
 const corsOrigin = process.env.FRONTEND_URL;
+const adminPanelUrl = process.env.ADMIN_PANEL_URL || 'http://localhost:5173';
+
 if (!corsOrigin && process.env.NODE_ENV === 'production') {
     console.error('FATAL: FRONTEND_URL environment variable is required in production mode');
     process.exit(1);
 }
 
+// Allow multiple origins: React Native app and Admin Panel
+const allowedOrigins = [
+    corsOrigin || 'http://localhost:8081', // React Native app
+    adminPanelUrl, // Admin panel
+];
+
 app.use(cors({
-    origin: corsOrigin || 'http://localhost:8081', // Safe default for development only
+    origin: function (origin, callback) {
+        // Allow requests with no origin (mobile apps, Postman, etc.)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            console.warn(`CORS blocked request from origin: ${origin}`);
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true,
 }));
 app.use(express.json());
