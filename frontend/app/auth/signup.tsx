@@ -317,7 +317,7 @@ export default function SignUpScreen() {
                 ) : (
                   <>
                     <Image
-                      source={require('@/assets/images/google-logo.png')}
+                      source={require('@/assets/images/google-logo.jpg')}
                       style={styles.googleIcon}
                     />
                     <Text style={styles.googleButtonText}>Sign in with Google</Text>

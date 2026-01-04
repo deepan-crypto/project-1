@@ -218,7 +218,7 @@ export default function LoginScreen() {
                 ) : (
                   <>
                     <Image
-                      source={require('@/assets/images/google-logo.png')}
+                      source={require('@/assets/images/google-logo.jpg')}
                       style={styles.googleIcon}
                     />
                     <Text style={styles.googleButtonText}>Login with Google</Text>
