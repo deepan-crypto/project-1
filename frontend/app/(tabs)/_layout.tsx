@@ -1,7 +1,10 @@
 import { Tabs } from 'expo-router';
 import { Home, Layers, Bell, User, Search } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TabLayout() {
+  const insets = useSafeAreaInsets();
+
   return (
     <Tabs
       screenOptions={{
@@ -13,8 +16,8 @@ export default function TabLayout() {
           backgroundColor: '#FFFFFF',
           borderTopWidth: 1,
           borderTopColor: '#E0E0E0',
-          height: 60,
-          paddingBottom: 10,
+          height: 60 + insets.bottom, // Add bottom inset for safe area
+          paddingBottom: insets.bottom + 10, // Dynamic bottom padding
           paddingTop: 10,
           elevation: 0,
           shadowOpacity: 0,
