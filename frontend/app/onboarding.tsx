@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Dimensions, PanResponder, Animated } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { authStorage } from '@/utils/authStorage';
 
 const { width } = Dimensions.get('window');
 
@@ -52,7 +53,9 @@ export default function OnboardingScreen() {
     })
   ).current;
 
-  const handleSignUp = () => {
+  const handleSignUp = async () => {
+    // Mark onboarding as completed before navigating
+    await authStorage.setOnboardingCompleted();
     router.replace('/auth/signup');
   };
 

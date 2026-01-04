@@ -1,18 +1,50 @@
-import { useEffect } from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
+import { authStorage } from '@/utils/authStorage';
 
 export default function SplashScreen() {
   const router = useRouter();
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      router.replace('/onboarding');
-    }, 2000);
-
-    return () => clearTimeout(timer);
+    checkAuth();
   }, []);
+
+  const checkAuth = async () => {
+    try {
+      // Check if onboarding has been completed
+      const hasSeenOnboarding = await authStorage.hasCompletedOnboarding();
+
+      // Check if user opted for remember me
+      const rememberMe = await authStorage.getRememberMe();
+      const token = await authStorage.getToken();
+
+      // Wait minimum 1.5 seconds for splash screen visibility
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      if (rememberMe && token) {
+        // User has remember me enabled and valid token - auto login
+        router.replace('/(tabs)');
+      } else if (hasSeenOnboarding) {
+        // User has seen onboarding before - go to login
+        if (!rememberMe && token) {
+          await authStorage.clearAuth();
+        }
+        router.replace('/auth/login');
+      } else {
+        // First time user - show onboarding
+        router.replace('/onboarding');
+      }
+    } catch (error) {
+      console.error('Auth check error:', error);
+      // On error, go to onboarding
+      router.replace('/onboarding');
+    } finally {
+      setIsChecking(false);
+    }
+  };
 
   return (
     <LinearGradient
@@ -22,6 +54,13 @@ export default function SplashScreen() {
       <View style={styles.content}>
         <Text style={styles.title}>Thoughts</Text>
         <Text style={styles.subtitle}>Share your mind</Text>
+        {isChecking && (
+          <ActivityIndicator
+            size="large"
+            color="#FFFFFF"
+            style={styles.loader}
+          />
+        )}
       </View>
     </LinearGradient>
   );
@@ -52,5 +91,7 @@ const styles = StyleSheet.create({
     opacity: 0.9,
     lineHeight: 16 * 1.4,
   },
+  loader: {
+    marginTop: 20,
+  },
 });
-
