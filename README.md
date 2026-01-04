@@ -5,7 +5,7 @@ Update API URL in
 frontend/config/api.ts
 :
 typescript
-const API_BASE_URL = 'https://your-backend-domain.com/api';
+const API_BASE_URL = 'https://project-1-backend-r8r9.onrender.com/api';
 Update CORS in 
 backend/server.js
  for your frontend domain:
