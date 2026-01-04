@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { protect } = require('../middleware/auth');
+const isAdmin = require('../middleware/isAdmin');
 const upload = require('../middleware/upload');
 const {
     getUserProfile,
@@ -23,6 +24,10 @@ const {
     registerPushToken,
     changePassword,
     deleteAccount,
+    deleteUserByAdmin,
+    getAllUsers,
+    getUserPollsAdmin,
+    getUserReportsAdmin,
 } = require('../controllers/userController');
 
 // User search
@@ -58,5 +63,11 @@ router.delete('/:userId/unfollow', protect, unfollowUser);
 router.get('/:userId/followers', getFollowers);
 router.get('/:userId/following', getFollowing);
 router.get('/:userId/stats', getUserStats);
+
+// Admin routes
+router.get('/admin/all', isAdmin, getAllUsers);
+router.get('/admin/:userId/polls', isAdmin, getUserPollsAdmin);
+router.get('/admin/:userId/reports', isAdmin, getUserReportsAdmin);
+router.delete('/:userId/admin', isAdmin, deleteUserByAdmin);
 
 module.exports = router;
