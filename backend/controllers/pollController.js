@@ -1,6 +1,7 @@
 const Poll = require('../models/Poll');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
+const ReportedPoll = require('../models/ReportedPoll');
 const { emitNotification, emitNotificationUpdate } = require('../utils/socketEmitter');
 const { sendPushNotification } = require('../utils/pushNotificationService');
 
@@ -683,6 +684,139 @@ const getPollLikes = async (req, res, next) => {
     }
 };
 
+
+// @desc    Report a poll
+// @route   POST /api/polls/:pollId/report
+// @access  Private
+const reportPoll = async (req, res, next) => {
+    try {
+        const { reason } = req.body;
+        const pollId = req.params.pollId;
+
+        if (!reason || reason.trim().length === 0) {
+            res.status(400);
+            throw new Error('Report reason is required');
+        }
+
+        // Check if poll exists
+        const poll = await Poll.findById(pollId);
+        if (!poll) {
+            res.status(404);
+            throw new Error('Poll not found');
+        }
+
+        // Check if user already reported this poll
+        const existingReport = await ReportedPoll.findOne({
+            pollId: pollId,
+            reportedBy: req.user._id,
+            status: 'pending',
+        });
+
+        if (existingReport) {
+            res.status(400);
+            throw new Error('You have already reported this poll');
+        }
+
+        // Create report
+        const report = await ReportedPoll.create({
+            pollId: pollId,
+            reportedBy: req.user._id,
+            reason: reason.trim(),
+        });
+
+        res.status(201).json({
+            success: true,
+            message: 'Poll reported successfully. Our team will review it.',
+            report,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Get all reported polls (Admin only)
+// @route   GET /api/polls/reports
+// @access  Private/Admin
+const getReportedPolls = async (req, res, next) => {
+    try {
+        const reports = await ReportedPoll.find({ status: 'pending' })
+            .populate('pollId', 'question options userId createdAt')
+            .populate('reportedBy', 'username email profilePicture')
+            .sort({ createdAt: -1 });
+
+        // Populate the poll owner info
+        const reportsWithOwner = await Promise.all(
+            reports.map(async (report) => {
+                if (report.pollId) {
+                    await report.pollId.populate('userId', 'username email profilePicture');
+                }
+                return report;
+            })
+        );
+
+        res.status(200).json({
+            success: true,
+            count: reportsWithOwner.length,
+            reports: reportsWithOwner,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Delete a reported poll (Admin only)
+// @route   DELETE /api/polls/reports/:reportId
+// @access  Private/Admin
+const deleteReportedPoll = async (req, res, next) => {
+    try {
+        const report = await ReportedPoll.findById(req.params.reportId);
+
+        if (!report) {
+            res.status(404);
+            throw new Error('Report not found');
+        }
+
+        // Delete the poll
+        await Poll.findByIdAndDelete(report.pollId);
+
+        // Mark report as resolved
+        report.status = 'resolved';
+        await report.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Poll deleted successfully',
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Dismiss a report without deleting poll (Admin only)
+// @route   PUT /api/polls/reports/:reportId/dismiss
+// @access  Private/Admin
+const dismissReport = async (req, res, next) => {
+    try {
+        const report = await ReportedPoll.findById(req.params.reportId);
+
+        if (!report) {
+            res.status(404);
+            throw new Error('Report not found');
+        }
+
+        // Mark report as resolved
+        report.status = 'resolved';
+        await report.save();
+
+        res.status(200).json({
+            success: true,
+            message: 'Report dismissed successfully',
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     createPoll,
     getAllPolls,
@@ -694,4 +828,8 @@ module.exports = {
     getPollDetails,
     deletePoll,
     getPollLikes,
+    reportPoll,
+    getReportedPolls,
+    deleteReportedPoll,
+    dismissReport,
 };
