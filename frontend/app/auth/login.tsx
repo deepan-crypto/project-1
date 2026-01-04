@@ -68,9 +68,13 @@ export default function LoginScreen() {
       const data = await response.json();
 
       if (response.ok) {
-        // Store token and user data securely
+        // Save remember me preference
+        await authStorage.setRememberMe(rememberMe);
+
+        // Always store token and user data (needed for current session)
         await authStorage.setToken(data.token);
         await authStorage.setUser(data.user);
+
         router.replace('/(tabs)');
       } else {
         // Handle backend errors
