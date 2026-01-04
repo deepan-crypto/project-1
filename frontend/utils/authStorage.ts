@@ -2,6 +2,8 @@ import * as SecureStore from 'expo-secure-store';
 
 const TOKEN_KEY = 'auth_token';
 const USER_KEY = 'user_data';
+const REMEMBER_ME_KEY = 'remember_me';
+const ONBOARDING_COMPLETED_KEY = 'onboarding_completed';
 
 export const authStorage = {
     // Save token
@@ -61,9 +63,52 @@ export const authStorage = {
         }
     },
 
-    // Clear all auth data
+    // Save remember me preference
+    async setRememberMe(remember: boolean) {
+        try {
+            await SecureStore.setItemAsync(REMEMBER_ME_KEY, remember ? 'true' : 'false');
+        } catch (error) {
+            console.error('Error saving remember me:', error);
+        }
+    },
+
+    // Get remember me preference
+    async getRememberMe(): Promise<boolean> {
+        try {
+            const value = await SecureStore.getItemAsync(REMEMBER_ME_KEY);
+            return value === 'true';
+        } catch (error) {
+            console.error('Error getting remember me:', error);
+            return false;
+        }
+    },
+
+    // Mark onboarding as completed
+    async setOnboardingCompleted() {
+        try {
+            await SecureStore.setItemAsync(ONBOARDING_COMPLETED_KEY, 'true');
+        } catch (error) {
+            console.error('Error saving onboarding status:', error);
+        }
+    },
+
+    // Check if onboarding was completed
+    async hasCompletedOnboarding(): Promise<boolean> {
+        try {
+            const value = await SecureStore.getItemAsync(ONBOARDING_COMPLETED_KEY);
+            return value === 'true';
+        } catch (error) {
+            console.error('Error getting onboarding status:', error);
+            return false;
+        }
+    },
+
+    // Clear all auth data (but keep onboarding status)
     async clearAuth() {
         await this.removeToken();
         await this.removeUser();
+        await SecureStore.deleteItemAsync(REMEMBER_ME_KEY);
     },
 };
+
+
