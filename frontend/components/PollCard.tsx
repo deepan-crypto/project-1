@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, Share } from 'react-native';
-import { Heart, Trash2 } from 'lucide-react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, Share, Modal, TextInput } from 'react-native';
+import { Heart, Trash2, MoreVertical, Flag, X } from 'lucide-react-native';
 import SendIcon from './SendIcon';
 import { router } from 'expo-router';
 
@@ -26,6 +26,7 @@ interface PollCardProps {
   onDelete?: (id: string) => void;
   onLike?: (id: string) => Promise<{ likes: number; liked: boolean }>;
   onVote?: (pollId: string, optionIndex: number) => Promise<{ options: PollOption[]; hasVoted: boolean }>;
+  isOwnPoll?: boolean;
 }
 
 // Format time ago helper function
@@ -56,6 +57,7 @@ export default function PollCard({
   onDelete,
   onLike,
   onVote,
+  isOwnPoll = false,
 }: PollCardProps) {
   const [options, setOptions] = useState(initialOptions);
   const [hasVoted, setHasVoted] = useState(initialHasVoted);
@@ -63,6 +65,10 @@ export default function PollCard({
   const [isLiked, setIsLiked] = useState(initialIsLiked);
   const [liking, setLiking] = useState(false);
   const [voting, setVoting] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportReason, setReportReason] = useState('');
+  const [reporting, setReporting] = useState(false);
 
   // Sync state with props when they change (e.g., after refetch)
   useEffect(() => {
@@ -129,6 +135,45 @@ export default function PollCard({
     router.push(`/poll/${id}/likes`);
   };
 
+  const handleReport = async () => {
+    if (!id || !reportReason.trim()) {
+      Alert.alert('Error', 'Please provide a reason for reporting this poll');
+      return;
+    }
+
+    setReporting(true);
+    try {
+      // Get the auth token from storage
+      const { authStorage } = await import('../utils/authStorage');
+      const authToken = await authStorage.getToken();
+
+      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/polls/${id}/report`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({ reason: reportReason.trim() }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        Alert.alert('Success', 'Poll reported successfully. Our team will review it.');
+        setShowReportModal(false);
+        setReportReason('');
+        setShowMenu(false);
+      } else {
+        Alert.alert('Error', data.message || 'Failed to report poll');
+      }
+    } catch (error) {
+      console.error('Error reporting poll:', error);
+      Alert.alert('Error', 'Failed to report poll. Please try again.');
+    } finally {
+      setReporting(false);
+    }
+  };
+
   return (
     <View style={styles.card}>
       {/* Header with user info */}
@@ -141,7 +186,31 @@ export default function PollCard({
           </View>
           <Text style={styles.question}>{question}</Text>
         </View>
+        {!isOwnPoll && (
+          <TouchableOpacity
+            onPress={() => setShowMenu(!showMenu)}
+            style={styles.menuButton}
+          >
+            <MoreVertical size={20} color="#687684" />
+          </TouchableOpacity>
+        )}
       </View>
+
+      {/* Menu Dropdown */}
+      {showMenu && (
+        <View style={styles.menuDropdown}>
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={() => {
+              setShowMenu(false);
+              setShowReportModal(true);
+            }}
+          >
+            <Flag size={16} color="#FF4444" />
+            <Text style={styles.menuItemText}>Report Poll</Text>
+          </TouchableOpacity>
+        </View>
+      )}
 
       {/* Poll Options */}
       <View style={styles.optionsContainer}>
@@ -223,6 +292,58 @@ export default function PollCard({
           )}
         </View>
       </View>
+
+      {/* Report Modal */}
+      <Modal
+        visible={showReportModal}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setShowReportModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Report Poll</Text>
+              <TouchableOpacity onPress={() => setShowReportModal(false)}>
+                <X size={24} color="#101720" />
+              </TouchableOpacity>
+            </View>
+
+            <Text style={styles.modalLabel}>Why are you reporting this poll?</Text>
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Enter reason (e.g., inappropriate content, spam, etc.)"
+              placeholderTextColor="#B0B0B0"
+              value={reportReason}
+              onChangeText={setReportReason}
+              multiline
+              numberOfLines={4}
+              textAlignVertical="top"
+            />
+
+            <View style={styles.modalActions}>
+              <TouchableOpacity
+                style={styles.modalCancelButton}
+                onPress={() => {
+                  setShowReportModal(false);
+                  setReportReason('');
+                }}
+              >
+                <Text style={styles.modalCancelText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalSubmitButton, reporting && styles.modalSubmitButtonDisabled]}
+                onPress={handleReport}
+                disabled={reporting || !reportReason.trim()}
+              >
+                <Text style={styles.modalSubmitText}>
+                  {reporting ? 'Reporting...' : 'Submit Report'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -374,5 +495,105 @@ const styles = StyleSheet.create({
   },
   deleteButton: {
     padding: 4,
+  },
+  menuButton: {
+    padding: 4,
+  },
+  menuDropdown: {
+    position: 'absolute',
+    top: 50,
+    right: 16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    zIndex: 1000,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    gap: 8,
+  },
+  menuItemText: {
+    fontSize: 14,
+    color: '#FF4444',
+    fontWeight: '500',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 20,
+    width: '85%',
+    maxWidth: 400,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#101720',
+  },
+  modalLabel: {
+    fontSize: 14,
+    color: '#6C7278',
+    marginBottom: 8,
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 14,
+    color: '#101720',
+    minHeight: 100,
+    marginBottom: 16,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  modalCancelButton: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    alignItems: 'center',
+  },
+  modalCancelText: {
+    fontSize: 14,
+    color: '#6C7278',
+    fontWeight: '600',
+  },
+  modalSubmitButton: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#FF4444',
+    alignItems: 'center',
+  },
+  modalSubmitButtonDisabled: {
+    backgroundColor: '#FFB0B0',
+  },
+  modalSubmitText: {
+    fontSize: 14,
+    color: '#FFFFFF',
+    fontWeight: '600',
   },
 });
