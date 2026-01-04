@@ -2,6 +2,7 @@ const User = require('../models/User');
 const Poll = require('../models/Poll');
 const Notification = require('../models/Notification');
 const FollowRequest = require('../models/FollowRequest');
+const ReportedPoll = require('../models/ReportedPoll');
 const { emitNotification } = require('../utils/socketEmitter');
 const { sendPushNotification } = require('../utils/pushNotificationService');
 
@@ -924,8 +925,8 @@ const deleteAccount = async (req, res, next) => {
 
         // Remove user's votes from all polls
         await Poll.updateMany(
-            { 'votes.userId': userId },
-            { $pull: { votes: { userId } } }
+            { 'options.votes': userId },
+            { $pull: { 'options.$[].votes': userId } }
         );
 
         // Remove user's likes from all polls
@@ -972,6 +973,180 @@ const deleteAccount = async (req, res, next) => {
     }
 };
 
+// @desc    Delete user by admin (with cascade deletion of polls)
+// @route   DELETE /api/users/:userId/admin
+// @access  Private/Admin
+const deleteUserByAdmin = async (req, res, next) => {
+    try {
+        const userId = req.params.userId;
+
+        const user = await User.findById(userId);
+
+        if (!user) {
+            res.status(404);
+            throw new Error('User not found');
+        }
+
+        // Delete all polls created by this user
+        await Poll.deleteMany({ userId: userId });
+
+        // Remove user from followers/following lists of other users
+        await User.updateMany(
+            { followers: userId },
+            { $pull: { followers: userId } }
+        );
+        await User.updateMany(
+            { following: userId },
+            { $pull: { following: userId } }
+        );
+
+        // Remove user's votes from all polls
+        await Poll.updateMany(
+            { 'options.votes': userId },
+            { $pull: { 'options.$[].votes': userId } }
+        );
+
+        // Remove user's likes from all polls
+        await Poll.updateMany(
+            { 'likes.userId': userId },
+            { $pull: { likes: { userId } } }
+        );
+
+        // Delete all notifications related to this user
+        await Notification.deleteMany({
+            $or: [
+                { recipientId: userId },
+                { senderId: userId }
+            ]
+        });
+
+        // Delete all follow requests
+        await FollowRequest.deleteMany({
+            $or: [
+                { senderId: userId },
+                { recipientId: userId }
+            ]
+        });
+
+        // Finally, delete the user
+        await User.findByIdAndDelete(userId);
+
+        res.status(200).json({
+            success: true,
+            message: 'User and all associated data deleted successfully',
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Get all users (Admin only)
+// @route   GET /api/users/admin/all
+// @access  Private/Admin
+const getAllUsers = async (req, res, next) => {
+    try {
+        const users = await User.find()
+            .select('-password')
+            .sort({ createdAt: -1 });
+
+        // Get poll count for each user
+        const usersWithStats = await Promise.all(
+            users.map(async (user) => {
+                const pollCount = await Poll.countDocuments({ userId: user._id });
+                const reportCount = await ReportedPoll.countDocuments({ reportedBy: user._id });
+
+                return {
+                    id: user._id,
+                    fullName: user.fullName,
+                    username: user.username,
+                    email: user.email,
+                    profilePicture: user.profilePicture,
+                    bio: user.bio,
+                    isPrivate: user.isPrivate,
+                    followersCount: user.followers.length,
+                    followingCount: user.following.length,
+                    pollCount,
+                    reportCount,
+                    createdAt: user.createdAt,
+                };
+            })
+        );
+
+        res.status(200).json({
+            success: true,
+            count: usersWithStats.length,
+            users: usersWithStats,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Get user's polls (Admin only)
+// @route   GET /api/users/admin/:userId/polls
+// @access  Private/Admin
+const getUserPollsAdmin = async (req, res, next) => {
+    try {
+        const userId = req.params.userId;
+
+        const polls = await Poll.find({ userId })
+            .sort({ createdAt: -1 })
+            .populate('userId', 'username fullName profilePicture');
+
+        const pollsWithDetails = polls.map(poll => {
+            const percentages = poll.calculatePercentages();
+            return {
+                id: poll._id,
+                question: poll.question,
+                options: percentages,
+                totalVotes: poll.totalVotes,
+                likes: poll.likes.length,
+                createdAt: poll.createdAt,
+            };
+        });
+
+        res.status(200).json({
+            success: true,
+            count: pollsWithDetails.length,
+            polls: pollsWithDetails,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Get reports by user (Admin only)
+// @route   GET /api/users/admin/:userId/reports
+// @access  Private/Admin
+const getUserReportsAdmin = async (req, res, next) => {
+    try {
+        const userId = req.params.userId;
+
+        const reports = await ReportedPoll.find({ reportedBy: userId })
+            .populate('pollId', 'question options userId')
+            .populate('reportedBy', 'username email')
+            .sort({ createdAt: -1 });
+
+        // Populate poll owner
+        const reportsWithDetails = await Promise.all(
+            reports.map(async (report) => {
+                if (report.pollId) {
+                    await report.pollId.populate('userId', 'username email');
+                }
+                return report;
+            })
+        );
+
+        res.status(200).json({
+            success: true,
+            count: reportsWithDetails.length,
+            reports: reportsWithDetails,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     getUserProfile,
     getCurrentUser,
@@ -993,4 +1168,8 @@ module.exports = {
     registerPushToken,
     changePassword,
     deleteAccount,
+    deleteUserByAdmin,
+    getAllUsers,
+    getUserPollsAdmin,
+    getUserReportsAdmin,
 };
