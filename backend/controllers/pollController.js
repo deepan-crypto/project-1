@@ -66,20 +66,31 @@ const getAllPolls = async (req, res, next) => {
         const filteredPolls = polls.filter(poll => {
             const pollOwner = poll.userId;
 
-            // If profile is not private, show poll
+            // Safety check: if pollOwner is missing, hide the poll
+            if (!pollOwner) {
+                return false;
+            }
+
+            // If profile is not private (or isPrivate is undefined/null, treat as public), show poll
             if (!pollOwner.isPrivate) {
                 return true;
             }
 
+            // From here, we know the profile IS private
+            // If no user is authenticated, hide private profile polls
+            if (!currentUserId) {
+                return false;
+            }
+
             // If current user is the poll owner, show poll
-            if (currentUserId && pollOwner._id.toString() === currentUserId) {
+            if (pollOwner._id.toString() === currentUserId) {
                 return true;
             }
 
             // If current user is a follower, show poll
-            if (currentUserId && pollOwner.followers) {
+            if (pollOwner.followers && Array.isArray(pollOwner.followers)) {
                 const isFollower = pollOwner.followers.some(
-                    followerId => followerId.toString() === currentUserId
+                    followerId => followerId && followerId.toString() === currentUserId
                 );
                 if (isFollower) {
                     return true;
@@ -340,19 +351,15 @@ const votePoll = async (req, res, next) => {
             throw new Error('Invalid option index');
         }
 
-        // Check if user already voted and on which option
-        let previousVoteIndex = -1;
-        poll.options.forEach((opt, idx) => {
-            const userVoteIndex = opt.votes.findIndex(
-                vote => vote.toString() === req.user._id.toString()
-            );
-            if (userVoteIndex !== -1) {
-                previousVoteIndex = idx;
-                // Remove the old vote
-                opt.votes.splice(userVoteIndex, 1);
-                opt.voteCount = Math.max(0, opt.voteCount - 1);
-            }
-        });
+        // Check if user already voted
+        const hasVoted = poll.options.some(opt =>
+            opt.votes.some(vote => vote.toString() === req.user._id.toString())
+        );
+
+        if (hasVoted) {
+            res.status(400);
+            throw new Error('You have already voted on this poll. Votes cannot be changed.');
+        }
 
         // Add new vote
         poll.options[optionIndex].votes.push(req.user._id);
@@ -363,8 +370,8 @@ const votePoll = async (req, res, next) => {
 
         await poll.save();
 
-        // Create notification for poll owner (only if first time voting)
-        if (previousVoteIndex === -1 && poll.userId.toString() !== req.user._id.toString()) {
+        // Create notification for poll owner
+        if (poll.userId.toString() !== req.user._id.toString()) {
             const notification = await Notification.create({
                 recipientId: poll.userId,
                 senderId: req.user._id,
@@ -425,7 +432,7 @@ const votePoll = async (req, res, next) => {
 
         res.status(200).json({
             success: true,
-            message: previousVoteIndex === -1 ? 'Vote recorded successfully' : 'Vote changed successfully',
+            message: 'Vote recorded successfully',
             options: percentages.map((opt, idx) => ({
                 id: idx,
                 text: opt.text,
