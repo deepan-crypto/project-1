@@ -799,6 +799,67 @@ const deleteReportedPoll = async (req, res, next) => {
     }
 };
 
+// @desc    Get all polls (Admin only)
+// @route   GET /api/polls/admin/all
+// @access  Private/Admin
+const getAllPollsAdmin = async (req, res, next) => {
+    try {
+        const polls = await Poll.find()
+            .populate('userId', 'username fullName email profilePicture')
+            .sort({ createdAt: -1 });
+
+        // Calculate percentages and total votes for each poll
+        const pollsWithDetails = polls.map(poll => {
+            const totalVotes = poll.options.reduce((sum, opt) => sum + (opt.voteCount || 0), 0);
+
+            return {
+                _id: poll._id,
+                question: poll.question,
+                options: poll.options.map(opt => ({
+                    text: opt.text,
+                    emoji: opt.emoji,
+                    voteCount: opt.voteCount || 0,
+                })),
+                userId: poll.userId,
+                totalVotes,
+                likes: poll.likes.length,
+                createdAt: poll.createdAt,
+            };
+        });
+
+        res.status(200).json({
+            success: true,
+            count: pollsWithDetails.length,
+            polls: pollsWithDetails,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// @desc    Delete a poll by ID (Admin only)
+// @route   DELETE /api/polls/admin/:pollId
+// @access  Private/Admin
+const deletePollByIdAdmin = async (req, res, next) => {
+    try {
+        const poll = await Poll.findById(req.params.pollId);
+
+        if (!poll) {
+            res.status(404);
+            throw new Error('Poll not found');
+        }
+
+        await poll.deleteOne();
+
+        res.status(200).json({
+            success: true,
+            message: 'Poll deleted successfully',
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 // @desc    Dismiss a report without deleting poll (Admin only)
 // @route   PUT /api/polls/reports/:reportId/dismiss
 // @access  Private/Admin
@@ -839,4 +900,6 @@ module.exports = {
     getReportedPolls,
     deleteReportedPoll,
     dismissReport,
+    getAllPollsAdmin,
+    deletePollByIdAdmin,
 };
