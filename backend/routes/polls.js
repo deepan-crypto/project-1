@@ -17,6 +17,8 @@ const {
     getReportedPolls,
     deleteReportedPoll,
     dismissReport,
+    getAllPollsAdmin,
+    deletePollByIdAdmin,
 } = require('../controllers/pollController');
 
 // Poll CRUD routes
@@ -25,10 +27,14 @@ router.get('/', optionalAuth, getAllPolls);
 router.get('/user/:userId', optionalAuth, getUserPolls);
 router.get('/user/:userId/voted', optionalAuth, getUserVotedPolls);
 
-// Admin routes for managing reports (must come before /:pollId to avoid matching 'reports' as pollId)
+// Admin routes for managing reports and polls (must come before /:pollId to avoid matching as pollId)
 router.get('/reports/all', isAdmin, getReportedPolls);
 router.delete('/reports/:reportId', isAdmin, deleteReportedPoll);
 router.put('/reports/:reportId/dismiss', isAdmin, dismissReport);
+
+// Admin routes for polls
+router.get('/admin/all', isAdmin, getAllPollsAdmin);
+router.delete('/admin/:pollId', isAdmin, deletePollByIdAdmin);
 
 // Poll detail and deletion (generic dynamic route comes after specific routes)
 router.get('/:pollId', getPollDetails);
