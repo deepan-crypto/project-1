@@ -5,6 +5,7 @@ const FollowRequest = require('../models/FollowRequest');
 const ReportedPoll = require('../models/ReportedPoll');
 const { emitNotification } = require('../utils/socketEmitter');
 const { sendPushNotification } = require('../utils/pushNotificationService');
+const { getFullImageUrl } = require('../utils/imageUrlHelper');
 
 // @desc    Get user profile by ID
 // @route   GET /api/users/profile/:userId
@@ -30,7 +31,7 @@ const getUserProfile = async (req, res, next) => {
                 fullName: user.fullName,
                 username: user.username,
                 bio: user.bio,
-                profilePicture: user.profilePicture,
+                profilePicture: getFullImageUrl(user.profilePicture),
                 followersCount: user.followers.length,
                 followingCount: user.following.length,
             },
@@ -56,7 +57,7 @@ const getCurrentUser = async (req, res, next) => {
                 email: user.email,
                 username: user.username,
                 bio: user.bio,
-                profilePicture: user.profilePicture,
+                profilePicture: getFullImageUrl(user.profilePicture),
                 dateOfBirth: user.dateOfBirth,
                 gender: user.gender,
                 followersCount: user.followers.length,
@@ -133,7 +134,7 @@ const updateProfile = async (req, res, next) => {
                 email: user.email,
                 username: user.username,
                 bio: user.bio,
-                profilePicture: user.profilePicture,
+                profilePicture: getFullImageUrl(user.profilePicture),
             },
         });
     } catch (error) {
@@ -165,7 +166,7 @@ const uploadAvatar = async (req, res, next) => {
         res.status(200).json({
             success: true,
             message: 'Profile picture uploaded successfully',
-            profilePicture: user.profilePicture,
+            profilePicture: getFullImageUrl(user.profilePicture),
         });
     } catch (error) {
         next(error);
@@ -453,7 +454,7 @@ const getUserByUsername = async (req, res, next) => {
                 fullName: user.fullName,
                 username: user.username,
                 bio: user.bio,
-                profilePicture: user.profilePicture,
+                profilePicture: getFullImageUrl(user.profilePicture),
                 isPrivate: user.isPrivate,
                 followers: user.followers,
                 following: user.following,
@@ -506,7 +507,7 @@ const searchUsers = async (req, res, next) => {
             id: user._id,
             fullName: user.fullName,
             username: user.username,
-            profilePicture: user.profilePicture,
+            profilePicture: getFullImageUrl(user.profilePicture),
             isPrivate: user.isPrivate,
             isFollowing: currentUser.following.includes(user._id),
             hasPendingRequest: pendingRecipientIds.includes(user._id.toString()),
@@ -1060,7 +1061,7 @@ const getAllUsers = async (req, res, next) => {
                     fullName: user.fullName,
                     username: user.username,
                     email: user.email,
-                    profilePicture: user.profilePicture,
+                    profilePicture: getFullImageUrl(user.profilePicture),
                     bio: user.bio,
                     isPrivate: user.isPrivate,
                     followersCount: user.followers.length,

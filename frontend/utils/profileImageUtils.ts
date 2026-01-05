@@ -1,9 +1,8 @@
-import API_BASE_URL from '@/config/api';
-
 /**
- * Converts a profile picture path/URL to a fully qualified URL
- * Handles various cases: null, HTTP URLs, relative paths
- * Adds cache busting parameter to prevent stale images
+ * Get the full URL for a profile image
+ * The backend now generates full URLs, so we simply use them as-is
+ * @param profilePicture - The profile picture URL/path from the backend
+ * @returns Full URL to the profile image
  */
 export const getProfileImageUrl = (profilePicture?: string | null): string => {
     // Default fallback image
@@ -14,19 +13,7 @@ export const getProfileImageUrl = (profilePicture?: string | null): string => {
         return defaultImage;
     }
 
-    // Already a full HTTP/HTTPS URL
-    if (profilePicture.startsWith('http://') || profilePicture.startsWith('https://')) {
-        // Add cache busting to prevent stale images
-        return `${profilePicture}?t=${Date.now()}`;
-    }
-
-    // Relative path - construct full URL
-    // Remove '/api' from API_BASE_URL and append the relative path
-    const baseUrl = API_BASE_URL.replace('/api', '');
-
-    // Ensure path starts with /
-    const path = profilePicture.startsWith('/') ? profilePicture : `/${profilePicture}`;
-
-    // Return full URL with cache busting
-    return `${baseUrl}${path}?t=${Date.now()}`;
+    // Backend provides full URLs - use as-is
+    return profilePicture;
 };
+

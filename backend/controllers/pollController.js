@@ -4,6 +4,7 @@ const Notification = require('../models/Notification');
 const ReportedPoll = require('../models/ReportedPoll');
 const { emitNotification, emitNotificationUpdate } = require('../utils/socketEmitter');
 const { sendPushNotification } = require('../utils/pushNotificationService');
+const { getFullImageUrl } = require('../utils/imageUrlHelper');
 
 // @desc    Create a new poll
 // @route   POST /api/polls
@@ -116,7 +117,7 @@ const getAllPolls = async (req, res, next) => {
                 userId: poll.userId._id,
                 user: {
                     name: poll.userId.username,
-                    avatar: poll.userId.profilePicture,
+                    avatar: getFullImageUrl(poll.userId.profilePicture),
                 },
                 question: poll.question,
                 options: percentages.map((opt, idx) => ({
@@ -212,7 +213,7 @@ const getUserPolls = async (req, res, next) => {
                 id: poll._id,
                 user: {
                     name: poll.userId.username,
-                    avatar: poll.userId.profilePicture,
+                    avatar: getFullImageUrl(poll.userId.profilePicture),
                 },
                 question: poll.question,
                 options: percentages.map((opt, idx) => ({
@@ -306,7 +307,7 @@ const getUserVotedPolls = async (req, res, next) => {
                 user: {
                     name: poll.userId.username,
                     fullName: poll.userId.fullName,
-                    avatar: poll.userId.profilePicture,
+                    avatar: getFullImageUrl(poll.userId.profilePicture),
                 },
                 question: poll.question,
                 options: percentages.map((opt, idx) => ({
@@ -607,7 +608,7 @@ const getPollDetails = async (req, res, next) => {
                 id: poll._id,
                 user: {
                     name: poll.userId.username,
-                    avatar: poll.userId.profilePicture,
+                    avatar: getFullImageUrl(poll.userId.profilePicture),
                 },
                 question: poll.question,
                 options: percentages.map((opt, idx) => ({
@@ -674,7 +675,7 @@ const getPollLikes = async (req, res, next) => {
             id: like.userId._id,
             username: like.userId.username,
             fullName: like.userId.fullName,
-            profilePicture: like.userId.profilePicture,
+            profilePicture: getFullImageUrl(like.userId.profilePicture),
             likedAt: like.likedAt,
         }));
 
