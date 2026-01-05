@@ -68,8 +68,10 @@ export default function LoginScreen() {
       const data = await response.json();
 
       if (response.ok) {
-        // Save remember me preference
-        await authStorage.setRememberMe(rememberMe);
+        // Save remember me preference only if user checked the box
+        if (rememberMe) {
+          await authStorage.setRememberMe(true);
+        }
 
         // Always store token and user data (needed for current session)
         await authStorage.setToken(data.token);

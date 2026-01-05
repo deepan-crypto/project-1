@@ -20,18 +20,18 @@ export default function SplashScreen() {
       // Check if user opted for remember me
       const rememberMe = await authStorage.getRememberMe();
       const token = await authStorage.getToken();
+      const user = await authStorage.getUser();
 
       // Wait minimum 1.5 seconds for splash screen visibility
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      if (rememberMe && token) {
+      if (rememberMe && token && user) {
         // User has remember me enabled and valid token - auto login
+        // Note: If token is expired, API calls will handle it and redirect to login
         router.replace('/(tabs)');
       } else if (hasSeenOnboarding) {
         // User has seen onboarding before - go to login
-        if (!rememberMe && token) {
-          await authStorage.clearAuth();
-        }
+        // Don't clear auth here - let user explicitly logout if needed
         router.replace('/auth/login');
       } else {
         // First time user - show onboarding
