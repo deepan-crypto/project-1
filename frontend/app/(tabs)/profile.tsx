@@ -325,6 +325,17 @@ export default function ProfileScreen() {
 
   // Handle vote on poll
   const handleVotePoll = async (pollId: string, optionIndex: number): Promise<{ options: any[]; hasVoted: boolean }> => {
+    // Check if user has already voted on this poll
+    const poll = allPolls.find(p => p.id === pollId);
+    if (poll?.hasVoted) {
+      Alert.alert(
+        'Already Voted',
+        'You have already voted on this poll. Votes cannot be changed.',
+        [{ text: 'OK' }]
+      );
+      throw new Error('Already voted');
+    }
+
     const token = await authStorage.getToken();
     if (!token) {
       Alert.alert('Error', 'Please log in to vote');
