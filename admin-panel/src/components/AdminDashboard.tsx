@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useAdmin } from '../context/AdminContext';
 import { pollReportsAPI, userAPI, ReportedPoll, User } from '../lib/api';
-import { LogOut, AlertTriangle, FileText, Trash2, CheckCircle, Users, ChevronDown, ChevronUp } from 'lucide-react';
+import { LogOut, AlertTriangle, FileText, Trash2, CheckCircle, Users, ChevronDown, ChevronUp, List } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { admin, logout } = useAdmin();
   const [reportedPolls, setReportedPolls] = useState<ReportedPoll[]>([]);
+  const [allPolls, setAllPolls] = useState<any[]>([]);
   const [users, setUsers] = useState<User[]>([]);
-  const [activeTab, setActiveTab] = useState<'polls' | 'users'>('polls');
+  const [activeTab, setActiveTab] = useState<'reported' | 'allPolls' | 'users'>('reported');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
@@ -22,6 +23,8 @@ export default function AdminDashboard() {
   useEffect(() => {
     if (activeTab === 'users' && users.length === 0) {
       fetchUsers();
+    } else if (activeTab === 'allPolls' && allPolls.length === 0) {
+      fetchAllPolls();
     }
   }, [activeTab]);
 
@@ -52,6 +55,32 @@ export default function AdminDashboard() {
       setError(err.message || 'Failed to load users');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchAllPolls = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const pollsResponse = await pollReportsAPI.getAllPolls();
+      setAllPolls(pollsResponse.polls || []);
+    } catch (err: any) {
+      console.error('Error fetching all polls:', err);
+      setError(err.message || 'Failed to load polls');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeletePollFromAll = async (pollId: string) => {
+    if (!confirm('Are you sure you want to delete this poll? This action cannot be undone.')) return;
+
+    try {
+      await pollReportsAPI.deletePollById(pollId);
+      await fetchAllPolls();
+    } catch (err: any) {
+      alert('Error deleting poll: ' + (err.message || 'Unknown error'));
     }
   };
 
@@ -144,10 +173,10 @@ export default function AdminDashboard() {
         <div className="mb-6">
           <div className="flex gap-4 border-b border-slate-200">
             <button
-              onClick={() => setActiveTab('polls')}
-              className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors relative ${activeTab === 'polls'
-                  ? 'text-slate-900 border-b-2 border-slate-900'
-                  : 'text-slate-600 hover:text-slate-900'
+              onClick={() => setActiveTab('reported')}
+              className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors relative ${activeTab === 'reported'
+                ? 'text-slate-900 border-b-2 border-slate-900'
+                : 'text-slate-600 hover:text-slate-900'
                 }`}
             >
               <FileText className="w-4 h-4" />
@@ -159,10 +188,25 @@ export default function AdminDashboard() {
               )}
             </button>
             <button
+              onClick={() => setActiveTab('allPolls')}
+              className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors relative ${activeTab === 'allPolls'
+                ? 'text-slate-900 border-b-2 border-slate-900'
+                : 'text-slate-600 hover:text-slate-900'
+                }`}
+            >
+              <List className="w-4 h-4" />
+              All Polls
+              {allPolls.length > 0 && (
+                <span className="bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
+                  {allPolls.length}
+                </span>
+              )}
+            </button>
+            <button
               onClick={() => setActiveTab('users')}
               className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors relative ${activeTab === 'users'
-                  ? 'text-slate-900 border-b-2 border-slate-900'
-                  : 'text-slate-600 hover:text-slate-900'
+                ? 'text-slate-900 border-b-2 border-slate-900'
+                : 'text-slate-600 hover:text-slate-900'
                 }`}
             >
               <Users className="w-4 h-4" />
@@ -189,7 +233,7 @@ export default function AdminDashboard() {
         ) : (
           <>
             {/* Reported Polls Tab */}
-            {activeTab === 'polls' && (
+            {activeTab === 'reported' && (
               <div className="space-y-4">
                 {reportedPolls.length === 0 ? (
                   <div className="bg-white rounded-lg p-12 text-center">
@@ -253,6 +297,66 @@ export default function AdminDashboard() {
                           <CheckCircle className="w-4 h-4" />
                           Dismiss Report
                         </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+
+            {/* All Polls Tab */}
+            {activeTab === 'allPolls' && (
+              <div className="space-y-4">
+                {allPolls.length === 0 ? (
+                  <div className="bg-white rounded-lg p-12 text-center">
+                    <List className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-slate-900 mb-2">No polls found</h3>
+                    <p className="text-slate-600">There are no polls in the system yet.</p>
+                  </div>
+                ) : (
+                  allPolls.map((poll) => (
+                    <div key={poll._id} className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+                      <div className="mb-4">
+                        <h3 className="text-lg font-semibold text-slate-900 mb-3">
+                          {poll.question}
+                        </h3>
+                        {poll.options && (
+                          <div className="space-y-1 mb-3">
+                            {poll.options.map((option: any, idx: number) => (
+                              <div key={idx} className="text-sm text-slate-600">
+                                • {option.text} {option.emoji || ''} ({option.voteCount} votes)
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <div className="flex items-center gap-4 text-sm text-slate-500">
+                          <span>Poll by: {poll.userId?.username || 'Unknown'}</span>
+                          <span>•</span>
+                          <span>Total votes: {poll.totalVotes}</span>
+                          <span>•</span>
+                          <span>Likes: {poll.likes}</span>
+                          <span>•</span>
+                          <span>{new Date(poll.createdAt).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-3">
+                        <button
+                          onClick={() => handleDeletePollFromAll(poll._id)}
+                          className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                          Delete Poll
+                        </button>
+                        {poll.userId?._id && (
+                          <button
+                            onClick={() => handleDeleteUser(poll.userId._id, poll.userId.username)}
+                            className="flex items-center gap-2 px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            Delete User & All Polls
+                          </button>
+                        )}
                       </div>
                     </div>
                   ))

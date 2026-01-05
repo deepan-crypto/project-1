@@ -83,6 +83,18 @@ export const pollReportsAPI = {
         return apiCall('/polls/reports/all');
     },
 
+    // Get all polls (admin)
+    getAllPolls: async (): Promise<{ success: boolean; count: number; polls: any[] }> => {
+        return apiCall('/polls/admin/all');
+    },
+
+    // Delete a poll by ID (admin)
+    deletePollById: async (pollId: string): Promise<{ success: boolean; message: string }> => {
+        return apiCall(`/polls/admin/${pollId}`, {
+            method: 'DELETE',
+        });
+    },
+
     // Delete a poll (from report)
     deletePoll: async (reportId: string): Promise<{ success: boolean; message: string }> => {
         return apiCall(`/polls/reports/${reportId}`, {
