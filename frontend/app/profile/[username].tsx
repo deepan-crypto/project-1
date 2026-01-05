@@ -30,20 +30,22 @@ interface UserProfile {
 
 interface Poll {
     _id: string;
+    id: string;
     question: string;
     options: {
-        id: string;
+        id: number;
         text: string;
-        votes: string[];
+        percentage: number;
         emoji?: string;
     }[];
     user: {
-        _id: string;
-        fullName: string;
-        username: string;
-        profilePicture: string;
+        name: string;
+        avatar: string;
     };
-    likes: string[];
+    likes: number;
+    hasVoted: boolean;
+    isLiked: boolean;
+    votedOptionIndex?: number;
     createdAt: string;
 }
 
@@ -361,31 +363,15 @@ export default function UserProfileScreen() {
                         </View>
                     ) : (
                         polls.map((poll) => (
-                            <View key={poll._id} style={styles.pollCardWrapper}>
+                            <View key={poll.id} style={styles.pollCardWrapper}>
                                 <PollCard
-                                    id={poll._id}
-                                    user={{
-                                        name: poll.user.fullName,
-                                        avatar: poll.user.profilePicture
-                                            ? poll.user.profilePicture.startsWith('http')
-                                                ? poll.user.profilePicture
-                                                : `${API_BASE_URL.replace('/api', '')}${poll.user.profilePicture}`
-                                            : 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200',
-                                    }}
+                                    id={poll.id}
+                                    user={poll.user}
                                     question={poll.question}
-                                    options={poll.options.map((opt, idx) => {
-                                        const totalVotes = poll.options.reduce((sum, o) => sum + (o.votes?.length || 0), 0);
-                                        const percentage = totalVotes > 0 ? Math.round(((opt.votes?.length || 0) / totalVotes) * 100) : 0;
-                                        return {
-                                            id: opt.id || idx.toString(),
-                                            text: opt.text,
-                                            percentage,
-                                            emoji: opt.emoji,
-                                        };
-                                    })}
-                                    likes={poll.likes?.length || 0}
-                                    hasVoted={poll.options.some(opt => opt.votes?.includes(currentUserId || ''))}
-                                    isLiked={poll.likes?.includes(currentUserId || '')}
+                                    options={poll.options}
+                                    likes={poll.likes}
+                                    hasVoted={poll.hasVoted}
+                                    isLiked={poll.isLiked}
                                     createdAt={poll.createdAt}
                                 />
                             </View>
