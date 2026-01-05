@@ -285,7 +285,7 @@ export default function AdminDashboard() {
                         {report.pollId?.userId?._id && (
                           <button
                             onClick={() => handleDeleteUser(report.pollId.userId._id, report.pollId.userId.username)}
-                            className="flex items-center gap-2 px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors"
+                            className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                           >
                             <Trash2 className="w-4 h-4" />
                             Delete User & All Polls
@@ -352,7 +352,7 @@ export default function AdminDashboard() {
                         {poll.userId?._id && (
                           <button
                             onClick={() => handleDeleteUser(poll.userId._id, poll.userId.username)}
-                            className="flex items-center gap-2 px-4 py-2 bg-red-700 text-white rounded-lg hover:bg-red-800 transition-colors"
+                            className="hidden"
                           >
                             <Trash2 className="w-4 h-4" />
                             Delete User & All Polls
@@ -507,7 +507,7 @@ export default function AdminDashboard() {
               </div>
             )}
           </>
-        )}
+        )} 
       </div>
     </div>
   );
