@@ -89,7 +89,7 @@ export default function AdminLogin() {
 
           <div className="mt-6 pt-6 border-t border-slate-200">
             <p className="text-xs text-center text-slate-500">
-              Demo credentials: thoughtsadmin@mail.com / admin@123
+             
             </p>
           </div>
         </div>

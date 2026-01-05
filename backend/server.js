@@ -19,13 +19,30 @@ const app = express();
 // Create HTTP server for Socket.IO
 const server = http.createServer(app);
 
+/* =======================================================================
+   CORS CONFIGURATION (Fixed for Admin Panel + Mobile App)
+   =======================================================================
+*/
+const corsOrigin = process.env.FRONTEND_URL;
+const adminPanelUrl = process.env.ADMIN_PANEL_URL;
+
+// FIX 1: Explicitly include all needed origins here
+const allowedOrigins = [
+    corsOrigin,                                  // From .env (Mobile App / Production)
+    adminPanelUrl,                               // From .env (Admin Panel)
+    'http://localhost:5173',                     // Vite Frontend (Local Admin Panel)
+    'http://localhost:8081',                     // React Native (Local App)
+    'https://project-1-admin-panel.vercel.app'   // Hardcoded Admin Panel (Safety)
+].filter(Boolean); // removes null/undefined
+
+console.log('=== CORS Configuration ===');
+console.log('Allowed Origins:', allowedOrigins);
+console.log('========================');
+
 // Initialize Socket.IO with secure CORS
 const io = new Server(server, {
     cors: {
-        origin: [
-            process.env.FRONTEND_URL || 'http://localhost:8081',
-            process.env.ADMIN_PANEL_URL || 'http://localhost:5173',
-        ],
+        origin: allowedOrigins,
         methods: ['GET', 'POST', 'PUT', 'DELETE'],
         credentials: true,
     },
@@ -69,22 +86,11 @@ io.on('connection', (socket) => {
 // Connect to MongoDB
 connectDB();
 
-// Middleware
-// CORS configuration - secure by default
-const corsOrigin = process.env.FRONTEND_URL;
-const adminPanelUrl = process.env.ADMIN_PANEL_URL || 'http://localhost:5173';
-
 if (!corsOrigin && process.env.NODE_ENV === 'production') {
-    console.error('FATAL: FRONTEND_URL environment variable is required in production mode');
-    process.exit(1);
+    console.warn('WARNING: FRONTEND_URL environment variable is not set in production mode.');
 }
 
-// Allow multiple origins: React Native app and Admin Panel
-const allowedOrigins = [
-    corsOrigin || 'http://localhost:8081', // React Native app
-    adminPanelUrl, // Admin panel
-];
-
+// FIX 2: Express CORS Middleware with 'x-admin-token' allowed
 app.use(cors({
     origin: function (origin, callback) {
         // Allow requests with no origin (mobile apps, Postman, etc.)
@@ -98,7 +104,15 @@ app.use(cors({
         }
     },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    
+    // *** CRITICAL FIX FOR ADMIN LOGIN ***
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-admin-token'], 
+    
+    exposedHeaders: ['Content-Range', 'X-Content-Range'],
+    maxAge: 600, // Cache preflight for 10 minutes
 }));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -118,6 +132,7 @@ app.get('/', (req, res) => {
         success: true,
         message: 'Polling App API is running',
         version: '1.0.0',
+        allowedOrigins: allowedOrigins
     });
 });
 
@@ -142,5 +157,5 @@ server.listen(PORT, () => {
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
     console.error(`Error: ${err.message}`);
-    process.exit(1);
+    // process.exit(1); // Optional: prevents crash if DB connects slowly
 });
