@@ -80,6 +80,16 @@ export default function PollCard({
   }, [initialOptions, initialHasVoted, initialLikes, initialIsLiked]);
 
   const handleVote = async (optionIndex: number) => {
+    // Prevent voting if user has already voted
+    if (hasVoted) {
+      Alert.alert(
+        'Already Voted',
+        'You have already voted on this poll. Votes cannot be changed.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
+
     if (!id || !onVote || voting) return;
     setVoting(true);
     try {
@@ -229,7 +239,7 @@ export default function PollCard({
                   !hasVoted && styles.optionUnvoted,
                 ]}
                 onPress={() => handleVote(index)}
-                disabled={voting}
+                disabled={voting || hasVoted}
               >
                 {hasVoted && (
                   <View

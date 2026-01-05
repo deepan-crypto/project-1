@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,12 +10,14 @@ import {
   ActivityIndicator,
   RefreshControl,
   Alert,
+  BackHandler,
 } from 'react-native';
 import { useFocusEffect } from 'expo-router';
 import PollCard from '@/components/PollCard';
 import API_BASE_URL from '@/config/api';
 import { authStorage } from '@/utils/authStorage';
 import { useSocket } from '@/utils/useSocket';
+import { getProfileImageUrl } from '@/utils/profileImageUtils';
 
 interface Poll {
   id: string;
@@ -86,6 +88,33 @@ export default function HomeScreen() {
     };
   }, [socket]);
 
+  // Handle hardware back button - exit app instead of navigating back
+  const backPressCount = useRef(0);
+  useEffect(() => {
+    const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+      // Increment press count
+      backPressCount.current += 1;
+
+      if (backPressCount.current === 1) {
+        // First press - show message
+        Alert.alert('Exit App', 'Press back again to exit', [{ text: 'OK' }]);
+
+        // Reset counter after 2 seconds
+        setTimeout(() => {
+          backPressCount.current = 0;
+        }, 2000);
+
+        return true; // Prevent default back behavior
+      } else {
+        // Second press within 2 seconds - exit app
+        BackHandler.exitApp();
+        return false;
+      }
+    });
+
+    return () => backHandler.remove();
+  }, []);
+
   const fetchPolls = async () => {
     console.log('===== FETCHPOLLS FUNCTION CALLED =====');
     try {
@@ -110,9 +139,7 @@ export default function HomeScreen() {
           userId: poll.userId,
           user: {
             name: poll.user.name,
-            avatar: poll.user.avatar?.startsWith('http')
-              ? poll.user.avatar
-              : `${API_BASE_URL.replace('/api', '')}${poll.user.avatar}`,
+            avatar: getProfileImageUrl(poll.user.avatar),
           },
           question: poll.question,
           options: poll.options,

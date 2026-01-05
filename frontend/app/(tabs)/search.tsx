@@ -15,6 +15,7 @@ import { router } from 'expo-router';
 import { Search as SearchIcon } from 'lucide-react-native';
 import { authStorage } from '@/utils/authStorage';
 import API_BASE_URL from '@/config/api';
+import { getProfileImageUrl } from '@/utils/profileImageUtils';
 
 interface SearchUser {
     id: string;
@@ -135,18 +136,16 @@ export default function SearchScreen() {
         }
     };
 
-    const getProfileImageUrl = (profilePicture: string) => {
-        if (!profilePicture) {
-            return 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200';
-        }
-        if (profilePicture.startsWith('http')) {
-            return `${profilePicture}?t=${Date.now()}`;
-        }
-        return `${API_BASE_URL.replace('/api', '')}${profilePicture}?t=${Date.now()}`;
-    };
+
 
     const handleUserPress = (username: string) => {
-        router.push({ pathname: '/profile/[username]', params: { username } });
+        try {
+            // Use the correct path format for Expo Router
+            router.push(`/profile/${username}`);
+        } catch (error) {
+            console.error('Navigation error:', error);
+            Alert.alert('Error', 'Unable to view profile. Please try again.');
+        }
     };
 
     const renderActionButton = (user: SearchUser) => {

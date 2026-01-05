@@ -15,6 +15,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { Heart, Share2, ArrowRight, Trash2, Settings } from 'lucide-react-native';
 import { authStorage } from '@/utils/authStorage';
 import API_BASE_URL from '@/config/api';
+import { getProfileImageUrl as getProfileImage } from '@/utils/profileImageUtils';
 
 interface UserPoll {
   id: string;
@@ -230,16 +231,7 @@ export default function ProfileScreen() {
   };
 
   // Get profile image URL (handle relative paths)
-  const getProfileImageUrl = () => {
-    if (!user?.profilePicture) {
-      return 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200';
-    }
-    if (user.profilePicture.startsWith('http')) {
-      return `${user.profilePicture}?t=${Date.now()}`;
-    }
-    // Convert relative path to full URL with cache busting
-    return `${API_BASE_URL.replace('/api', '')}${user.profilePicture}?t=${Date.now()}`;
-  };
+  const getProfileImageUrl = () => getProfileImage(user?.profilePicture);
 
   // Handle delete poll
   const handleDeletePoll = async (pollId: string) => {
