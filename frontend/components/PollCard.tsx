@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, Share, Modal, T
 import { Heart, Trash2, MoreVertical, Flag, X } from 'lucide-react-native';
 import SendIcon from './SendIcon';
 import { router } from 'expo-router';
+import API_BASE_URL from '@/config/api';
 
 interface PollOption {
   id: string | number;
@@ -147,7 +148,7 @@ export default function PollCard({
       const { authStorage } = await import('../utils/authStorage');
       const authToken = await authStorage.getToken();
 
-      const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/polls/${id}/report`, {
+      const response = await fetch(`${API_BASE_URL}/polls/${id}/report`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
