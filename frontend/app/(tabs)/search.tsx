@@ -140,8 +140,8 @@ export default function SearchScreen() {
 
     const handleUserPress = (username: string) => {
         try {
-            // Use the correct path format for Expo Router
-            router.push(`/profile/${username}`);
+            // Use the correct path format for Expo Router dynamic routes
+            router.push({ pathname: '/profile/[username]', params: { username } });
         } catch (error) {
             console.error('Navigation error:', error);
             Alert.alert('Error', 'Unable to view profile. Please try again.');

@@ -94,7 +94,7 @@ export default function PollLikesScreen() {
     const renderUser = ({ item }: { item: LikedUser }) => (
         <TouchableOpacity
             style={styles.userRow}
-            onPress={() => router.push(`/profile/${item.username}`)}
+            onPress={() => router.push({ pathname: '/profile/[username]', params: { username: item.username } })}
         >
             <Image
                 source={{ uri: getProfileImageUrl(item.profilePicture) }}
