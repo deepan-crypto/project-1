@@ -1,8 +1,7 @@
 /**
- * Get the full URL for a profile image
- * The backend now generates full URLs, so we simply use them as-is
+ * Get the full URL for a profile image with cache-busting
  * @param profilePicture - The profile picture URL/path from the backend
- * @returns Full URL to the profile image
+ * @returns Full URL to the profile image with timestamp for cache-busting
  */
 export const getProfileImageUrl = (profilePicture?: string | null): string => {
     // Default fallback image
@@ -13,7 +12,8 @@ export const getProfileImageUrl = (profilePicture?: string | null): string => {
         return defaultImage;
     }
 
-    // Backend provides full URLs - use as-is
-    return profilePicture;
+    // Add cache-busting timestamp to force refresh
+    const separator = profilePicture.includes('?') ? '&' : '?';
+    return `${profilePicture}${separator}t=${Date.now()}`;
 };
 
