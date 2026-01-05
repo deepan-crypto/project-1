@@ -54,12 +54,12 @@ export default function PollLikesScreen() {
 
     const getProfileImageUrl = (profilePicture: string) => {
         if (!profilePicture) {
-            return 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=100';
+            return 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200';
         }
         if (profilePicture.startsWith('http')) {
-            return profilePicture;
+            return `${profilePicture}?t=${Date.now()}`;
         }
-        return `${API_BASE_URL.replace('/api', '')}${profilePicture}`;
+        return `${API_BASE_URL.replace('/api', '')}${profilePicture}?t=${Date.now()}`;
     };
 
     const getTimeAgo = (timestamp: string) => {

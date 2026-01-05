@@ -40,9 +40,9 @@ export default function EditProfileScreen() {
                     // Set existing profile image
                     if (userData.profilePicture) {
                         if (userData.profilePicture.startsWith('http')) {
-                            setExistingProfileImage(userData.profilePicture);
+                            setExistingProfileImage(`${userData.profilePicture}?t=${Date.now()}`);
                         } else {
-                            setExistingProfileImage(`${API_BASE_URL.replace('/api', '')}${userData.profilePicture}`);
+                            setExistingProfileImage(`${API_BASE_URL.replace('/api', '')}${userData.profilePicture}?t=${Date.now()}`);
                         }
                     }
                 }

@@ -24,6 +24,13 @@ router.post('/', protect, createPoll);
 router.get('/', optionalAuth, getAllPolls);
 router.get('/user/:userId', optionalAuth, getUserPolls);
 router.get('/user/:userId/voted', optionalAuth, getUserVotedPolls);
+
+// Admin routes for managing reports (must come before /:pollId to avoid matching 'reports' as pollId)
+router.get('/reports/all', isAdmin, getReportedPolls);
+router.delete('/reports/:reportId', isAdmin, deleteReportedPoll);
+router.put('/reports/:reportId/dismiss', isAdmin, dismissReport);
+
+// Poll detail and deletion (generic dynamic route comes after specific routes)
 router.get('/:pollId', getPollDetails);
 router.delete('/:pollId', protect, deletePoll);
 
@@ -35,10 +42,5 @@ router.get('/:pollId/likes', getPollLikes);
 
 // Poll reporting routes
 router.post('/:pollId/report', protect, reportPoll);
-
-// Admin routes for managing reports
-router.get('/reports/all', isAdmin, getReportedPolls);
-router.delete('/reports/:reportId', isAdmin, deleteReportedPoll);
-router.put('/reports/:reportId/dismiss', isAdmin, dismissReport);
 
 module.exports = router;
