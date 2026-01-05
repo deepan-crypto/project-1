@@ -12,6 +12,8 @@ import {
     StatusBar,
     Alert,
     ActivityIndicator,
+    KeyboardAvoidingView,
+    Platform,
 } from 'react-native';
 import { router } from 'expo-router';
 import { X } from 'lucide-react-native';
@@ -182,76 +184,83 @@ export default function EditProfileScreen() {
                 </TouchableOpacity>
             </View>
 
-            <ScrollView
-                style={styles.scrollView}
-                contentContainerStyle={styles.content}
-                showsVerticalScrollIndicator={false}
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={styles.keyboardView}
+                keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
             >
-                {/* Profile Image Section */}
-                <View style={styles.profileImageSection}>
-                    <View style={styles.profileImageContainer}>
-                        <Image
-                            source={{ uri: displayImage }}
-                            style={styles.profileImage}
-                        />
-                    </View>
-                    <TouchableOpacity onPress={handlePickImage}>
-                        <Text style={styles.changePhotoText}>Change profile picture</Text>
-                    </TouchableOpacity>
-                </View>
-
-                {/* Form Section */}
-                <View style={styles.form}>
-                    <View style={styles.inputGroup}>
-                        <Text style={styles.label}>Full Name</Text>
-                        <TextInput
-                            style={styles.input}
-                            value={fullName}
-                            onChangeText={setFullName}
-                            placeholder="Enter your full name"
-                            placeholderTextColor="#999"
-                        />
-                    </View>
-
-                    <View style={styles.inputGroup}>
-                        <Text style={styles.label}>Username</Text>
-                        <TextInput
-                            style={styles.input}
-                            value={username}
-                            onChangeText={setUsername}
-                            placeholder="Enter your username"
-                            placeholderTextColor="#999"
-                        />
-                    </View>
-
-                    <View style={styles.inputGroup}>
-                        <Text style={styles.label}>Bio</Text>
-                        <TextInput
-                            style={[styles.input, styles.bioInput]}
-                            value={bio}
-                            onChangeText={setBio}
-                            placeholder="Tell us about yourself"
-                            placeholderTextColor="#999"
-                            multiline={true}
-                            numberOfLines={4}
-                            textAlignVertical="top"
-                        />
-                    </View>
-                </View>
-
-                {/* Save Button */}
-                <TouchableOpacity
-                    style={styles.saveButton}
-                    onPress={handleSave}
-                    disabled={loading}
+                <ScrollView
+                    style={styles.scrollView}
+                    contentContainerStyle={styles.content}
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
                 >
-                    {loading ? (
-                        <ActivityIndicator color="#FFFFFF" />
-                    ) : (
-                        <Text style={styles.saveButtonText}>Save</Text>
-                    )}
-                </TouchableOpacity>
-            </ScrollView>
+                    {/* Profile Image Section */}
+                    <View style={styles.profileImageSection}>
+                        <View style={styles.profileImageContainer}>
+                            <Image
+                                source={{ uri: displayImage }}
+                                style={styles.profileImage}
+                            />
+                        </View>
+                        <TouchableOpacity onPress={handlePickImage}>
+                            <Text style={styles.changePhotoText}>Change profile picture</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                    {/* Form Section */}
+                    <View style={styles.form}>
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>Full Name</Text>
+                            <TextInput
+                                style={styles.input}
+                                value={fullName}
+                                onChangeText={setFullName}
+                                placeholder="Enter your full name"
+                                placeholderTextColor="#999"
+                            />
+                        </View>
+
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>Username</Text>
+                            <TextInput
+                                style={styles.input}
+                                value={username}
+                                onChangeText={setUsername}
+                                placeholder="Enter your username"
+                                placeholderTextColor="#999"
+                            />
+                        </View>
+
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.label}>Bio</Text>
+                            <TextInput
+                                style={[styles.input, styles.bioInput]}
+                                value={bio}
+                                onChangeText={setBio}
+                                placeholder="Tell us about yourself"
+                                placeholderTextColor="#999"
+                                multiline={true}
+                                numberOfLines={4}
+                                textAlignVertical="top"
+                            />
+                        </View>
+                    </View>
+
+                    {/* Save Button */}
+                    <TouchableOpacity
+                        style={styles.saveButton}
+                        onPress={handleSave}
+                        disabled={loading}
+                    >
+                        {loading ? (
+                            <ActivityIndicator color="#FFFFFF" />
+                        ) : (
+                            <Text style={styles.saveButtonText}>Save</Text>
+                        )}
+                    </TouchableOpacity>
+                </ScrollView>
+            </KeyboardAvoidingView>
         </View>
     );
 }
@@ -270,6 +279,9 @@ const styles = StyleSheet.create({
         paddingBottom: 16,
         borderBottomWidth: 1,
         borderBottomColor: '#E0E0E0',
+    },
+    keyboardView: {
+        flex: 1,
     },
     headerTitle: {
         fontSize: 16,
