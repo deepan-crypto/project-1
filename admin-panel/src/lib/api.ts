@@ -12,10 +12,16 @@ export interface Admin {
 
 export interface User {
     _id: string;
+    id: string; // Alias for _id
     username: string;
     email: string;
     fullName: string;
     profilePicture: string;
+    bio?: string;
+    pollCount?: number;
+    reportCount?: number;
+    followersCount?: number;
+    followingCount?: number;
     createdAt: string;
 }
 

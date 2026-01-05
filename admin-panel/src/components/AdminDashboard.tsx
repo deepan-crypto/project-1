@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAdmin } from '../context/AdminContext';
 import { pollReportsAPI, userAPI, ReportedPoll, User } from '../lib/api';
+import { getProfileImageUrl } from '../lib/imageUtils';
 import { LogOut, AlertTriangle, FileText, Trash2, CheckCircle, Users, ChevronDown, ChevronUp, List } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -379,7 +380,7 @@ export default function AdminDashboard() {
                       <div className="p-6">
                         <div className="flex items-start gap-4">
                           <img
-                            src={user.profilePicture}
+                            src={getProfileImageUrl(user.profilePicture)}
                             alt={user.fullName}
                             className="w-16 h-16 rounded-full object-cover"
                           />
