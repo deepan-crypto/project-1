@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAdmin } from '../context/AdminContext';
 import { pollReportsAPI, userAPI, ReportedPoll, User } from '../lib/api';
 import { getProfileImageUrl } from '../lib/imageUtils';
-import { LogOut, AlertTriangle, FileText, Trash2, CheckCircle, Users, ChevronDown, ChevronUp, List } from 'lucide-react';
+import { LogOut, AlertTriangle, FileText, Trash2, CheckCircle, Users, ChevronDown, ChevronUp, List, Search, Calendar } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { admin, logout } = useAdmin();
@@ -16,6 +16,11 @@ export default function AdminDashboard() {
   const [userPolls, setUserPolls] = useState<any[]>([]);
   const [userReports, setUserReports] = useState<ReportedPoll[]>([]);
   const [loadingUserData, setLoadingUserData] = useState(false);
+
+  // Filter states
+  const [userSearchQuery, setUserSearchQuery] = useState('');
+  const [pollStartDate, setPollStartDate] = useState('');
+  const [pollEndDate, setPollEndDate] = useState('');
 
   useEffect(() => {
     fetchReportedContent();
@@ -144,6 +149,44 @@ export default function AdminDashboard() {
       setLoadingUserData(false);
     }
   };
+
+  // Filtering logic
+  const filteredUsers = users.filter(user => {
+    if (!userSearchQuery) return true;
+    const query = userSearchQuery.toLowerCase();
+    return (
+      user.username.toLowerCase().includes(query) ||
+      user.fullName.toLowerCase().includes(query) ||
+      user.email.toLowerCase().includes(query)
+    );
+  });
+
+  const filteredPolls = allPolls.filter(poll => {
+    if (!pollStartDate && !pollEndDate) return true;
+    const pollDate = new Date(poll.createdAt);
+
+    if (pollStartDate && pollEndDate) {
+      const start = new Date(pollStartDate);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(pollEndDate);
+      end.setHours(23, 59, 59, 999);
+      return pollDate >= start && pollDate <= end;
+    }
+
+    if (pollStartDate) {
+      const start = new Date(pollStartDate);
+      start.setHours(0, 0, 0, 0);
+      return pollDate >= start;
+    }
+
+    if (pollEndDate) {
+      const end = new Date(pollEndDate);
+      end.setHours(23, 59, 59, 999);
+      return pollDate <= end;
+    }
+
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -308,14 +351,56 @@ export default function AdminDashboard() {
             {/* All Polls Tab */}
             {activeTab === 'allPolls' && (
               <div className="space-y-4">
-                {allPolls.length === 0 ? (
+                {/* Date Filter */}
+                <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
+                  <div className="flex items-center gap-4 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="w-5 h-5 text-slate-600" />
+                      <span className="text-sm font-medium text-slate-700">Filter by Date:</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm text-slate-600">From:</label>
+                      <input
+                        type="date"
+                        value={pollStartDate}
+                        onChange={(e) => setPollStartDate(e.target.value)}
+                        className="px-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <label className="text-sm text-slate-600">To:</label>
+                      <input
+                        type="date"
+                        value={pollEndDate}
+                        onChange={(e) => setPollEndDate(e.target.value)}
+                        className="px-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                      />
+                    </div>
+                    {(pollStartDate || pollEndDate) && (
+                      <button
+                        onClick={() => {
+                          setPollStartDate('');
+                          setPollEndDate('');
+                        }}
+                        className="px-3 py-1.5 text-sm bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors"
+                      >
+                        Clear Filters
+                      </button>
+                    )}
+                  </div>
+                </div>
+                {filteredPolls.length === 0 ? (
                   <div className="bg-white rounded-lg p-12 text-center">
                     <List className="w-12 h-12 text-slate-400 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-slate-900 mb-2">No polls found</h3>
-                    <p className="text-slate-600">There are no polls in the system yet.</p>
+                    <p className="text-slate-600">
+                      {pollStartDate || pollEndDate
+                        ? 'No polls match the selected date range.'
+                        : 'There are no polls in the system yet.'}
+                    </p>
                   </div>
                 ) : (
-                  allPolls.map((poll) => (
+                  filteredPolls.map((poll) => (
                     <div key={poll._id} className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
                       <div className="mb-4">
                         <h3 className="text-lg font-semibold text-slate-900 mb-3">
@@ -368,14 +453,39 @@ export default function AdminDashboard() {
             {/* Users Tab */}
             {activeTab === 'users' && (
               <div className="space-y-4">
-                {users.length === 0 ? (
+                {/* User Search Filter */}
+                <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-4">
+                  <div className="flex items-center gap-3">
+                    <Search className="w-5 h-5 text-slate-600" />
+                    <input
+                      type="text"
+                      placeholder="Search users by username, full name, or email..."
+                      value={userSearchQuery}
+                      onChange={(e) => setUserSearchQuery(e.target.value)}
+                      className="flex-1 px-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-slate-500"
+                    />
+                    {userSearchQuery && (
+                      <button
+                        onClick={() => setUserSearchQuery('')}
+                        className="px-3 py-2 text-sm bg-slate-100 text-slate-700 rounded-lg hover:bg-slate-200 transition-colors"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                </div>
+                {filteredUsers.length === 0 ? (
                   <div className="bg-white rounded-lg p-12 text-center">
                     <Users className="w-12 h-12 text-slate-400 mx-auto mb-4" />
                     <h3 className="text-lg font-medium text-slate-900 mb-2">No users found</h3>
-                    <p className="text-slate-600">No users are registered in the system.</p>
+                    <p className="text-slate-600">
+                      {userSearchQuery
+                        ? 'No users match your search query.'
+                        : 'No users are registered in the system.'}
+                    </p>
                   </div>
                 ) : (
-                  users.map((user) => (
+                  filteredUsers.map((user) => (
                     <div key={user.id} className="bg-white rounded-lg shadow-sm border border-slate-200">
                       <div className="p-6">
                         <div className="flex items-start gap-4">
@@ -507,7 +617,7 @@ export default function AdminDashboard() {
               </div>
             )}
           </>
-        )} 
+        )}
       </div>
     </div>
   );

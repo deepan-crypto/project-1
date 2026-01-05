@@ -140,7 +140,7 @@ export default function SearchScreen() {
 
     const handleUserPress = (username: string) => {
         try {
-            // Use the correct path format for Expo Router dynamic routes
+            // Navigate to user profile using the same pattern as followers/following pages
             router.push({ pathname: '/profile/[username]', params: { username } });
         } catch (error) {
             console.error('Navigation error:', error);
