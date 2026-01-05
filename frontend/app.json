@@ -20,6 +20,11 @@
     "orientation": "portrait",
     "icon": "./assets/images/ican.png",
     "scheme": "myapp",
+    "splash": {
+      "image": "./assets/images/ican.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
