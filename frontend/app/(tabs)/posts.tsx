@@ -114,7 +114,7 @@ export default function PostsScreen() {
   };
 
   const handleClose = () => {
-    router.replace('/(tabs)');
+    router.back();
   };
 
   return (
