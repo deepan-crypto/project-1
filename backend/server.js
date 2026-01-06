@@ -1,4 +1,20 @@
 require('dotenv').config();
+
+// Validate required environment variables
+const requiredEnvVars = [
+    'MONGODB_URI',
+    'JWT_SECRET',
+    'GOOGLE_CLIENT_ID',
+    'GOOGLE_CLIENT_SECRET'
+];
+
+const missingVars = requiredEnvVars.filter(v => !process.env[v]);
+if (missingVars.length > 0) {
+    console.error('❌ Missing required environment variables:', missingVars.join(', '));
+    console.error('Please check your .env file and ensure all required variables are set.');
+    process.exit(1);
+}
+
 const express = require('express');
 const cors = require('cors');
 const http = require('http');
@@ -105,16 +121,16 @@ app.use(cors({
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    
+
     // *** CRITICAL FIX FOR ADMIN LOGIN ***
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-admin-token'], 
-    
+    allowedHeaders: ['Content-Type', 'Authorization', 'x-admin-token'],
+
     exposedHeaders: ['Content-Range', 'X-Content-Range'],
     maxAge: 600, // Cache preflight for 10 minutes
 }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' })); // Limit request body size
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Static files for uploaded images
 app.use('/uploads', express.static('uploads'));
