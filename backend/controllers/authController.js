@@ -205,6 +205,7 @@ const forgotPassword = async (req, res, next) => {
 const resetPassword = async (req, res, next) => {
     try {
         const { token, newPassword } = req.body;
+        const { sendPasswordChangedEmail } = require('../utils/emailService');
 
         if (!token || !newPassword) {
             res.status(400);
@@ -227,6 +228,17 @@ const resetPassword = async (req, res, next) => {
         user.resetPasswordToken = undefined;
         user.resetPasswordExpires = undefined;
         await user.save();
+
+        // Send password changed confirmation email (non-blocking)
+        sendPasswordChangedEmail(user.email, user.fullName || user.username)
+            .then(result => {
+                if (result.success) {
+                    console.log('Password changed confirmation email sent to:', user.email);
+                } else {
+                    console.error('Failed to send password changed email:', result.error);
+                }
+            })
+            .catch(err => console.error('Error sending password changed email:', err));
 
         res.status(200).json({
             success: true,

@@ -145,19 +145,30 @@ export default function SignUpScreen() {
     setErrors({});
 
     try {
+      console.log('Initiating Google Sign-In via backend OAuth...');
       const result = await signInWithGoogleBackend();
+
+      console.log('Google Sign-In result:', { success: result.success, hasToken: !!result.token, hasUser: !!result.user });
 
       if (result.success && result.token && result.user) {
         // Store token and user data
         await authStorage.setToken(result.token);
         await authStorage.setUser(result.user);
+        console.log('Authentication successful, navigating to app...');
         router.replace('/(tabs)');
       } else {
-        Alert.alert('Authentication Failed', result.error || 'Failed to sign in with Google');
+        console.error('Google authentication failed:', result.error);
+        Alert.alert(
+          'Authentication Failed',
+          result.error || 'Failed to sign in with Google. Please try again.'
+        );
       }
     } catch (error) {
       console.error('Google Sign-In error:', error);
-      Alert.alert('Error', 'An unexpected error occurred. Please try again.');
+      Alert.alert(
+        'Error',
+        'An unexpected error occurred during Google sign-in. Please check your internet connection and try again.'
+      );
     } finally {
       setLoading(false);
     }

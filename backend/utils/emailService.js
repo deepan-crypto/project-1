@@ -58,6 +58,8 @@ const createEmailMessage = (to, subject, htmlContent) => {
  */
 const sendPasswordResetEmail = async (email, resetToken) => {
   try {
+    const { passwordResetTemplate } = require('./emailTemplates');
+
     // Create OAuth2 client
     const oauth2Client = createOAuth2Client();
 
@@ -67,44 +69,8 @@ const sendPasswordResetEmail = async (email, resetToken) => {
     // Construct reset URL
     const resetUrl = `${process.env.FRONTEND_URL || 'myapp://auth'}/reset-password?token=${resetToken}`;
 
-    // HTML email template
-    const htmlContent = `
-      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
-        <div style="background-color: white; border-radius: 10px; padding: 40px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-          <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="color: #45BFD0; margin: 0;">🗳️ ${process.env.APP_NAME || 'Polling App'}</h1>
-          </div>
-          
-          <h2 style="color: #333; margin-bottom: 20px;">Password Reset Request</h2>
-          
-          <p style="color: #666; font-size: 16px; line-height: 1.6;">
-            Hi there! We received a request to reset your password. Click the button below to create a new password:
-          </p>
-          
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${resetUrl}" 
-               style="display: inline-block; padding: 14px 30px; background-color: #45BFD0; color: white; 
-                      text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px;">
-              Reset Your Password
-            </a>
-          </div>
-          
-          <p style="color: #888; font-size: 14px; margin-top: 30px;">
-            ⏰ This link will expire in <strong>1 hour</strong> for security reasons.
-          </p>
-          
-          <p style="color: #888; font-size: 14px;">
-            If you didn't request this password reset, you can safely ignore this email. Your password will remain unchanged.
-          </p>
-          
-          <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-          
-          <p style="color: #aaa; font-size: 12px; text-align: center;">
-            This is an automated email from ${process.env.APP_NAME || 'Polling App'}. Please do not reply to this email.
-          </p>
-        </div>
-      </div>
-    `;
+    // Use professional email template
+    const htmlContent = passwordResetTemplate(resetUrl, 1); // 1 hour expiry
 
     // Create RFC 2822 formatted email
     const encodedMessage = createEmailMessage(
@@ -149,6 +115,93 @@ const sendPasswordResetEmail = async (email, resetToken) => {
   }
 };
 
+/**
+ * Send welcome email to new users
+ * @param {string} email - Recipient email address
+ * @param {string} userName - User's name
+ * @returns {Promise<Object>} Result object with success status
+ */
+const sendWelcomeEmail = async (email, userName) => {
+  try {
+    const { welcomeEmailTemplate } = require('./emailTemplates');
+
+    const oauth2Client = createOAuth2Client();
+    const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+
+    const appUrl = process.env.FRONTEND_URL || 'myapp://';
+    const htmlContent = welcomeEmailTemplate(userName, appUrl);
+
+    const encodedMessage = createEmailMessage(
+      email,
+      `Welcome to ${process.env.APP_NAME || 'Polling App'}! 🎉`,
+      htmlContent
+    );
+
+    const response = await gmail.users.messages.send({
+      userId: 'me',
+      requestBody: {
+        raw: encodedMessage,
+      },
+    });
+
+    console.log('Welcome email sent successfully:', response.data.id);
+    return {
+      success: true,
+      messageId: response.data.id,
+    };
+  } catch (error) {
+    console.error('Failed to send welcome email:', error);
+    return {
+      success: false,
+      error: error.message || 'Failed to send email',
+    };
+  }
+};
+
+/**
+ * Send password changed confirmation email
+ * @param {string} email - Recipient email address
+ * @param {string} userName - User's name
+ * @returns {Promise<Object>} Result object with success status
+ */
+const sendPasswordChangedEmail = async (email, userName) => {
+  try {
+    const { passwordChangedTemplate } = require('./emailTemplates');
+
+    const oauth2Client = createOAuth2Client();
+    const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+
+    const htmlContent = passwordChangedTemplate(userName);
+
+    const encodedMessage = createEmailMessage(
+      email,
+      `Password Changed - ${process.env.APP_NAME || 'Polling App'}`,
+      htmlContent
+    );
+
+    const response = await gmail.users.messages.send({
+      userId: 'me',
+      requestBody: {
+        raw: encodedMessage,
+      },
+    });
+
+    console.log('Password changed email sent successfully:', response.data.id);
+    return {
+      success: true,
+      messageId: response.data.id,
+    };
+  } catch (error) {
+    console.error('Failed to send password changed email:', error);
+    return {
+      success: false,
+      error: error.message || 'Failed to send email',
+    };
+  }
+};
+
 module.exports = {
   sendPasswordResetEmail,
+  sendWelcomeEmail,
+  sendPasswordChangedEmail,
 };

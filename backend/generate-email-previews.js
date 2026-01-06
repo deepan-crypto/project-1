@@ -1,0 +1,166 @@
+const {
+    passwordResetTemplate,
+    welcomeEmailTemplate,
+    passwordChangedTemplate,
+    verificationEmailTemplate,
+    loginNotificationTemplate
+} = require('./utils/emailTemplates');
+const fs = require('fs');
+const path = require('path');
+
+// Sample data
+const resetUrl = 'https://yourapp.com/reset-password?token=SAMPLE_TOKEN_123456';
+const verifyUrl = 'https://yourapp.com/verify?token=VERIFY_TOKEN_789';
+const appUrl = 'https://yourapp.com/app';
+
+// Generate all templates
+const templates = {
+    'password-reset': passwordResetTemplate(resetUrl, 1),
+    'welcome': welcomeEmailTemplate('John Doe', appUrl),
+    'password-changed': passwordChangedTemplate('John Doe'),
+    'verification': verificationEmailTemplate(verifyUrl, 'John Doe'),
+    'login-notification': loginNotificationTemplate('John Doe', 'New York, USA', 'iPhone 13')
+};
+
+// Create previews directory if it doesn't exist
+const previewDir = path.join(__dirname, 'email-previews');
+if (!fs.existsSync(previewDir)) {
+    fs.mkdirSync(previewDir);
+}
+
+// Save each template to a file
+Object.keys(templates).forEach(name => {
+    const filename = path.join(previewDir, `${name}.html`);
+    fs.writeFileSync(filename, templates[name]);
+    console.log(`✅ Created preview: ${name}.html`);
+});
+
+// Create index file to view all templates
+const indexHtml = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email Template Previews - Polling App</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background-color: #f5f5f5;
+    }
+    h1 {
+      color: #45BFD0;
+      margin-bottom: 10px;
+    }
+    p {
+      color: #666;
+      margin-bottom: 30px;
+    }
+    .template-list {
+      background: white;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .template-item {
+      padding: 20px;
+      margin-bottom: 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+    .template-item:hover {
+      border-color: #45BFD0;
+      box-shadow: 0 2px 8px rgba(69, 191, 208, 0.2);
+    }
+    .template-item h3 {
+      margin: 0 0 10px;
+      color: #333;
+    }
+    .template-item p {
+      margin: 0 0 15px;
+      color: #666;
+      font-size: 14px;
+    }
+    .template-item a {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #45BFD0;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+    }
+    .template-item a:hover {
+      background-color: #2B9EB3;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      background-color: #4caf50;
+      color: white;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-left: 10px;
+    }
+    .badge.ready {
+      background-color: #ff9800;
+    }
+  </style>
+</head>
+<body>
+  <h1>🗳️ Email Template Previews</h1>
+  <p>Click on any template below to preview it in your browser</p>
+  
+  <div class="template-list">
+    <div class="template-item">
+      <h3>Password Reset Email <span class="badge">ACTIVE</span></h3>
+      <p>Sent when a user requests to reset their password. Includes secure reset link with 1-hour expiry.</p>
+      <a href="password-reset.html" target="_blank">View Preview →</a>
+    </div>
+
+    <div class="template-item">
+      <h3>Password Changed Confirmation <span class="badge">ACTIVE</span></h3>
+      <p>Confirms successful password change with security details and timestamp.</p>
+      <a href="password-changed.html" target="_blank">View Preview →</a>
+    </div>
+
+    <div class="template-item">
+      <h3>Welcome Email <span class="badge ready">READY</span></h3>
+      <p>Welcomes new users to the platform and highlights key features.</p>
+      <a href="welcome.html" target="_blank">View Preview →</a>
+    </div>
+
+    <div class="template-item">
+      <h3>Email Verification <span class="badge ready">READY</span></h3>
+      <p>Verifies user's email address with a secure verification link.</p>
+      <a href="verification.html" target="_blank">View Preview →</a>
+    </div>
+
+    <div class="template-item">
+      <h3>Login Notification <span class="badge ready">READY</span></h3>
+      <p>Notifies users of new login activity with device and location details.</p>
+      <a href="login-notification.html" target="_blank">View Preview →</a>
+    </div>
+  </div>
+
+  <div style="margin-top: 30px; padding: 20px; background: #fff3cd; border-left: 4px solid #ff9800; border-radius: 4px;">
+    <p style="margin: 0; color: #856404;">
+      <strong>📝 Note:</strong> These are preview files with sample data. 
+      Actual emails will contain real user data and functional links.
+    </p>
+  </div>
+</body>
+</html>
+`;
+
+fs.writeFileSync(path.join(previewDir, 'index.html'), indexHtml);
+console.log(`✅ Created index.html`);
+console.log(`\n📂 All email previews saved to: ${previewDir}`);
+console.log(`\n🌐 Open index.html in your browser to view all templates!`);
+console.log(`   File path: ${path.join(previewDir, 'index.html')}\n`);
