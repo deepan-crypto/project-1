@@ -1,3 +1,5 @@
+import API_BASE_URL from '@/config/api';
+
 /**
  * Get the full URL for a profile image with cache-busting
  * @param profilePicture - The profile picture URL/path from the backend
@@ -12,8 +14,17 @@ export const getProfileImageUrl = (profilePicture?: string | null): string => {
         return defaultImage;
     }
 
+    let fullUrl = profilePicture;
+
+    // Convert relative paths to full URLs
+    if (!profilePicture.startsWith('http')) {
+        // Remove '/api' from base URL and append the profile picture path
+        const baseUrl = API_BASE_URL.replace('/api', '');
+        fullUrl = `${baseUrl}${profilePicture}`;
+    }
+
     // Add cache-busting timestamp to force refresh
-    const separator = profilePicture.includes('?') ? '&' : '?';
-    return `${profilePicture}${separator}t=${Date.now()}`;
+    const separator = fullUrl.includes('?') ? '&' : '?';
+    return `${fullUrl}${separator}t=${Date.now()}`;
 };
 

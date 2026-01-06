@@ -489,7 +489,7 @@ export default function ProfileScreen() {
                       source={{
                         uri: poll.isOwn
                           ? getProfileImageUrl()
-                          : (poll.user?.avatar ? (poll.user.avatar.startsWith('http') ? poll.user.avatar : `${API_BASE_URL.replace('/api', '')}${poll.user.avatar}`) : 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200')
+                          : getProfileImage(poll.user?.avatar)
                       }}
                       style={styles.smallAvatar}
                     />
