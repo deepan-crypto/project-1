@@ -117,6 +117,7 @@ const getAllPolls = async (req, res, next) => {
                 userId: poll.userId._id,
                 user: {
                     name: poll.userId.username,
+                    username: poll.userId.username,
                     avatar: getFullImageUrl(poll.userId.profilePicture),
                 },
                 question: poll.question,
