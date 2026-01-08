@@ -30,8 +30,14 @@ interface SearchUser {
 export default function SearchScreen() {
     const [query, setQuery] = useState('');
     const [users, setUsers] = useState<SearchUser[]>([]);
+    const [suggestedUsers, setSuggestedUsers] = useState<SearchUser[]>([]);
     const [loading, setLoading] = useState(false);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+    // Fetch suggested users on mount
+    useEffect(() => {
+        fetchSuggestedUsers();
+    }, []);
 
     // Debounce search
     useEffect(() => {
@@ -45,6 +51,24 @@ export default function SearchScreen() {
 
         return () => clearTimeout(timeoutId);
     }, [query]);
+
+    const fetchSuggestedUsers = async () => {
+        try {
+            const token = await authStorage.getToken();
+            const response = await fetch(`${API_BASE_URL}/users/suggested`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            const data = await response.json();
+
+            if (response.ok && data.users) {
+                setSuggestedUsers(data.users);
+            }
+        } catch (error) {
+            console.error('Error fetching suggested users:', error);
+        }
+    };
 
     const searchUsers = async () => {
         if (!query.trim()) return;
@@ -229,7 +253,10 @@ export default function SearchScreen() {
                 </View>
             ) : (
                 <ScrollView style={styles.scrollView} contentContainerStyle={styles.content}>
-                    {users.map((user) => (
+                    {!query.trim() && suggestedUsers.length > 0 && (
+                        <Text style={styles.sectionTitle}>Suggested Users</Text>
+                    )}
+                    {(query.trim() ? users : suggestedUsers).map((user) => (
                         <View key={user.id} style={styles.userCard}>
                             <TouchableOpacity
                                 style={styles.userCardContent}
@@ -318,6 +345,13 @@ const styles = StyleSheet.create({
     },
     content: {
         paddingHorizontal: 16,
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#101720',
+        marginTop: 8,
+        marginBottom: 12,
     },
     userCard: {
         flexDirection: 'row',

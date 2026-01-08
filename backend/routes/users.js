@@ -15,6 +15,7 @@ const {
     getUserStats,
     getUserByUsername,
     searchUsers,
+    getSuggestedUsers,
     sendFollowRequest,
     acceptFollowRequest,
     rejectFollowRequest,
@@ -32,6 +33,7 @@ const {
 
 // User search
 router.get('/search', protect, searchUsers);
+router.get('/suggested', protect, getSuggestedUsers);
 
 // User profile routes
 router.get('/me', protect, getCurrentUser);

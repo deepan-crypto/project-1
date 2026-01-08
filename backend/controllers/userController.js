@@ -522,6 +522,53 @@ const searchUsers = async (req, res, next) => {
     }
 };
 
+// @desc    Get suggested/random users
+// @route   GET /api/users/suggested
+// @access  Private
+const getSuggestedUsers = async (req, res, next) => {
+    try {
+        // Get random users using MongoDB aggregation
+        const randomUsers = await User.aggregate([
+            { $match: { _id: { $ne: req.user._id } } }, // Exclude current user
+            { $sample: { size: 10 } }, // Get 10 random users
+            {
+                $project: {
+                    _id: 1,
+                    fullName: 1,
+                    username: 1,
+                    profilePicture: 1,
+                    isPrivate: 1,
+                },
+            },
+        ]);
+
+        // Get follow status for each user
+        const currentUser = await User.findById(req.user._id);
+        const pendingRequests = await FollowRequest.find({
+            senderId: req.user._id,
+            status: 'pending',
+        });
+        const pendingRecipientIds = pendingRequests.map(r => r.recipientId.toString());
+
+        const usersWithStatus = randomUsers.map(user => ({
+            id: user._id,
+            fullName: user.fullName,
+            username: user.username,
+            profilePicture: getFullImageUrl(user.profilePicture),
+            isPrivate: user.isPrivate,
+            isFollowing: currentUser.following.some(id => id.toString() === user._id.toString()),
+            hasPendingRequest: pendingRecipientIds.includes(user._id.toString()),
+        }));
+
+        res.status(200).json({
+            success: true,
+            users: usersWithStatus,
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 // @desc    Send follow request to private profile
 // @route   POST /api/users/follow-request/:userId
 // @access  Private
@@ -1160,6 +1207,7 @@ module.exports = {
     getUserStats,
     getUserByUsername,
     searchUsers,
+    getSuggestedUsers,
     sendFollowRequest,
     acceptFollowRequest,
     rejectFollowRequest,
