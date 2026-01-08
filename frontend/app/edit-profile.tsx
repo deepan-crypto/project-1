@@ -353,10 +353,15 @@ const styles = StyleSheet.create({
     },
     saveButton: {
         backgroundColor: '#4098D2',
-        borderRadius: 8,
-        paddingVertical: 14,
+        borderRadius: 5,
+        width: 252,
+        height: 50,
+        paddingVertical: 10,
+        paddingHorizontal: 24,
         alignItems: 'center',
-        width: '100%',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: '#4098D2',
     },
     saveButtonText: {
         color: '#FFFFFF',
