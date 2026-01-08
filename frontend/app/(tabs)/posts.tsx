@@ -155,71 +155,44 @@ export default function PostsScreen() {
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
         >
-          {/* Question Input */}
+          {/* Form Inputs - 4 boxes with placeholder text only */}
           <View style={styles.inputsContainer}>
-            <View style={styles.thoughtBox}>
-              <TextInput
-                style={styles.questionInput}
-                value={question}
-                onChangeText={setQuestion}
-                placeholder="Say something!"
-                placeholderTextColor="#6C7278"
-                multiline={true}
-              />
-            </View>
+            {/* Box 1: Large text area */}
+            <TextInput
+              style={styles.questionInput}
+              value={question}
+              onChangeText={setQuestion}
+              placeholder="Say something!"
+              placeholderTextColor="#6C7278"
+              multiline={true}
+            />
 
-            {/* Thought 1 - Always visible (Required) */}
-            <View style={styles.thoughtBox}>
-              <Text style={styles.thoughtLabel}>Thought 1</Text>
-              <TextInput
-                style={styles.thoughtInput}
-                value={thought1}
-                onChangeText={setThought1}
-                placeholder="Thought 1"
-                placeholderTextColor="#6C7278"
-                multiline={true}
-              />
-            </View>
+            {/* Box 2: Thought 1 */}
+            <TextInput
+              style={styles.thoughtInput}
+              value={thought1}
+              onChangeText={setThought1}
+              placeholder="Thought 1"
+              placeholderTextColor="#6C7278"
+            />
 
-            {/* Thought 2 - Always visible (Required) */}
-            <View style={styles.thoughtBox}>
-              <Text style={styles.thoughtLabel}></Text>
-              <TextInput
-                style={styles.thoughtInput}
-                value={thought2}
-                onChangeText={setThought2}
-                placeholder="Thought 2"
-                placeholderTextColor="#6C7278"
-              />
-            </View>
+            {/* Box 3: Thought 2 */}
+            <TextInput
+              style={styles.thoughtInput}
+              value={thought2}
+              onChangeText={setThought2}
+              placeholder="Thought 2"
+              placeholderTextColor="#6C7278"
+            />
 
-            {/* Thought 3 - Show if visibleThoughts >= 3 */}
-            {visibleThoughts >= 3 && (
-              <View style={styles.thoughtBox}>
-                <Text style={styles.thoughtLabel}></Text>
-                <TextInput
-                  style={styles.thoughtInput}
-                  value={thought3}
-                  onChangeText={setThought3}
-                  placeholder="Thought 3"
-                  placeholderTextColor="#6C7278"
-                />
-              </View>
-            )}
-
-            {/* Thought 4 - Show if visibleThoughts >= 4 */}
-            {visibleThoughts >= 4 && (
-              <View style={styles.thoughtBox}>
-                <Text style={styles.thoughtLabel}></Text>
-                <TextInput
-                  style={styles.thoughtInput}
-                  value={thought4}
-                  onChangeText={setThought4}
-                  placeholder="Fourth thought (optional)"
-                  placeholderTextColor="#6C7278"
-                />
-              </View>
-            )}
+            {/* Box 4: Thought 3 */}
+            <TextInput
+              style={styles.thoughtInput}
+              value={thought3}
+              onChangeText={setThought3}
+              placeholder="Thought 3"
+              placeholderTextColor="#6C7278"
+            />
           </View>
 
           {/* Post Button with Gradient */}
