@@ -25,6 +25,7 @@ interface Poll {
   user: {
     name: string;
     avatar: string;
+    username?: string;
   };
   question: string;
   options: {
@@ -140,6 +141,7 @@ export default function HomeScreen() {
           user: {
             name: poll.user.name,
             avatar: getProfileImageUrl(poll.user.avatar),
+            username: poll.user.username,
           },
           question: poll.question,
           options: poll.options,

@@ -17,6 +17,7 @@ interface PollCardProps {
   user: {
     name: string;
     avatar: string;
+    username?: string;
   };
   question: string;
   options: PollOption[];
@@ -185,6 +186,16 @@ export default function PollCard({
     }
   };
 
+  const handleUserPress = () => {
+    if (!user.username) return;
+    try {
+      router.push({ pathname: '/profile/[username]', params: { username: user.username } });
+    } catch (error) {
+      console.error('Navigation error:', error);
+      Alert.alert('Error', 'Unable to view profile. Please try again.');
+    }
+  };
+
   return (
     <View style={styles.card}>
       {/* Header with user info */}
@@ -192,7 +203,9 @@ export default function PollCard({
         <Image source={{ uri: user.avatar }} style={styles.avatar} />
         <View style={styles.userInfo}>
           <View style={styles.userHeader}>
-            <Text style={styles.userName}>{user.name}</Text>
+            <TouchableOpacity onPress={handleUserPress} disabled={!user.username}>
+              <Text style={styles.userName}>{user.name}</Text>
+            </TouchableOpacity>
             {createdAt && <Text style={styles.timeAgo}>{formatTimeAgo(createdAt)}</Text>}
           </View>
           <Text style={styles.question}>{question}</Text>

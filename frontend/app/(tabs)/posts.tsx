@@ -160,7 +160,7 @@ export default function PostsScreen() {
             <View style={styles.thoughtBox}>
               <Text style={styles.thoughtLabel}>Question (optional)</Text>
               <TextInput
-                style={styles.thoughtInput}
+                style={styles.questionInput}
                 value={question}
                 onChangeText={setQuestion}
                 placeholder="What do you want to ask?"
@@ -334,14 +334,26 @@ const styles = StyleSheet.create({
     color: '#FF4444',
     fontSize: 14,
   },
-  thoughtInput: {
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderRadius: 8,
+  questionInput: {
+    width: 328,
+    height: 189,
+    borderWidth: 0.5,
+    borderColor: '#6C7278',
+    borderRadius: 10,
     padding: 12,
     fontSize: 14,
     color: '#101720',
-    height: 100,
+    textAlignVertical: 'top',
+  },
+  thoughtInput: {
+    width: 255,
+    height: 47,
+    borderWidth: 0.5,
+    borderColor: '#6C7278',
+    borderRadius: 7,
+    padding: 12,
+    fontSize: 14,
+    color: '#101720',
     textAlignVertical: 'top',
   },
   postButtonContainer: {
