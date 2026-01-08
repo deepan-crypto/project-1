@@ -378,6 +378,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingVertical: 16,
     paddingHorizontal: 16,
+    borderBottomWidth: 0.5,
+    borderBottomColor: 'rgba(0, 0, 0, 0.3)',
   },
   header: {
     flexDirection: 'row',
