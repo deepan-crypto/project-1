@@ -141,7 +141,7 @@ export default function PostsScreen() {
             <Text style={styles.userName}>{user?.fullName || 'User'}</Text>
           </View>
           <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-            <X size={24} color="#101720" />
+            <X size={24} color="#101720" strokeWidth={1.5} />
           </TouchableOpacity>
         </View>
       </View>
@@ -158,12 +158,11 @@ export default function PostsScreen() {
           {/* Question Input */}
           <View style={styles.inputsContainer}>
             <View style={styles.thoughtBox}>
-              <Text style={styles.thoughtLabel}>Question (optional)</Text>
               <TextInput
                 style={styles.questionInput}
                 value={question}
                 onChangeText={setQuestion}
-                placeholder="What do you want to ask?"
+                placeholder="Say something!"
                 placeholderTextColor="#6C7278"
                 multiline={true}
               />
@@ -171,14 +170,12 @@ export default function PostsScreen() {
 
             {/* Thought 1 - Always visible (Required) */}
             <View style={styles.thoughtBox}>
-              <Text style={styles.thoughtLabel}>
-                Thought 1 <Text style={styles.required}>*</Text>
-              </Text>
+              <Text style={styles.thoughtLabel}>Thought 1</Text>
               <TextInput
                 style={styles.thoughtInput}
                 value={thought1}
                 onChangeText={setThought1}
-                placeholder="First thought"
+                placeholder="Thought 1"
                 placeholderTextColor="#6C7278"
                 multiline={true}
               />
@@ -186,14 +183,12 @@ export default function PostsScreen() {
 
             {/* Thought 2 - Always visible (Required) */}
             <View style={styles.thoughtBox}>
-              <Text style={styles.thoughtLabel}>
-                Thought 2 <Text style={styles.required}>*</Text>
-              </Text>
+              <Text style={styles.thoughtLabel}></Text>
               <TextInput
                 style={styles.thoughtInput}
                 value={thought2}
                 onChangeText={setThought2}
-                placeholder="Second thought"
+                placeholder="Thought 2"
                 placeholderTextColor="#6C7278"
               />
             </View>
@@ -201,12 +196,12 @@ export default function PostsScreen() {
             {/* Thought 3 - Show if visibleThoughts >= 3 */}
             {visibleThoughts >= 3 && (
               <View style={styles.thoughtBox}>
-                <Text style={styles.thoughtLabel}>Thought 3</Text>
+                <Text style={styles.thoughtLabel}></Text>
                 <TextInput
                   style={styles.thoughtInput}
                   value={thought3}
                   onChangeText={setThought3}
-                  placeholder="Third thought (optional)"
+                  placeholder="Thought 3"
                   placeholderTextColor="#6C7278"
                 />
               </View>
@@ -215,7 +210,7 @@ export default function PostsScreen() {
             {/* Thought 4 - Show if visibleThoughts >= 4 */}
             {visibleThoughts >= 4 && (
               <View style={styles.thoughtBox}>
-                <Text style={styles.thoughtLabel}>Thought 4</Text>
+                <Text style={styles.thoughtLabel}></Text>
                 <TextInput
                   style={styles.thoughtInput}
                   value={thought4}
@@ -245,18 +240,7 @@ export default function PostsScreen() {
             </LinearGradient>
           </TouchableOpacity>
 
-          {/* Add Thoughts Button - Show when less than 4 thoughts visible */}
-          {visibleThoughts < 4 && (
-            <TouchableOpacity
-              onPress={handleAddThought}
-              style={styles.addThoughtButton}
-            >
-              <Plus size={20} color="#4098D2" />
-              <Text style={styles.addThoughtText}>
-                Add Thought {visibleThoughts + 1}
-              </Text>
-            </TouchableOpacity>
-          )}
+          {/* Add Thoughts Button - Removed per Figma design */}
         </ScrollView>
       </KeyboardAvoidingView>
     </View>
@@ -327,8 +311,8 @@ const styles = StyleSheet.create({
   },
   thoughtLabel: {
     fontSize: 14,
-    color: '#101720',
-    fontWeight: '500',
+    color: '#9CA3AF',
+    fontWeight: '400',
   },
   required: {
     color: '#FF4444',
