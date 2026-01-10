@@ -1,0 +1,13 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Centered Q logo with 17.5% padding on all sides for adaptive icon safe area -->
+  <!-- Original viewBox was 73x95, now scaled to fit in 1024x1024 with padding -->
+  <g transform="translate(179, 105) scale(9.1)">
+    <path d="M42.3355 91.4999C43.8355 72.4999 45.8355 40.5 38.8355 33.5C31.8355 26.5 11.1273 41.1744 4.33557 35C-1.16442 30 10.3202 3.00001 38.8355 3C60.8356 2.99999 69.8355 20 69.8355 32C69.8355 49.2627 56.8355 59 44.0874 61C19.8355 64.8048 13.8355 48 12.8355 46" stroke="url(#paint0_linear_1_428)" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <defs>
+    <linearGradient id="paint0_linear_1_428" x1="36.4183" y1="2.97708" x2="36.4183" y2="91.4999" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#458FD0"/>
+      <stop offset="1" stop-color="#07F2DF"/>
+    </linearGradient>
+  </defs>
+</svg>
