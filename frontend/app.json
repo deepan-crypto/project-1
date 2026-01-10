@@ -7,7 +7,7 @@
       "package": "com.deepangokul.cryptoapp",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/ican.png",
-        "backgroundColor": "#45BFD0"
+        "backgroundColor": "#ffffff"
       },
       "permissions": [
         "NOTIFICATIONS"
