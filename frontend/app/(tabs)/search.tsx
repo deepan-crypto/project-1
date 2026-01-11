@@ -11,7 +11,7 @@ import {
     ActivityIndicator,
     Alert,
 } from 'react-native';
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { Search as SearchIcon } from 'lucide-react-native';
 import { authStorage } from '@/utils/authStorage';
 import API_BASE_URL from '@/config/api';
@@ -34,10 +34,12 @@ export default function SearchScreen() {
     const [loading, setLoading] = useState(false);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-    // Fetch suggested users on mount
-    useEffect(() => {
-        fetchSuggestedUsers();
-    }, []);
+    // Fetch suggested users on mount and when screen comes into focus
+    useFocusEffect(
+        useCallback(() => {
+            fetchSuggestedUsers();
+        }, [])
+    );
 
     // Debounce search
     useEffect(() => {
