@@ -527,9 +527,20 @@ const searchUsers = async (req, res, next) => {
 // @access  Private
 const getSuggestedUsers = async (req, res, next) => {
     try {
-        // Get random users using MongoDB aggregation
+        // Get current user's following list
+        const currentUser = await User.findById(req.user._id);
+        const followingIds = currentUser.following.map(id => id.toString());
+
+        // Get random users using MongoDB aggregation, excluding current user and already followed users
         const randomUsers = await User.aggregate([
-            { $match: { _id: { $ne: req.user._id } } }, // Exclude current user
+            {
+                $match: {
+                    _id: {
+                        $ne: req.user._id,
+                        $nin: currentUser.following // Exclude users already being followed
+                    }
+                }
+            },
             { $sample: { size: 10 } }, // Get 10 random users
             {
                 $project: {
@@ -542,8 +553,7 @@ const getSuggestedUsers = async (req, res, next) => {
             },
         ]);
 
-        // Get follow status for each user
-        const currentUser = await User.findById(req.user._id);
+        // Get pending follow requests
         const pendingRequests = await FollowRequest.find({
             senderId: req.user._id,
             status: 'pending',
@@ -556,7 +566,7 @@ const getSuggestedUsers = async (req, res, next) => {
             username: user.username,
             profilePicture: getFullImageUrl(user.profilePicture),
             isPrivate: user.isPrivate,
-            isFollowing: currentUser.following.some(id => id.toString() === user._id.toString()),
+            isFollowing: false, // These users are not being followed (filtered out above)
             hasPendingRequest: pendingRecipientIds.includes(user._id.toString()),
         }));
 

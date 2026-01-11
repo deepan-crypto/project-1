@@ -189,7 +189,7 @@ export default function PollCard({
   const handleUserPress = () => {
     if (!user.username) return;
     try {
-      router.push({ pathname: '/profile/[username]', params: { username: user.username } });
+      router.push({ pathname: '/(tabs)/profile/[username]', params: { username: user.username } });
     } catch (error) {
       console.error('Navigation error:', error);
       Alert.alert('Error', 'Unable to view profile. Please try again.');

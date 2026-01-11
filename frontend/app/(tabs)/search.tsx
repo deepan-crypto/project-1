@@ -107,8 +107,8 @@ export default function SearchScreen() {
             const data = await response.json();
 
             if (response.ok) {
-                // Update local state
-                setUsers(users.map(user => {
+                // Update both users and suggestedUsers state
+                const updateUser = (user: SearchUser) => {
                     if (user.id === userId) {
                         if (data.requestSent) {
                             return { ...user, hasPendingRequest: true };
@@ -117,7 +117,10 @@ export default function SearchScreen() {
                         }
                     }
                     return user;
-                }));
+                };
+
+                setUsers(users.map(updateUser));
+                setSuggestedUsers(suggestedUsers.map(updateUser));
 
                 if (data.requestSent) {
                     Alert.alert('Request Sent', 'Follow request has been sent');
@@ -145,9 +148,11 @@ export default function SearchScreen() {
             });
 
             if (response.ok) {
-                setUsers(users.map(user =>
-                    user.id === userId ? { ...user, isFollowing: false } : user
-                ));
+                const updateUser = (user: SearchUser) =>
+                    user.id === userId ? { ...user, isFollowing: false } : user;
+
+                setUsers(users.map(updateUser));
+                setSuggestedUsers(suggestedUsers.map(updateUser));
             } else {
                 const data = await response.json();
                 Alert.alert('Error', data.message || 'Failed to unfollow user');
@@ -165,7 +170,7 @@ export default function SearchScreen() {
     const handleUserPress = (username: string) => {
         try {
             // Navigate to user profile using the same pattern as followers/following pages
-            router.push({ pathname: '/profile/[username]', params: { username } });
+            router.push({ pathname: '/(tabs)/profile/[username]', params: { username } });
         } catch (error) {
             console.error('Navigation error:', error);
             Alert.alert('Error', 'Unable to view profile. Please try again.');

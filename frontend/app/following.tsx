@@ -143,7 +143,7 @@ export default function FollowingScreen() {
     };
 
     const handleUserPress = (username: string) => {
-        router.push({ pathname: '/profile/[username]', params: { username } });
+        router.push({ pathname: '/(tabs)/profile/[username]', params: { username } });
     };
 
     return (
