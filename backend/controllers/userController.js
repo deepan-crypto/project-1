@@ -513,6 +513,12 @@ const searchUsers = async (req, res, next) => {
             hasPendingRequest: pendingRecipientIds.includes(user._id.toString()),
         }));
 
+        // Sort: users not following first, then users already following
+        usersWithStatus.sort((a, b) => {
+            if (a.isFollowing === b.isFollowing) return 0;
+            return a.isFollowing ? 1 : -1; // Not following (false) comes before following (true)
+        });
+
         res.status(200).json({
             success: true,
             users: usersWithStatus,
