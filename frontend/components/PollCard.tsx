@@ -71,6 +71,7 @@ export default function PollCard({
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportReason, setReportReason] = useState('');
   const [reporting, setReporting] = useState(false);
+  const [showAlreadyVotedMessage, setShowAlreadyVotedMessage] = useState(false);
 
   // Sync state with props when they change (e.g., after refetch)
   useEffect(() => {
@@ -83,12 +84,12 @@ export default function PollCard({
   const handleVote = async (optionIndex: number) => {
     // Prevent voting if user has already voted
     if (hasVoted) {
-      Alert.alert(
-        'Already Voted',
-        'You have already voted on this poll. Votes cannot be changed.',
-        [{ text: 'OK' }]
-      );
-      // Return early without throwing
+      // Show temporary message
+      setShowAlreadyVotedMessage(true);
+      // Auto-dismiss after 3 seconds
+      setTimeout(() => {
+        setShowAlreadyVotedMessage(false);
+      }, 3000);
       return;
     }
 
@@ -220,6 +221,10 @@ export default function PollCard({
             {createdAt && <Text style={styles.timeAgo}>{formatTimeAgo(createdAt)}</Text>}
           </View>
           <Text style={styles.question}>{question}</Text>
+          {/* Temporary "Already Voted" Message */}
+          {showAlreadyVotedMessage && (
+            <Text style={styles.alreadyVotedText}>You have already voted</Text>
+          )}
         </View>
         {!isOwnPoll && (
           <TouchableOpacity
@@ -672,5 +677,11 @@ const styles = StyleSheet.create({
     color: '#FF0000',
     marginTop: 4,
     textAlign: 'right',
+  },
+  alreadyVotedText: {
+    fontSize: 12,
+    color: '#458FD0',
+    fontWeight: '600',
+    marginTop: 4,
   },
 });
