@@ -249,6 +249,17 @@ export default function HomeScreen() {
     }
 
     const token = await authStorage.getToken();
+
+    // DEBUG LOGGING
+    console.log('====== FRONTEND VOTING DEBUG ======');
+    console.log('Token exists:', !!token);
+    console.log('Token length:', token?.length);
+    console.log('Token (first 20 chars):', token?.substring(0, 20));
+    console.log('Poll ID:', pollId);
+    console.log('Option Index:', optionIndex);
+    console.log('API URL:', `${API_BASE_URL}/polls/${pollId}/vote`);
+    console.log('===================================');
+
     if (!token) {
       Alert.alert('Error', 'Please log in to vote');
       throw new Error('Not authenticated');
@@ -264,6 +275,9 @@ export default function HomeScreen() {
     });
 
     const data = await response.json();
+
+    console.log('Response status:', response.status);
+    console.log('Response data:', data);
 
     if (response.ok && data.options) {
       return {
