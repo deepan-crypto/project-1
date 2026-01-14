@@ -29,9 +29,6 @@ export default function PostsScreen() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
-  // Character limit states
-  const [questionDisabled, setQuestionDisabled] = useState(false);
-
   // Load user data
   useEffect(() => {
     const loadUser = async () => {
@@ -50,9 +47,6 @@ export default function PostsScreen() {
   const handleQuestionChange = (text: string) => {
     if (text.length <= 250) {
       setQuestion(text);
-      setQuestionDisabled(false);
-    } else if (text.length === 251) {
-      setQuestionDisabled(true);
     }
   };
 
@@ -65,15 +59,14 @@ export default function PostsScreen() {
 
   // Check if post button should be enabled
   const isPostEnabled = () => {
-    return (
+    const hasRequiredFields = thought1.trim() !== '' && thought2.trim() !== '';
+    const withinLimits =
       question.length <= 250 &&
       thought1.length <= 50 &&
       thought2.length <= 50 &&
-      thought3.length <= 50 &&
-      !questionDisabled &&
-      thought1.trim() !== '' &&
-      thought2.trim() !== ''
-    );
+      thought3.length <= 50;
+
+    return hasRequiredFields && withinLimits;
   };
 
   const handlePost = async () => {
@@ -122,7 +115,6 @@ export default function PostsScreen() {
               setThought2('');
               setThought3('');
               setVisibleThoughts(2);
-              setQuestionDisabled(false);
               router.push('/(tabs)');
             }
           }
@@ -169,16 +161,12 @@ export default function PostsScreen() {
             {/* Poll Question Input - No border */}
             <View>
               <TextInput
-                style={[
-                  styles.questionInput,
-                  questionDisabled && styles.questionInputDisabled
-                ]}
+                style={styles.questionInput}
                 value={question}
                 onChangeText={handleQuestionChange}
                 placeholder="Say something"
                 placeholderTextColor="#6C7278"
                 multiline={true}
-                editable={!questionDisabled}
               />
               {/* Character counter */}
               <View style={styles.counterContainer}>
