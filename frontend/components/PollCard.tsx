@@ -314,15 +314,11 @@ export default function PollCard({
           </TouchableOpacity>
         </View>
 
-        {/* Center: Share */}
-        <View style={styles.footerCenter}>
+        {/* Right: Share and Delete */}
+        <View style={styles.footerRight}>
           <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
             <SendIcon size={18} color="#687684" />
           </TouchableOpacity>
-        </View>
-
-        {/* Right: Delete (if available) */}
-        <View style={styles.footerRight}>
           {onDelete && id && (
             <TouchableOpacity
               style={styles.deleteButton}
@@ -526,17 +522,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    flex: 1,
-    marginLeft: 1,
-  },
-  footerCenter: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   footerRight: {
-    flex: 1,
-    alignItems: 'flex-end',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   likeButton: {
     flexDirection: 'row',
