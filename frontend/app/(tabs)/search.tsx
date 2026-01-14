@@ -124,9 +124,7 @@ export default function SearchScreen() {
                 setUsers(users.map(updateUser));
                 setSuggestedUsers(suggestedUsers.map(updateUser));
 
-                if (data.requestSent) {
-                    Alert.alert('Request Sent', 'Follow request has been sent');
-                }
+                // Silently update state without showing alert
             } else {
                 Alert.alert('Error', data.message || 'Failed to follow user');
             }
