@@ -409,16 +409,16 @@ export default function PollCard({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#FFFFFF',
-    marginBottom: 12,
-    paddingVertical: 16,
+    marginBottom: 8,
+    paddingVertical: 12,
     paddingHorizontal: 16,
     borderBottomWidth: 0.5,
-    borderBottomColor: 'rgba(0, 0, 0, 0.3)',
+    borderBottomColor: '#E5E5E5',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   avatar: {
     width: 40,
