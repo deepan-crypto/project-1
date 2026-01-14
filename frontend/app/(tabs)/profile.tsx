@@ -329,11 +329,12 @@ export default function ProfileScreen() {
     // Check if user has already voted on this poll
     const poll = allPolls.find(p => p.id === pollId);
     if (poll?.hasVoted) {
-      Alert.alert(
-        'Already Voted',
-        'You have already voted on this poll. Votes cannot be changed.',
-        [{ text: 'OK' }]
-      );
+      // Show temporary message for this specific poll
+      setShowAlreadyVotedMessage(pollId);
+      // Auto-dismiss after 3 seconds
+      setTimeout(() => {
+        setShowAlreadyVotedMessage(null);
+      }, 3000);
       // Return current poll data instead of throwing
       return { options: poll.options, hasVoted: true };
     }
