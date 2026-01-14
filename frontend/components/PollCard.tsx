@@ -314,11 +314,15 @@ export default function PollCard({
           </TouchableOpacity>
         </View>
 
-        {/* Right: Share and Delete */}
-        <View style={styles.footerRight}>
+        {/* Center: Share */}
+        <View style={styles.footerCenter}>
           <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
             <SendIcon size={18} color="#687684" />
           </TouchableOpacity>
+        </View>
+
+        {/* Right: Delete (if available) */}
+        <View style={styles.footerRight}>
           {onDelete && id && (
             <TouchableOpacity
               style={styles.deleteButton}
