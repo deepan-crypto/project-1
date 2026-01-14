@@ -25,10 +25,12 @@ export default function PostsScreen() {
   const [thought1, setThought1] = useState('');
   const [thought2, setThought2] = useState('');
   const [thought3, setThought3] = useState('');
-  const [thought4, setThought4] = useState('');
-  const [visibleThoughts, setVisibleThoughts] = useState(2); // Start with 2 visible thoughts
+  const [visibleThoughts, setVisibleThoughts] = useState(2);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+
+  // Character limit states
+  const [questionDisabled, setQuestionDisabled] = useState(false);
 
   // Load user data
   useEffect(() => {
@@ -44,10 +46,34 @@ export default function PostsScreen() {
   // Get profile image URL
   const getProfileImageUrl = () => getProfileImage(user?.profilePicture);
 
-  const handleAddThought = () => {
-    if (visibleThoughts < 4) {
-      setVisibleThoughts(visibleThoughts + 1);
+  // Handle question input with character limit
+  const handleQuestionChange = (text: string) => {
+    if (text.length <= 250) {
+      setQuestion(text);
+      setQuestionDisabled(false);
+    } else if (text.length === 251) {
+      setQuestionDisabled(true);
     }
+  };
+
+  // Handle thought input with character limit
+  const handleThoughtChange = (setter: (text: string) => void, text: string) => {
+    if (text.length <= 50) {
+      setter(text);
+    }
+  };
+
+  // Check if post button should be enabled
+  const isPostEnabled = () => {
+    return (
+      question.length <= 250 &&
+      thought1.length <= 50 &&
+      thought2.length <= 50 &&
+      thought3.length <= 50 &&
+      !questionDisabled &&
+      thought1.trim() !== '' &&
+      thought2.trim() !== ''
+    );
   };
 
   const handlePost = async () => {
@@ -60,7 +86,6 @@ export default function PostsScreen() {
     // Build options array (only include non-empty options)
     const options = [thought1.trim(), thought2.trim()];
     if (thought3.trim()) options.push(thought3.trim());
-    if (thought4.trim()) options.push(thought4.trim());
 
     setLoading(true);
     try {
@@ -96,8 +121,8 @@ export default function PostsScreen() {
               setThought1('');
               setThought2('');
               setThought3('');
-              setThought4('');
               setVisibleThoughts(2);
+              setQuestionDisabled(false);
               router.push('/(tabs)');
             }
           }
@@ -130,22 +155,6 @@ export default function PostsScreen() {
         />
       </View>
 
-      {/* User Header with Close Button */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <View style={styles.userInfo}>
-            <Image
-              source={{ uri: getProfileImageUrl() }}
-              style={styles.avatar}
-            />
-            <Text style={styles.userName}>{user?.fullName || 'User'}</Text>
-          </View>
-          <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-            <X size={24} color="#101720" strokeWidth={1.5} />
-          </TouchableOpacity>
-        </View>
-      </View>
-
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
@@ -155,68 +164,104 @@ export default function PostsScreen() {
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
         >
-          {/* Form Inputs - 4 boxes with placeholder text only */}
+          {/* Form Inputs */}
           <View style={styles.inputsContainer}>
-            {/* Box 1: Large text area */}
-            <TextInput
-              style={styles.questionInput}
-              value={question}
-              onChangeText={setQuestion}
-              placeholder="Say something!"
-              placeholderTextColor="#6C7278"
-              multiline={true}
-            />
+            {/* Poll Question Input - No border */}
+            <View>
+              <TextInput
+                style={[
+                  styles.questionInput,
+                  questionDisabled && styles.questionInputDisabled
+                ]}
+                value={question}
+                onChangeText={handleQuestionChange}
+                placeholder="Say something"
+                placeholderTextColor="#6C7278"
+                multiline={true}
+                editable={!questionDisabled}
+              />
+              {/* Character counter */}
+              <View style={styles.counterContainer}>
+                <Text
+                  style={[
+                    styles.counterText,
+                    question.length > 200 && styles.counterTextRed
+                  ]}
+                >
+                  {question.length}/250
+                </Text>
+              </View>
+            </View>
 
-            {/* Box 2: Thought 1 */}
-            <TextInput
-              style={styles.thoughtInput}
-              value={thought1}
-              onChangeText={setThought1}
-              placeholder="Thought 1"
-              placeholderTextColor="#6C7278"
-            />
+            {/* Poll Option 1 - Full width */}
+            <View>
+              <TextInput
+                style={styles.thoughtInput}
+                value={thought1}
+                onChangeText={(text) => handleThoughtChange(setThought1, text)}
+                placeholder="Thought 1"
+                placeholderTextColor="#6C7278"
+              />
+              {thought1.length === 50 && (
+                <Text style={styles.maxCharText}>Maximum 50 characters reached</Text>
+              )}
+            </View>
 
-            {/* Box 3: Thought 2 */}
-            <TextInput
-              style={styles.thoughtInput}
-              value={thought2}
-              onChangeText={setThought2}
-              placeholder="Thought 2"
-              placeholderTextColor="#6C7278"
-            />
+            {/* Poll Option 2 - Full width */}
+            <View>
+              <TextInput
+                style={styles.thoughtInput}
+                value={thought2}
+                onChangeText={(text) => handleThoughtChange(setThought2, text)}
+                placeholder="Thought 2"
+                placeholderTextColor="#6C7278"
+              />
+              {thought2.length === 50 && (
+                <Text style={styles.maxCharText}>Maximum 50 characters reached</Text>
+              )}
+            </View>
 
-            {/* Box 4: Thought 3 */}
-            <TextInput
-              style={styles.thoughtInput}
-              value={thought3}
-              onChangeText={setThought3}
-              placeholder="Thought 3"
-              placeholderTextColor="#6C7278"
-            />
+            {/* Poll Option 3 - Full width */}
+            <View>
+              <TextInput
+                style={styles.thoughtInput}
+                value={thought3}
+                onChangeText={(text) => handleThoughtChange(setThought3, text)}
+                placeholder="Thought 3"
+                placeholderTextColor="#6C7278"
+              />
+              {thought3.length === 50 && (
+                <Text style={styles.maxCharText}>Maximum 50 characters reached</Text>
+              )}
+            </View>
           </View>
 
           {/* Post Button with Gradient */}
           <TouchableOpacity
             onPress={handlePost}
             style={styles.postButtonContainer}
-            disabled={loading}
+            disabled={loading || !isPostEnabled()}
           >
             <LinearGradient
               colors={['rgba(255, 255, 255, 0.12)', 'rgba(255, 255, 255, 0)']}
-              style={styles.postButton}
+              style={[
+                styles.postButton,
+                (!isPostEnabled() || loading) && styles.postButtonDisabled
+              ]}
             >
               {loading ? (
                 <ActivityIndicator color="#FFFFFF" />
               ) : (
-                <Text style={styles.postButtonText}>Post</Text>
+                <Text style={[
+                  styles.postButtonText,
+                  (!isPostEnabled()) && styles.postButtonTextDisabled
+                ]}>Post</Text>
               )}
             </LinearGradient>
           </TouchableOpacity>
-
-          {/* Add Thoughts Button - Removed per Figma design */}
         </ScrollView>
       </KeyboardAvoidingView>
-    </View>
+    </View >
   );
 }
 
@@ -237,35 +282,6 @@ const styles = StyleSheet.create({
     width: 30,
     height: 40,
   },
-  header: {
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-    backgroundColor: '#FFFFFF',
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  userInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  avatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#E0E0E0',
-  },
-  userName: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#101720',
-  },
-  closeButton: {
-    padding: 8,
-  },
   keyboardView: {
     flex: 1,
   },
@@ -273,37 +289,42 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 20,
     gap: 20,
   },
   inputsContainer: {
     gap: 20,
   },
-  thoughtBox: {
-    gap: 8,
-  },
-  thoughtLabel: {
-    fontSize: 14,
-    color: '#9CA3AF',
-    fontWeight: '400',
-  },
-  required: {
-    color: '#FF4444',
-    fontSize: 14,
-  },
   questionInput: {
     width: 328,
     height: 189,
-    borderWidth: 0.5,
-    borderColor: '#6C7278',
+    borderWidth: 0,
+    borderColor: 'transparent',
     borderRadius: 10,
     padding: 12,
     fontSize: 14,
     color: '#101720',
     textAlignVertical: 'top',
+    backgroundColor: 'transparent',
+  },
+  questionInputDisabled: {
+    backgroundColor: '#F5F5F5',
+  },
+  counterContainer: {
+    alignItems: 'flex-end',
+    marginTop: 4,
+  },
+  counterText: {
+    fontSize: 12,
+    color: '#6C7278',
+  },
+  counterTextRed: {
+    color: '#FF0000',
   },
   thoughtInput: {
-    width: 255,
+    width: '100%',
     height: 47,
     borderWidth: 0.5,
     borderColor: '#6C7278',
@@ -312,6 +333,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#101720',
     textAlignVertical: 'top',
+  },
+  maxCharText: {
+    fontSize: 11,
+    color: '#FF0000',
+    marginTop: 4,
+    textAlign: 'right',
   },
   postButtonContainer: {
     alignItems: 'center',
@@ -324,10 +351,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 8,
   },
+  postButtonDisabled: {
+    backgroundColor: '#CCCCCC',
+    opacity: 0.6,
+  },
   postButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  postButtonTextDisabled: {
+    color: '#999999',
   },
   addThoughtButton: {
     flexDirection: 'row',
@@ -348,5 +382,3 @@ const styles = StyleSheet.create({
     color: '#4098D2',
   },
 });
-
-
