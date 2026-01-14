@@ -12,7 +12,8 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { router, useFocusEffect } from 'expo-router';
-import { Heart, Share2, ArrowRight, Trash2, Settings } from 'lucide-react-native';
+import { Heart, ArrowRight, Trash2, Settings } from 'lucide-react-native';
+import SendIcon from '@/components/SendIcon';
 import { authStorage } from '@/utils/authStorage';
 import API_BASE_URL from '@/config/api';
 import { getProfileImageUrl as getProfileImage } from '@/utils/profileImageUtils';
@@ -573,7 +574,7 @@ export default function ProfileScreen() {
                       style={styles.actionButton}
                       onPress={() => handleSharePoll(poll.id, poll.question)}
                     >
-                      <Share2 size={18} color="#6C7278" />
+                      <SendIcon size={18} color="#6C7278" />
                     </TouchableOpacity>
                     {/* Delete button - only for own polls */}
                     {poll.isOwn && (
