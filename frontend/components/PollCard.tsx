@@ -147,6 +147,16 @@ export default function PollCard({
     router.push(`/poll/${id}/likes`);
   };
 
+  const handleReportReasonChange = (text: string) => {
+    if (text.length <= 50) {
+      setReportReason(text);
+    }
+  };
+
+  const isSubmitEnabled = () => {
+    return reportReason.length >= 1 && reportReason.length <= 49;
+  };
+
   const handleReport = async () => {
     if (!id || !reportReason.trim()) {
       Alert.alert('Error', 'Please provide a reason for reporting this poll');
@@ -284,8 +294,9 @@ export default function PollCard({
           );
         })}
       </View>
-      {/* Footer with likes and share */}
+      {/* Footer with likes, share, and delete */}
       <View style={styles.footer}>
+        {/* Left: Heart + Likes */}
         <View style={styles.footerLeft}>
           <TouchableOpacity
             style={styles.likeButton}
@@ -302,10 +313,16 @@ export default function PollCard({
             <Text style={styles.likesText}>{likes}</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.footerRight}>
+
+        {/* Center: Share */}
+        <View style={styles.footerCenter}>
           <TouchableOpacity style={styles.shareButton} onPress={handleShare}>
             <SendIcon size={18} color="#687684" />
           </TouchableOpacity>
+        </View>
+
+        {/* Right: Delete (if available) */}
+        <View style={styles.footerRight}>
           {onDelete && id && (
             <TouchableOpacity
               style={styles.deleteButton}
@@ -334,16 +351,24 @@ export default function PollCard({
             </View>
 
             <Text style={styles.modalLabel}>Why are you reporting this poll?</Text>
-            <TextInput
-              style={styles.modalInput}
-              placeholder="Enter reason (e.g., inappropriate content, spam, etc.)"
-              placeholderTextColor="#B0B0B0"
-              value={reportReason}
-              onChangeText={setReportReason}
-              multiline
-              numberOfLines={4}
-              textAlignVertical="top"
-            />
+            <View>
+              <TextInput
+                style={styles.modalInput}
+                placeholder="Enter reason"
+                placeholderTextColor="#B0B0B0"
+                value={reportReason}
+                onChangeText={handleReportReasonChange}
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+              />
+              <View style={styles.characterCountContainer}>
+                <Text style={styles.characterCountText}>{reportReason.length}/50</Text>
+              </View>
+              {reportReason.length === 50 && (
+                <Text style={styles.characterLimitText}>Character limit reached</Text>
+              )}
+            </View>
 
             <View style={styles.modalActions}>
               <TouchableOpacity
@@ -356,9 +381,12 @@ export default function PollCard({
                 <Text style={styles.modalCancelText}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalSubmitButton, reporting && styles.modalSubmitButtonDisabled]}
+                style={[
+                  styles.modalSubmitButton,
+                  (reporting || !isSubmitEnabled()) && styles.modalSubmitButtonDisabled
+                ]}
                 onPress={handleReport}
-                disabled={reporting || !reportReason.trim()}
+                disabled={reporting || !isSubmitEnabled()}
               >
                 <Text style={styles.modalSubmitText}>
                   {reporting ? 'Reporting...' : 'Submit Report'}
@@ -498,13 +526,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+    flex: 1,
+    marginLeft: 1,
+  },
+  footerCenter: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  footerRight: {
+    flex: 1,
+    alignItems: 'flex-end',
   },
   likeButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 4,
-  },
-  shareButton: {
     padding: 4,
   },
   likesText: {
@@ -514,12 +550,10 @@ const styles = StyleSheet.create({
   likedText: {
     color: '#FF4444',
   },
-  footerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
   deleteButton: {
+    padding: 4,
+  },
+  shareButton: {
     padding: 4,
   },
   menuButton: {
@@ -615,11 +649,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalSubmitButtonDisabled: {
-    backgroundColor: '#FFB0B0',
+    backgroundColor: '#CCCCCC',
+    opacity: 0.6,
   },
   modalSubmitText: {
     fontSize: 14,
     color: '#FFFFFF',
     fontWeight: '600',
+  },
+  characterCountContainer: {
+    alignItems: 'flex-end',
+    marginTop: 4,
+  },
+  characterCountText: {
+    fontSize: 12,
+    color: '#6C7278',
+  },
+  characterLimitText: {
+    fontSize: 11,
+    color: '#FF0000',
+    marginTop: 4,
+    textAlign: 'right',
   },
 });
