@@ -263,7 +263,7 @@ const styles = StyleSheet.create({
   },
   logoHeader: {
     paddingTop: 40,
-    paddingBottom: 12,
+    paddingBottom: 8,
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
