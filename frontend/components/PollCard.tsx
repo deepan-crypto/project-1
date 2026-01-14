@@ -88,6 +88,7 @@ export default function PollCard({
         'You have already voted on this poll. Votes cannot be changed.',
         [{ text: 'OK' }]
       );
+      // Return early without throwing
       return;
     }
 

@@ -334,7 +334,8 @@ export default function ProfileScreen() {
         'You have already voted on this poll. Votes cannot be changed.',
         [{ text: 'OK' }]
       );
-      throw new Error('Already voted');
+      // Return current poll data instead of throwing
+      return { options: poll.options, hasVoted: true };
     }
 
     const token = await authStorage.getToken();
