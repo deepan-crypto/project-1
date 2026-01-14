@@ -45,6 +45,7 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [showAlreadyVotedMessage, setShowAlreadyVotedMessage] = useState<string | null>(null);
 
   // Socket connection for real-time updates
   const { socket, isConnected } = useSocket();
@@ -240,11 +241,12 @@ export default function HomeScreen() {
     // Check if user has already voted on this poll
     const poll = polls.find(p => p.id === pollId);
     if (poll?.hasVoted) {
-      Alert.alert(
-        'Already Voted',
-        'You have already voted on this poll. Votes cannot be changed.',
-        [{ text: 'OK' }]
-      );
+      // Show temporary message for this specific poll
+      setShowAlreadyVotedMessage(pollId);
+      // Auto-dismiss after 3 seconds
+      setTimeout(() => {
+        setShowAlreadyVotedMessage(null);
+      }, 3000);
       // Return current poll data instead of throwing
       return { options: poll.options, hasVoted: true };
     }
