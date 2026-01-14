@@ -32,6 +32,14 @@ const protect = async (req, res, next) => {
 
         next();
     } catch (error) {
+        // Log detailed error information
+        console.error('====== AUTH MIDDLEWARE ERROR ======');
+        console.error('Error name:', error.name);
+        console.error('Error message:', error.message);
+        console.error('Token (first 20 chars):', token?.substring(0, 20));
+        console.error('JWT_SECRET exists:', !!process.env.JWT_SECRET);
+        console.error('====================================');
+
         return res.status(401).json({
             success: false,
             message: 'Not authorized, token failed',
