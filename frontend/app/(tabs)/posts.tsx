@@ -59,14 +59,14 @@ export default function PostsScreen() {
 
   // Check if post button should be enabled
   const isPostEnabled = () => {
-    const hasRequiredFields = thought1.trim() !== '' && thought2.trim() !== '';
-    const withinLimits =
-      question.length <= 250 &&
-      thought1.length <= 50 &&
-      thought2.length <= 50 &&
-      thought3.length <= 50;
+    // Only disable if character limits are exceeded
+    const exceedsLimits =
+      question.length > 250 ||
+      thought1.length > 50 ||
+      thought2.length > 50 ||
+      thought3.length > 50;
 
-    return hasRequiredFields && withinLimits;
+    return !exceedsLimits;
   };
 
   const handlePost = async () => {
