@@ -507,6 +507,11 @@ export default function ProfileScreen() {
                   <Text style={styles.pollTime}>{formatTimeAgo(poll.createdAt)}</Text>
                 </View>
 
+                {/* Temporary "Already Voted" Message */}
+                {showAlreadyVotedMessage === poll.id && (
+                  <Text style={styles.alreadyVotedText}>You have already voted</Text>
+                )}
+
                 {/* Poll Options */}
                 <View style={styles.pollOptions}>
                   {poll.options.map((option: { text: string; percentage: number }, index: number) => {
@@ -956,6 +961,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginTop: 4,
+  },
+  alreadyVotedText: {
+    fontSize: 12,
+    color: '#458FD0',
+    fontWeight: '600',
+    marginTop: 8,
+    marginBottom: 8,
   },
 });
 
