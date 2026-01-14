@@ -179,6 +179,9 @@ export default function PostsScreen() {
                   {question.length}/250
                 </Text>
               </View>
+              {question.length === 250 && (
+                <Text style={styles.maxCharText}>Maximum 250 characters reached</Text>
+              )}
             </View>
 
             {/* Poll Option 1 - Full width */}
