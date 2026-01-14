@@ -569,14 +569,19 @@ export default function ProfileScreen() {
                       <Text style={styles.likesCount}>{poll.likes}</Text>
                     </TouchableOpacity>
                   </View>
-                  <View style={styles.footerRight}>
+
+                  {/* Center: Share */}
+                  <View style={styles.footerCenter}>
                     <TouchableOpacity
                       style={styles.actionButton}
                       onPress={() => handleSharePoll(poll.id, poll.question)}
                     >
                       <SendIcon size={18} color="#6C7278" />
                     </TouchableOpacity>
-                    {/* Delete button - only for own polls */}
+                  </View>
+
+                  {/* Right: Delete (only for own polls) */}
+                  <View style={styles.footerRight}>
                     {poll.isOwn && (
                       <TouchableOpacity
                         style={styles.actionButton}
@@ -898,10 +903,20 @@ const styles = StyleSheet.create({
   footerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
+    marginLeft: 1,  // Move like 1px to the right
+  },
+  footerCenter: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   footerRight: {
     flexDirection: 'row',
     alignItems: 'center',
+    flex: 1,
+    justifyContent: 'flex-end',
+    marginRight: 1,  // Move delete 1px to the left
   },
   actionButton: {
     flexDirection: 'row',
