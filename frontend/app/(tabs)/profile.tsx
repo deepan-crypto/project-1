@@ -42,6 +42,7 @@ export default function ProfileScreen() {
   const [loadingPolls, setLoadingPolls] = useState(true);
   const [loadingVotedPolls, setLoadingVotedPolls] = useState(true);
   const [stats, setStats] = useState({ followersCount: 0, followingCount: 0 });
+  const [showAlreadyVotedMessage, setShowAlreadyVotedMessage] = useState<string | null>(null);
 
   // Fetch user stats from API
   const fetchUserStats = async (userId: string) => {
