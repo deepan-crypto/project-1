@@ -187,7 +187,7 @@ export default function UserProfileScreen() {
             if (response.ok) {
                 if (data.requestSent) {
                     setHasPendingRequest(true);
-                    Alert.alert('Request Sent', 'Follow request has been sent');
+                    // Silently update state without showing alert
                 } else {
                     setIsFollowing(true);
                 }
