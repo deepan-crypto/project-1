@@ -522,11 +522,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+    flex: 1,
+    marginLeft: 1,  // Move like 1px to the right
+  },
+  footerCenter: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   footerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    flex: 1,
+    alignItems: 'flex-end',
+    marginRight: 1,  // Move delete 1px to the left
   },
   likeButton: {
     flexDirection: 'row',
