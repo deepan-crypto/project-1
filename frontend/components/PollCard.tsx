@@ -82,15 +82,12 @@ export default function PollCard({
   }, [initialOptions, initialHasVoted, initialLikes, initialIsLiked]);
 
   const handleVote = async (optionIndex: number) => {
-    console.log('PollCard handleVote called, hasVoted:', hasVoted);
     // Prevent voting if user has already voted
     if (hasVoted) {
-      console.log('Setting showAlreadyVotedMessage to true');
       // Show temporary message
       setShowAlreadyVotedMessage(true);
       // Auto-dismiss after 3 seconds
       setTimeout(() => {
-        console.log('Dismissing showAlreadyVotedMessage');
         setShowAlreadyVotedMessage(false);
       }, 3000);
       return;
@@ -271,7 +268,7 @@ export default function PollCard({
                   !hasVoted && styles.optionUnvoted,
                 ]}
                 onPress={() => handleVote(index)}
-                disabled={voting || hasVoted}
+                disabled={voting}
               >
                 {hasVoted && (
                   <View
