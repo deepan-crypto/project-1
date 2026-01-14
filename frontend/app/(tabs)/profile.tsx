@@ -607,14 +607,14 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingTop: 0,
-    paddingBottom: 100,
+    paddingBottom: 80,
     backgroundColor: '#FFFFFF',
     flexGrow: 1,
   },
   // Logo Header Styles
   logoHeader: {
     paddingTop: 40,
-    paddingBottom: 12,
+    paddingBottom: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -636,7 +636,7 @@ const styles = StyleSheet.create({
   // Profile Header Styles
   profileHeader: {
     backgroundColor: '#FFFFFF',
-    paddingVertical: 24,
+    paddingVertical: 16,
     paddingHorizontal: 20,
   },
   profileTopRow: {
@@ -759,7 +759,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 8,
+    marginBottom: 12,
   },
   pollUserInfo: {
     flexDirection: 'row',
@@ -801,11 +801,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#458FD0',
     fontWeight: '600',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   pollOptions: {
     gap: 8,
-    marginBottom: 12,
+    marginBottom: 8,
   },
   pollOptionRow: {
     flexDirection: 'row',
