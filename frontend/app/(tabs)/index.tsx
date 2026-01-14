@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
   },
   logoHeader: {
     paddingTop: 40,
-    paddingBottom: 12,
+    paddingBottom: 8,
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
@@ -380,7 +380,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   content: {
-    paddingBottom: 100,
+    paddingBottom: 80,
   },
   loadingContainer: {
     flex: 1,
