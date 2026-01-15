@@ -19,6 +19,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import API_BASE_URL from '@/config/api';
 import { authStorage } from '@/utils/authStorage';
 import { getProfileImageUrl as getProfileImage } from '@/utils/profileImageUtils';
+import { useToast } from '@/utils/ToastContext';
 
 export default function PostsScreen() {
   const [question, setQuestion] = useState('');
@@ -28,6 +29,7 @@ export default function PostsScreen() {
   const [visibleThoughts, setVisibleThoughts] = useState(2);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const { showToast } = useToast();
 
   // Load user data
   useEffect(() => {
@@ -80,7 +82,21 @@ export default function PostsScreen() {
     const options = [thought1.trim(), thought2.trim()];
     if (thought3.trim()) options.push(thought3.trim());
 
-    setLoading(true);
+    // Store the poll data before clearing
+    const pollData = {
+      question: question.trim() || 'What do you think?',
+      options: options,
+    };
+
+    // Clear form and navigate immediately (Instagram-style)
+    setQuestion('');
+    setThought1('');
+    setThought2('');
+    setThought3('');
+    setVisibleThoughts(2);
+    router.push('/(tabs)');
+
+    // Post in the background
     try {
       const token = await authStorage.getToken();
 
@@ -96,37 +112,21 @@ export default function PostsScreen() {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          question: question.trim() || 'What do you think?',
-          options: options,
-        }),
+        body: JSON.stringify(pollData),
       });
 
       const data = await response.json();
       console.log('Poll created:', data);
 
       if (response.ok) {
-        Alert.alert('Success!', 'Your poll has been posted!', [
-          {
-            text: 'OK',
-            onPress: () => {
-              setQuestion('');
-              setThought1('');
-              setThought2('');
-              setThought3('');
-              setVisibleThoughts(2);
-              router.push('/(tabs)');
-            }
-          }
-        ]);
+        // Show toast notification on success
+        showToast('Poll posted');
       } else {
         Alert.alert('Error', data.message || 'Failed to create poll');
       }
     } catch (error) {
       console.error('Error creating poll:', error);
       Alert.alert('Error', 'Network error. Please try again.');
-    } finally {
-      setLoading(false);
     }
   };
 
