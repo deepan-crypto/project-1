@@ -6,6 +6,7 @@ import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, P
 import { OpenSans_300Light, OpenSans_400Regular, OpenSans_600SemiBold } from '@expo-google-fonts/open-sans';
 import * as SplashScreen from 'expo-splash-screen';
 import { usePushNotifications } from '@/utils/usePushNotifications';
+import { ToastProvider } from '@/utils/ToastContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -35,7 +36,7 @@ export default function RootLayout() {
   }
 
   return (
-    <>
+    <ToastProvider>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="index" />
         <Stack.Screen name="onboarding" />
@@ -49,7 +50,7 @@ export default function RootLayout() {
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />
-    </>
+    </ToastProvider>
   );
 }
 
