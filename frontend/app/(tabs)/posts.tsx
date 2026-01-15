@@ -54,7 +54,7 @@ export default function PostsScreen() {
 
   // Handle thought input with character limit
   const handleThoughtChange = (setter: (text: string) => void, text: string) => {
-    if (text.length <= 50) {
+    if (text.length <= 30) {
       setter(text);
     }
   };
@@ -64,9 +64,9 @@ export default function PostsScreen() {
     // Only disable if character limits are exceeded
     const exceedsLimits =
       question.length > 250 ||
-      thought1.length > 50 ||
-      thought2.length > 50 ||
-      thought3.length > 50;
+      thought1.length > 30 ||
+      thought2.length > 30 ||
+      thought3.length > 30;
 
     return !exceedsLimits;
   };
@@ -193,8 +193,8 @@ export default function PostsScreen() {
                 placeholder="Thought 1"
                 placeholderTextColor="#6C7278"
               />
-              {thought1.length === 50 && (
-                <Text style={styles.maxCharText}>Maximum 50 characters reached</Text>
+              {thought1.length === 30 && (
+                <Text style={styles.maxCharText}>Maximum 30 characters reached</Text>
               )}
             </View>
 
@@ -207,8 +207,8 @@ export default function PostsScreen() {
                 placeholder="Thought 2"
                 placeholderTextColor="#6C7278"
               />
-              {thought2.length === 50 && (
-                <Text style={styles.maxCharText}>Maximum 50 characters reached</Text>
+              {thought2.length === 30 && (
+                <Text style={styles.maxCharText}>Maximum 30 characters reached</Text>
               )}
             </View>
 
@@ -221,8 +221,8 @@ export default function PostsScreen() {
                 placeholder="Thought 3"
                 placeholderTextColor="#6C7278"
               />
-              {thought3.length === 50 && (
-                <Text style={styles.maxCharText}>Maximum 50 characters reached</Text>
+              {thought3.length === 30 && (
+                <Text style={styles.maxCharText}>Maximum 30 characters reached</Text>
               )}
             </View>
           </View>
