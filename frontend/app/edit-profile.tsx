@@ -241,7 +241,7 @@ export default function EditProfileScreen() {
                                 placeholder="Tell us about yourself"
                                 placeholderTextColor="#999"
                                 multiline={true}
-                                numberOfLines={4}
+                                numberOfLines={2}
                                 textAlignVertical="top"
                             />
                         </View>
@@ -348,7 +348,7 @@ const styles = StyleSheet.create({
         height: 44,
     },
     bioInput: {
-        height: 120,
+        height: 68,
         paddingTop: 12,
     },
     saveButton: {
