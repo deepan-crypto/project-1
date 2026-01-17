@@ -8,15 +8,15 @@ const { width } = Dimensions.get('window');
 
 const onboardingData = [
   {
-    title: 'The human brain generates an estimated',
-    subtitle: '6,000 to 70,000 thoughts per day',
+    title: 'The human brain generates an',
+    subtitle: 'estimated 6,000 to 70,000 thoughts per day',
   },
   {
     title: 'A snapshot of billion thoughts',
     subtitle: '',
   },
   {
-    title: 'Welcome to Thoughts',
+    title: 'Welcome to Thots',
     subtitle: '',
   },
 ];
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 32,
     letterSpacing: 0,
-    marginBottom: 8,
+    marginBottom: 4,
   },
   subtitle: {
     fontSize: 16,
