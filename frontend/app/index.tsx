@@ -52,7 +52,7 @@ export default function SplashScreen() {
       style={styles.container}
     >
       <View style={styles.content}>
-        <Text style={styles.title}>Thoughts</Text>
+        <Text style={styles.title}>Thots</Text>
         <Text style={styles.subtitle}>Share your mind</Text>
         {isChecking && (
           <ActivityIndicator
