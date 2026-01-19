@@ -243,7 +243,9 @@ export default function EditProfileScreen() {
                                 multiline={true}
                                 numberOfLines={2}
                                 textAlignVertical="top"
+                                maxLength={100}
                             />
+                            <Text style={styles.charCounter}>{bio.length}/100</Text>
                         </View>
                     </View>
 
@@ -350,6 +352,12 @@ const styles = StyleSheet.create({
     bioInput: {
         height: 68,
         paddingTop: 12,
+    },
+    charCounter: {
+        fontSize: 12,
+        color: '#999',
+        textAlign: 'right',
+        marginTop: 4,
     },
     saveButton: {
         backgroundColor: '#4098D2',
