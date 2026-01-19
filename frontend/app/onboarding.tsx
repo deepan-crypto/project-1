@@ -8,8 +8,8 @@ const { width } = Dimensions.get('window');
 
 const onboardingData = [
   {
-    title: 'The human brain generates an',
-    subtitle: 'estimated 6,000 to 70,000 thoughts per day',
+    title: 'The human brain generates',
+    subtitle: 'an estimated 6,000 to 70,000 thoughts per day',
   },
   {
     title: 'A snapshot of billion thoughts',
