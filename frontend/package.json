@@ -29,7 +29,7 @@
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/native": "^7.0.14",
     "@supabase/supabase-js": "^2.58.0",
-    "expo": "^54.0.10",
+    "expo": "^54.0.31",
     "expo-auth-session": "^7.0.10",
     "expo-blur": "~15.0.7",
     "expo-camera": "~17.0.8",
@@ -66,7 +66,7 @@
     "@babel/core": "^7.25.2",
     "@types/react": "~19.1.10",
     "babel-plugin-module-resolver": "^5.0.2",
-    "eas-cli": "^3.14.2",
+    "eas-cli": "^3.18.3",
     "typescript": "~5.9.2"
   }
 }

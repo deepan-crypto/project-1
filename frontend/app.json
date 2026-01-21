@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Thots",
-    "slug": "thots",
+    "slug": "crypto-app",
     "version": "1.0.0",
     "android": {
       "package": "com.deepangokul.cryptoapp",
@@ -57,6 +57,7 @@
       "eas": {
         "projectId": "09787720-c92e-4247-943b-1dbe394d4a71"
       }
-    }
+    },
+    "owner": "deepangokul"
   }
 }
