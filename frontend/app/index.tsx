@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { authStorage } from '@/utils/authStorage';
+import API_BASE_URL from '@/config/api';
 
 export default function SplashScreen() {
   const router = useRouter();
@@ -26,6 +27,21 @@ export default function SplashScreen() {
       await new Promise(resolve => setTimeout(resolve, 1500));
 
       if (rememberMe && token && user) {
+        // Fetch latest user data from server to keep profile in sync
+        try {
+          const response = await fetch(`${API_BASE_URL}/users/me`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          if (response.ok) {
+            const data = await response.json();
+            if (data.user) {
+              await authStorage.setUser(data.user);
+            }
+          }
+        } catch (err) {
+          console.error('Failed to refresh user profile on startup:', err);
+        }
+
         // User has remember me enabled and valid token - auto login
         // Note: If token is expired, API calls will handle it and redirect to login
         router.replace('/(tabs)');

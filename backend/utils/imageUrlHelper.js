@@ -17,13 +17,11 @@ const getFullImageUrl = (profilePicture) => {
         return profilePicture;
     }
 
-    // Construct full URL from relative path
-    const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
-
-    // Ensure path starts with /
+    // Let the frontend handle prefixing the correct base URL.
+    // Just ensure path starts with /
     const path = profilePicture.startsWith('/') ? profilePicture : `/${profilePicture}`;
 
-    return `${baseUrl}${path}`;
+    return path;
 };
 
 module.exports = { getFullImageUrl };
