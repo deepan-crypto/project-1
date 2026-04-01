@@ -310,15 +310,15 @@ export default function SignUpScreen() {
                 </LinearGradient>
               </TouchableOpacity>
 
-              {/* OR Divider */}
-              <View style={styles.dividerContainer}>
+              {/* OR Divider - Commented out */}
+              {/* <View style={styles.dividerContainer}>
                 <View style={styles.divider} />
                 <Text style={styles.dividerText}>OR</Text>
                 <View style={styles.divider} />
-              </View>
+              </View> */}
 
-              {/* Google Sign-In Button */}
-              <TouchableOpacity
+              {/* Google Sign-In Button - Commented out */}
+              {/* <TouchableOpacity
                 style={[styles.googleButton, loading && styles.signUpButtonDisabled]}
                 onPress={handleGoogleSignIn}
                 disabled={loading}
@@ -334,7 +334,7 @@ export default function SignUpScreen() {
                     <Text style={styles.googleButtonText}>Sign in with Google</Text>
                   </>
                 )}
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </View>
           </View>
         </ScrollView>
