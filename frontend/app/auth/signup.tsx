@@ -28,7 +28,7 @@ export default function SignUpScreen() {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [dateOfBirth, setDateOfBirth] = useState('');
+
   const [showPassword, setShowPassword] = useState(false);
   const [selectedGender, setSelectedGender] = useState('');
   const [showGenderModal, setShowGenderModal] = useState(false);
@@ -65,15 +65,6 @@ export default function SignUpScreen() {
       newErrors.password = 'Password must be at least 6 characters';
     }
 
-    if (!dateOfBirth.trim()) {
-      newErrors.dateOfBirth = 'Date of birth is required';
-    } else {
-      // Validate DD/MM/YYYY format
-      const dateRegex = /^(0[1-9]|[12][0-9]|3[01])\/(0[1-9]|1[0-2])\/\d{4}$/;
-      if (!dateRegex.test(dateOfBirth)) {
-        newErrors.dateOfBirth = 'Please use DD/MM/YYYY format (e.g., 19/02/2007)';
-      }
-    }
 
     if (!selectedGender) {
       newErrors.gender = 'Please select a gender';
@@ -95,17 +86,7 @@ export default function SignUpScreen() {
     setLoading(true);
 
     try {
-      // Parse date from DD/MM/YYYY to ISO format
-      let parsedDate = null;
-      if (dateOfBirth) {
-        const dateParts = dateOfBirth.split('/');
-        if (dateParts.length === 3) {
-          const day = parseInt(dateParts[0], 10);
-          const month = parseInt(dateParts[1], 10) - 1; // Month is 0-indexed
-          const year = parseInt(dateParts[2], 10);
-          parsedDate = new Date(year, month, day).toISOString();
-        }
-      }
+
 
       const response = await fetch(`${API_BASE_URL}/auth/signup`, {
         method: 'POST',
@@ -117,7 +98,6 @@ export default function SignUpScreen() {
           email,
           username,
           password,
-          dateOfBirth: parsedDate,
           gender: selectedGender,
         }),
       });
@@ -264,17 +244,6 @@ export default function SignUpScreen() {
                 {errors.password && <Text style={styles.fieldError}>{errors.password}</Text>}
               </View>
 
-              <View style={styles.inputGroup}>
-                <Text style={styles.label}>Date of Birth</Text>
-                <TextInput
-                  style={[styles.input, errors.dateOfBirth && styles.inputError]}
-                  value={dateOfBirth}
-                  onChangeText={setDateOfBirth}
-                  placeholder="DD/MM/YYYY (e.g., 19/02/2007)"
-                  placeholderTextColor="#999"
-                />
-                {errors.dateOfBirth && <Text style={styles.fieldError}>{errors.dateOfBirth}</Text>}
-              </View>
 
               <View style={styles.inputGroup}>
                 <Text style={styles.label}>Select Gender</Text>
@@ -343,7 +312,7 @@ export default function SignUpScreen() {
       <Modal
         visible={showGenderModal}
         transparent
-        animationType="slide"
+        animationType="fade"
         onRequestClose={() => setShowGenderModal(false)}
       >
         <View style={styles.modalOverlay}>
@@ -395,6 +364,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     padding: 20,
+    paddingTop: 60,
   },
   card: {
     backgroundColor: '#FFFFFF',
@@ -486,15 +456,16 @@ const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   modalContent: {
     backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
+    borderRadius: 20,
     paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 32,
+    paddingVertical: 20,
+    width: '90%',
+    maxWidth: 400,
   },
   modalHeader: {
     flexDirection: 'row',

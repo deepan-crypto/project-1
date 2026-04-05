@@ -6,7 +6,7 @@ const { sendPasswordResetEmail } = require('../utils/emailService');
 // @access  Public
 const signup = async (req, res, next) => {
     try {
-        const { fullName, email, username, password, dateOfBirth, gender } = req.body;
+        const { fullName, email, username, password, gender } = req.body;
 
         // Validate required fields
         if (!fullName || !email || !username || !password) {
@@ -40,23 +40,7 @@ const signup = async (req, res, next) => {
             throw new Error('Password must be at least 6 characters long');
         }
 
-        // Validate date of birth if provided
-        if (dateOfBirth) {
-            // Check if dateOfBirth is a valid date
-            const date = new Date(dateOfBirth);
-            if (isNaN(date.getTime())) {
-                res.status(400);
-                throw new Error('Please provide a valid date of birth');
-            }
 
-            // Optional: Check if user is at least 13 years old
-            const thirteenYearsAgo = new Date();
-            thirteenYearsAgo.setFullYear(thirteenYearsAgo.getFullYear() - 13);
-            if (date > thirteenYearsAgo) {
-                res.status(400);
-                throw new Error('You must be at least 13 years old to register');
-            }
-        }
 
         // Check for existing email
         const existingEmail = await User.findOne({ email });
@@ -78,7 +62,6 @@ const signup = async (req, res, next) => {
             email,
             username,
             password,
-            dateOfBirth,
             gender,
         });
 
