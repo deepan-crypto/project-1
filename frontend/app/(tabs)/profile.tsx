@@ -887,11 +887,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   optionTextBlue: {
-    color: '#FFFFFF',
+    color: '#000000',
     fontWeight: '600',
   },
   optionTextWhite: {
-    color: '#FFFFFF',
+    color: '#000000',
     fontWeight: '600',
   },
   percentage: {

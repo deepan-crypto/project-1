@@ -76,36 +76,22 @@ export default function OnboardingScreen() {
         ) : null}
       </View>
 
-      <View style={styles.ctaSection}>
-        {/* CTA Card - Gradient bars */}
-        <View style={styles.ctaCard}>
-          <LinearGradient
-            colors={['#3DD1E0', '#45BFD0']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={styles.ctaBar}
-          />
-          <LinearGradient
-            colors={['#45BFD0', '#5DE0EF']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={[styles.ctaBar, styles.ctaBarSecond]}
-          />
-        </View>
-      </View>
+
 
       <View style={styles.footer}>
-        <View style={styles.pagination}>
-          {onboardingData.map((_, index) => (
-            <View
-              key={index}
-              style={[
-                styles.paginationDot,
-                index === currentPage && styles.paginationDotActive,
-              ]}
-            />
-          ))}
-        </View>
+        {!isLastPage && (
+          <View style={styles.pagination}>
+            {onboardingData.map((_, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.paginationDot,
+                  index === currentPage && styles.paginationDotActive,
+                ]}
+              />
+            ))}
+          </View>
+        )}
 
         {/* Show Sign Up button only on last page, otherwise show swipe hint */}
         {isLastPage ? (
@@ -140,9 +126,8 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#FFFFFF',
     textAlign: 'center',
-    lineHeight: 32,
+    lineHeight: 24,
     letterSpacing: 0,
-    marginBottom: 4,
   },
   subtitle: {
     fontSize: 16,
@@ -150,24 +135,10 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#FFFFFF',
     textAlign: 'center',
-    lineHeight: 32,
+    lineHeight: 24,
     letterSpacing: 0,
   },
-  ctaSection: {
-    paddingHorizontal: 40,
-    paddingBottom: 40,
-  },
-  ctaCard: {
-    gap: 12,
-  },
-  ctaBar: {
-    height: 12,
-    borderRadius: 6,
-    width: '100%',
-  },
-  ctaBarSecond: {
-    width: '70%',
-  },
+
   footer: {
     paddingBottom: 60,
     paddingHorizontal: 20,
@@ -192,6 +163,7 @@ const styles = StyleSheet.create({
   signupContainer: {
     alignItems: 'center',
     width: '100%',
+    marginBottom: 40,
   },
   signupButton: {
     backgroundColor: '#FFFFFF',

@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     marginBottom: 8,
   },
   avatar: {
@@ -511,7 +511,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   optionTextWhite: {
-    color: '#FFFFFF',
+    color: '#000000',
     fontWeight: '600',
   },
   optionPercentageVoted: {

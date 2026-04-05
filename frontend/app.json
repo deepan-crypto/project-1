@@ -47,6 +47,14 @@
           "icon": "./assets/images/ican.png",
           "color": "#458FD0"
         }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
       ]
     ],
     "experiments": {
