@@ -501,11 +501,11 @@ export default function ProfileScreen() {
                       <Text style={styles.pollUserName}>
                         {poll.isOwn ? (user?.fullName || 'User') : (poll.user?.fullName || poll.user?.name || 'User')}
                       </Text>
-                      <Text style={styles.pollQuestion}>{poll.question}</Text>
                     </View>
                   </View>
                   <Text style={styles.pollTime}>{formatTimeAgo(poll.createdAt)}</Text>
                 </View>
+                <Text style={styles.pollQuestion}>{poll.question}</Text>
 
                 {/* Temporary "Already Voted" Message */}
                 {showAlreadyVotedMessage === poll.id && (
@@ -879,7 +879,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   optionTextVoted: {
-    color: '#6C7278',
+    color: '#101720',
     fontWeight: '600',
   },
   optionTextUnvoted: {
@@ -887,11 +887,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   optionTextBlue: {
-    color: '#000000',
+    color: '#101720',
     fontWeight: '600',
   },
   optionTextWhite: {
-    color: '#000000',
+    color: '#101720',
     fontWeight: '600',
   },
   percentage: {

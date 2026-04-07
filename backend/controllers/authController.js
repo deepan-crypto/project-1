@@ -169,8 +169,15 @@ const forgotPassword = async (req, res, next) => {
         const emailResult = await sendPasswordResetEmail(email, resetToken);
 
         if (!emailResult.success) {
+            // Log the reset link and the exact error so the developer can debug or copy it
+            console.error('--- EMAIL FAILED TO SEND ---');
+            console.error('Reason:', emailResult.error);
+            console.error('Password Reset Token:', resetToken);
+            console.error('Reset link roughly:', `${process.env.FRONTEND_URL || 'myapp://auth'}/reset-password?token=${resetToken}`);
+            console.error('----------------------------');
+            
             res.status(500);
-            throw new Error('Email could not be sent');
+            throw new Error(`Email could not be sent: ${emailResult.error || 'Unknown error'}`);
         }
 
         res.status(200).json({

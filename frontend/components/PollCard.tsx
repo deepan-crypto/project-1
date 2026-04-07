@@ -220,11 +220,6 @@ export default function PollCard({
             </TouchableOpacity>
             {createdAt && <Text style={styles.timeAgo}>{formatTimeAgo(createdAt)}</Text>}
           </View>
-          <Text style={styles.question}>{question}</Text>
-          {/* Temporary "Already Voted" Message */}
-          {showAlreadyVotedMessage && (
-            <Text style={styles.alreadyVotedText}>You have already voted</Text>
-          )}
         </View>
         {!isOwnPoll && (
           <TouchableOpacity
@@ -235,6 +230,12 @@ export default function PollCard({
           </TouchableOpacity>
         )}
       </View>
+
+      <Text style={styles.question}>{question}</Text>
+      {/* Temporary "Already Voted" Message */}
+      {showAlreadyVotedMessage && (
+        <Text style={styles.alreadyVotedText}>You have already voted</Text>
+      )}
 
       {/* Menu Dropdown */}
       {showMenu && (
@@ -500,10 +501,10 @@ const styles = StyleSheet.create({
   },
   optionText: {
     fontSize: 14,
-    color: '#6C7278',
+    color: '#101720',
   },
   optionTextVoted: {
-    color: '#6C7278',
+    color: '#101720',
     fontWeight: '600',
   },
   optionTextUnvoted: {
@@ -511,7 +512,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   optionTextWhite: {
-    color: '#000000',
+    color: '#101720',
     fontWeight: '600',
   },
   optionPercentageVoted: {

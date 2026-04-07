@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   questionInput: {
-    width: 328,
+    width: '100%',
     height: 189,
     borderWidth: 0,
     borderColor: 'transparent',

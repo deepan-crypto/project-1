@@ -12,7 +12,7 @@ const {
 
 // Authentication routes with rate limiting
 router.post('/signup', authLimiter, signup);
-router.post('/login', authLimiter, login);
+router.post('/login', login);
 router.post('/forgot-password', authLimiter, forgotPassword);
 router.post('/reset-password', authLimiter, resetPassword);
 

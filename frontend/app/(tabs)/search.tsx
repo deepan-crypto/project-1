@@ -170,7 +170,7 @@ export default function SearchScreen() {
     const handleUserPress = (username: string) => {
         try {
             // Navigate to user profile using the same pattern as followers/following pages
-            router.push({ pathname: '/(tabs)/profile/[username]', params: { username } });
+            router.push({ pathname: '/(tabs)/profile/[username]', params: { username, from: 'search' } });
         } catch (error) {
             console.error('Navigation error:', error);
             Alert.alert('Error', 'Unable to view profile. Please try again.');

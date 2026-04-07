@@ -50,7 +50,7 @@ interface Poll {
 }
 
 export default function UserProfileScreen() {
-    const { username } = useLocalSearchParams<{ username: string }>();
+    const { username, from } = useLocalSearchParams<{ username: string; from?: string }>();
     const [user, setUser] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -290,7 +290,13 @@ export default function UserProfileScreen() {
         return (
             <View style={styles.errorContainer}>
                 <Text style={styles.errorText}>{error || 'User not found'}</Text>
-                <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+                <TouchableOpacity style={styles.backButton} onPress={() => {
+                    if (from === 'search') {
+                        router.navigate('/(tabs)/search');
+                    } else {
+                        router.back();
+                    }
+                }}>
                     <Text style={styles.backButtonText}>Go Back</Text>
                 </TouchableOpacity>
             </View>
@@ -303,7 +309,13 @@ export default function UserProfileScreen() {
 
             {/* Header with back button */}
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.headerButton}>
+                <TouchableOpacity onPress={() => {
+                    if (from === 'search') {
+                        router.navigate('/(tabs)/search');
+                    } else {
+                        router.back();
+                    }
+                }} style={styles.headerButton}>
                     <ArrowLeft size={24} color="#101720" />
                 </TouchableOpacity>
                 <Text style={styles.headerTitle}>@{user.username}</Text>
