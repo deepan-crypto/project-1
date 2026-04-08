@@ -16,7 +16,7 @@ const onboardingData = [
     subtitle: '',
   },
   {
-    title: 'Welcome to Thots',
+    title: 'Welcome to Thoughts',
     subtitle: '',
   },
 ];

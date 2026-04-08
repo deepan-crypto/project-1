@@ -1,12 +1,12 @@
 {
   "expo": {
-    "name": "Thots",
+    "name": "Thoughts",
     "slug": "crypto-app",
     "version": "1.0.0",
     "android": {
       "package": "com.deepangokul.cryptoapp",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/ican.png",
+        "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "permissions": [
