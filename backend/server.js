@@ -165,7 +165,7 @@ app.use(errorHandler);
 
 // Start server (use 'server' instead of 'app' for Socket.IO)
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
     console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
     console.log('Socket.IO enabled for real-time notifications');
 });
