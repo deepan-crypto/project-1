@@ -5,7 +5,8 @@ const requiredEnvVars = [
     'MONGODB_URI',
     'JWT_SECRET',
     'GOOGLE_CLIENT_ID',
-    'GOOGLE_CLIENT_SECRET'
+    'GOOGLE_CLIENT_SECRET',
+    'SENDGRID_API_KEY'
 ];
 
 const missingVars = requiredEnvVars.filter(v => !process.env[v]);
@@ -21,6 +22,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const connectDB = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
+const { initSendGrid } = require('./config/sendgridConfig');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -28,6 +30,7 @@ const userRoutes = require('./routes/users');
 const pollRoutes = require('./routes/polls');
 const postRoutes = require('./routes/posts');
 const notificationRoutes = require('./routes/notifications');
+const emailRoutes = require('./routes/email');
 
 // Initialize express app
 const app = express();
@@ -102,6 +105,9 @@ io.on('connection', (socket) => {
 // Connect to MongoDB
 connectDB();
 
+// Initialize SendGrid
+initSendGrid();
+
 if (!corsOrigin && process.env.NODE_ENV === 'production') {
     console.warn('WARNING: FRONTEND_URL environment variable is not set in production mode.');
 }
@@ -141,6 +147,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/polls', pollRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/email', emailRoutes);
 
 // Health check route
 app.get('/', (req, res) => {
