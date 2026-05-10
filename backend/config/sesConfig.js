@@ -1,4 +1,4 @@
-const { SESClient, GetAccountCommand } = require('@aws-sdk/client-ses');
+const { SESClient, GetSendQuotaCommand } = require('@aws-sdk/client-ses');
 
 /**
  * AWS SES Configuration

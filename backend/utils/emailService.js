@@ -1,83 +1,101 @@
-const { sgMail, getSender } = require('../config/sendgridConfig');
+const { SendEmailCommand } = require('@aws-sdk/client-ses');
+const { getSESClient, getSender } = require('../config/sesConfig');
 
 /**
- * SendGrid Email Service
- * Production-grade email sending with retry logic, error classification, and structured logging
+ * AWS SES Email Service
+ * Production-grade email sending with retry logic, error classification, and structured logging.
+ * Drop-in replacement for the previous SendGrid service — same exported API surface.
  */
 
 // ─── Base Send Function ──────────────────────────────────────────────────────
 
 /**
- * Send an email via SendGrid with retry logic
+ * Send an email via AWS SES with retry logic and exponential backoff
  * @param {Object} options
  * @param {string} options.to - Recipient email
  * @param {string} options.subject - Email subject
  * @param {string} options.html - HTML content
  * @param {string} [options.text] - Plain text fallback
- * @param {Object} [options.replyTo] - Reply-to address
+ * @param {Object} [options.replyTo] - Reply-to address { email, name }
  * @param {number} [retries=2] - Number of retries on transient failures
  * @returns {Promise<Object>} Result with success status and message ID
  */
 const sendEmail = async ({ to, subject, html, text, replyTo }, retries = 2) => {
     const sender = getSender();
+    const sesClient = getSESClient();
 
-    const msg = {
-        to,
-        from: {
-            email: sender.email,
-            name: sender.name,
+    const params = {
+        Source: `${sender.name} <${sender.email}>`,
+        Destination: {
+            ToAddresses: [to],
         },
-        subject,
-        html,
-        ...(text && { text }),
-        ...(replyTo && { replyTo }),
+        Message: {
+            Subject: {
+                Charset: 'UTF-8',
+                Data: subject,
+            },
+            Body: {
+                Html: {
+                    Charset: 'UTF-8',
+                    Data: html,
+                },
+                ...(text && {
+                    Text: {
+                        Charset: 'UTF-8',
+                        Data: text,
+                    },
+                }),
+            },
+        },
+        ...(replyTo && {
+            ReplyToAddresses: [
+                typeof replyTo === 'string'
+                    ? replyTo
+                    : replyTo.name
+                        ? `${replyTo.name} <${replyTo.email}>`
+                        : replyTo.email,
+            ],
+        }),
     };
 
     for (let attempt = 1; attempt <= retries + 1; attempt++) {
         try {
-            const [response] = await sgMail.send(msg);
+            const command = new SendEmailCommand(params);
+            const response = await sesClient.send(command);
 
             console.log(`✅ Email sent successfully`);
             console.log(`   To: ${to}`);
             console.log(`   Subject: ${subject}`);
-            console.log(`   Status: ${response.statusCode}`);
-            console.log(`   Message-ID: ${response.headers['x-message-id'] || 'N/A'}`);
+            console.log(`   SES Message-ID: ${response.MessageId || 'N/A'}`);
 
             return {
                 success: true,
-                statusCode: response.statusCode,
-                messageId: response.headers['x-message-id'] || null,
+                messageId: response.MessageId || null,
             };
         } catch (error) {
-            const statusCode = error.code || error.response?.statusCode;
-            const errorBody = error.response?.body;
+            const errorCode = error.name || error.Code || 'UnknownError';
+            const statusCode = error.$metadata?.httpStatusCode;
 
             console.error(`❌ Email send attempt ${attempt}/${retries + 1} failed`);
             console.error(`   To: ${to}`);
             console.error(`   Subject: ${subject}`);
-            console.error(`   Status: ${statusCode}`);
-            console.error(`   Error: ${error.message}`);
+            console.error(`   Error Code: ${errorCode}`);
+            console.error(`   HTTP Status: ${statusCode || 'N/A'}`);
+            console.error(`   Message: ${error.message}`);
 
-            if (errorBody?.errors) {
-                errorBody.errors.forEach((e, i) => {
-                    console.error(`   Error[${i}]: ${e.message} (field: ${e.field})`);
-                });
-            }
-
-            // Don't retry on client errors (4xx) — they won't succeed on retry
-            if (statusCode && statusCode >= 400 && statusCode < 500) {
-                const detailedMessage = errorBody?.errors?.[0]?.message || error.message;
+            // Don't retry on client/permanent errors
+            if (isNonRetryableError(errorCode, statusCode)) {
                 return {
                     success: false,
-                    statusCode,
-                    error: classifyError(statusCode, detailedMessage),
+                    errorCode,
+                    error: classifyError(errorCode, error.message),
                 };
             }
 
-            // Retry on server errors (5xx) or network errors
+            // Retry on transient/server errors
             if (attempt <= retries) {
-                const delay = Math.pow(2, attempt) * 500; // Exponential backoff: 1s, 2s
-                console.log(`   Retrying in ${delay}ms...`);
+                const delay = Math.pow(2, attempt) * 500; // 1s, 2s
+                console.log(`   ⏳ Retrying in ${delay}ms...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
             }
         }
@@ -90,21 +108,49 @@ const sendEmail = async ({ to, subject, html, text, replyTo }, retries = 2) => {
 };
 
 /**
- * Classify SendGrid errors into user-friendly messages
+ * Determine if an SES error should NOT be retried
+ * @param {string} errorCode - AWS error code name
+ * @param {number} [statusCode] - HTTP status code
+ * @returns {boolean}
  */
-const classifyError = (statusCode, message) => {
-    switch (statusCode) {
-        case 401:
-            if (message && message.toLowerCase().includes('credits exceeded')) {
-                return 'Email sending limit exceeded. Please try again later or upgrade your SendGrid plan.';
-            }
-            return 'Email service authentication failed. Please check the API key.';
-        case 403:
-            return 'Email service access denied. Verify sender authentication in SendGrid.';
-        case 413:
-            return 'Email content is too large.';
-        case 429:
+const isNonRetryableError = (errorCode, statusCode) => {
+    const permanentErrors = [
+        'MessageRejected',
+        'MailFromDomainNotVerifiedException',
+        'ConfigurationSetDoesNotExistException',
+        'AccountSendingPausedException',
+        'InvalidParameterValue',
+        'ValidationError',
+    ];
+    if (permanentErrors.includes(errorCode)) return true;
+    if (statusCode && statusCode >= 400 && statusCode < 500) return true;
+    return false;
+};
+
+/**
+ * Classify SES errors into user-friendly messages
+ * @param {string} errorCode - AWS error code
+ * @param {string} message - Raw error message
+ * @returns {string} User-friendly error message
+ */
+const classifyError = (errorCode, message) => {
+    switch (errorCode) {
+        case 'MessageRejected':
+            return 'Email was rejected by the mail service. Please verify the recipient address.';
+        case 'MailFromDomainNotVerifiedException':
+            return 'Sender domain is not verified. Contact support.';
+        case 'AccountSendingPausedException':
+            return 'Email sending is temporarily paused. Please try again later.';
+        case 'Throttling':
+        case 'TooManyRequestsException':
             return 'Email rate limit exceeded. Please try again later.';
+        case 'InvalidParameterValue':
+            return 'Invalid email parameters provided.';
+        case 'ConfigurationSetDoesNotExistException':
+            return 'Email configuration error. Contact support.';
+        case 'InvalidClientTokenId':
+        case 'UnrecognizedClientException':
+            return 'Email service authentication failed. Contact support.';
         default:
             return message || 'Failed to send email.';
     }
