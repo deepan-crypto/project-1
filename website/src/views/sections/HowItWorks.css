@@ -1,0 +1,47 @@
+.hiw__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+.hiw__card {
+  padding: 2.2rem;
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.55s ease, transform 0.55s ease, border-color 0.3s, box-shadow 0.3s;
+}
+.hiw__card--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hiw__step-num {
+  font-family: "Poppins", sans-serif;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: rgba(7,242,223,0.5);
+  margin-bottom: 1rem;
+}
+
+.hiw__icon {
+  font-size: 2.4rem;
+  margin-bottom: 1rem;
+  line-height: 1;
+}
+
+.hiw__card-title {
+  font-family: "Poppins", sans-serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 0.6rem;
+}
+
+.hiw__card-desc {
+  color: rgba(255,255,255,0.6);
+  font-size: 0.9rem;
+  line-height: 1.65;
+  margin: 0;
+}

@@ -1,0 +1,187 @@
+.preview__phones {
+  display: flex;
+  gap: 2.5rem;
+  justify-content: center;
+  margin-top: 3.5rem;
+  flex-wrap: wrap;
+  perspective: 1200px;
+}
+
+.preview__phone-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  opacity: 0;
+  transform: translateY(36px) scale(0.96);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.preview__phone-wrap--visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.preview__phone-wrap:nth-child(2) {
+  transform: translateY(36px) scale(1.04);
+  z-index: 2;
+}
+.preview__phone-wrap:nth-child(2).preview__phone-wrap--visible {
+  transform: translateY(-14px) scale(1.06);
+}
+
+.preview__phone {
+  width: 200px;
+  height: 410px;
+  background: #10151f;
+  border-radius: 36px;
+  border: 1.5px solid rgba(255,255,255,0.12);
+  box-shadow: 0 24px 60px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.04);
+  position: relative;
+  overflow: hidden;
+  animation: phoneBob 4s ease-in-out infinite;
+  animation-delay: calc(var(--i,0) * 0.5s);
+}
+@keyframes phoneBob {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+.preview__phone-wrap:nth-child(1) .preview__phone { animation-delay: 0s; }
+.preview__phone-wrap:nth-child(2) .preview__phone { animation-delay: 0.6s; }
+.preview__phone-wrap:nth-child(3) .preview__phone { animation-delay: 1.2s; }
+
+.preview__notch {
+  width: 70px; height: 18px;
+  background: #0A0E17;
+  border-radius: 0 0 14px 14px;
+  margin: 0 auto;
+  position: relative; z-index: 5;
+}
+
+.preview__screen {
+  position: absolute;
+  inset: 0;
+  top: 18px;
+  overflow: hidden;
+}
+
+.preview__home-bar {
+  position: absolute;
+  bottom: 8px;
+  left: 50%; transform: translateX(-50%);
+  width: 60px; height: 4px;
+  background: rgba(255,255,255,0.25);
+  border-radius: 4px;
+}
+
+/* ── Mock screen internals ─────────────────────────────── */
+.mock__screen {
+  height: 100%;
+  overflow: hidden;
+  font-size: 7.5px;
+  color: #fff;
+  background: #0d1117;
+  display: flex;
+  flex-direction: column;
+}
+
+.mock__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px 5px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  flex-shrink: 0;
+}
+.mock__header-logo { font-size: 10px; }
+.mock__header-title { font-weight: 700; font-size: 9px; letter-spacing: 0.02em; }
+.mock__header-bell  { font-size: 9px; opacity: 0.6; }
+.mock__back { opacity: 0.6; font-size: 9px; }
+
+.mock__poll {
+  padding: 7px 9px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  flex-shrink: 0;
+}
+.mock__poll-user { display: flex; align-items: center; gap: 5px; margin-bottom: 4px; }
+.mock__avatar {
+  width: 14px; height: 14px; border-radius: 50%;
+  background: linear-gradient(135deg, #07F2DF, #458FD0);
+  flex-shrink: 0;
+}
+.mock__uname { width: 40px; height: 4px; background: rgba(255,255,255,0.4); border-radius: 2px; margin-bottom: 2px; }
+.mock__time  { width: 22px; height: 3px; background: rgba(255,255,255,0.2); border-radius: 2px; }
+.mock__question { font-size: 7.5px; font-weight: 600; margin: 0 0 4px; line-height: 1.3; }
+.mock__option {
+  position: relative;
+  height: 13px; border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.1);
+  margin-bottom: 3px;
+  overflow: hidden;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 5px;
+}
+.mock__option-fill {
+  position: absolute; inset: 0; left: 0; border-radius: 3px;
+}
+.mock__opt-label, .mock__opt-pct {
+  position: relative; z-index: 1; font-size: 6px;
+}
+.mock__opt-pct { opacity: 0.75; }
+
+/* Create screen */
+.mock__create-body { padding: 8px; flex: 1; display: flex; flex-direction: column; gap: 5px; }
+.mock__textarea {
+  width: 100%; resize: none; background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1); border-radius: 6px;
+  color: #fff; font-size: 7px; padding: 5px; font-family: inherit;
+  height: 42px;
+}
+.mock__char-count { font-size: 6px; color: rgba(255,255,255,0.3); text-align: right; }
+.mock__divider { height: 1px; background: rgba(255,255,255,0.06); }
+.mock__field-label { font-size: 6px; color: rgba(255,255,255,0.4); font-weight: 600; }
+.mock__option-input {
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 5px; padding: 4px 6px; font-size: 6.5px;
+}
+.mock__option-add { color: #07F2DF; border-style: dashed; opacity: 0.7; }
+.mock__post-btn {
+  margin-top: auto; background: linear-gradient(135deg,#07F2DF,#458FD0);
+  border: none; border-radius: 7px; color: #0A0E17; font-weight: 700;
+  font-size: 7px; padding: 6px; cursor: pointer; text-align: center;
+}
+
+/* Profile screen */
+.mock__profile-banner {
+  height: 52px;
+  background: linear-gradient(135deg, #07F2DF22, #458FD044);
+  flex-shrink: 0;
+}
+.mock__profile-info { padding: 0 9px 9px; display: flex; flex-direction: column; align-items: center; }
+.mock__profile-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: linear-gradient(135deg, #07F2DF, #458FD0);
+  border: 2px solid #0d1117; margin-top: -14px; flex-shrink: 0;
+}
+.mock__profile-name { font-size: 8px; font-weight: 700; margin: 4px 0 2px; }
+.mock__profile-bio { font-size: 6px; color: rgba(255,255,255,0.4); text-align: center; line-height: 1.4; }
+.mock__stats-row { display: flex; gap: 10px; margin: 7px 0 5px; }
+.mock__stat { display: flex; flex-direction: column; align-items: center; font-size: 6px; }
+.mock__stat b { font-size: 8px; color: #fff; }
+.mock__stat span { color: rgba(255,255,255,0.4); }
+.mock__profile-btns { display: flex; gap: 5px; }
+.mock__edit-btn, .mock__share-btn {
+  border-radius: 5px; font-size: 6px; padding: 3px 8px;
+}
+.mock__edit-btn { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #fff; }
+.mock__share-btn { background: linear-gradient(135deg,#07F2DF,#458FD0); color: #0A0E17; font-weight: 700; }
+
+/* Labels */
+.preview__phone-label { text-align: center; }
+.preview__label-title {
+  display: block;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #fff;
+  margin-bottom: 2px;
+}
+.preview__label-desc { font-size: 0.78rem; color: rgba(255,255,255,0.45); }
