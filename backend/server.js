@@ -6,7 +6,10 @@ const requiredEnvVars = [
     'JWT_SECRET',
     'GOOGLE_CLIENT_ID',
     'GOOGLE_CLIENT_SECRET',
-    'SENDGRID_API_KEY'
+    'AWS_ACCESS_KEY_ID',
+    'AWS_SECRET_ACCESS_KEY',
+    'AWS_REGION',
+    'SES_FROM_EMAIL'
 ];
 
 const missingVars = requiredEnvVars.filter(v => !process.env[v]);
@@ -22,7 +25,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 const connectDB = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
-const { initSendGrid } = require('./config/sendgridConfig');
+const { initSES } = require('./config/sesConfig');
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -105,8 +108,8 @@ io.on('connection', (socket) => {
 // Connect to MongoDB
 connectDB();
 
-// Initialize SendGrid
-initSendGrid();
+// Initialize AWS SES
+initSES().catch(err => console.error('SES init error:', err.message));
 
 if (!corsOrigin && process.env.NODE_ENV === 'production') {
     console.warn('WARNING: FRONTEND_URL environment variable is not set in production mode.');
