@@ -66,10 +66,11 @@ const sendEmail = async ({ to, subject, html, text, replyTo }, retries = 2) => {
 
             // Don't retry on client errors (4xx) — they won't succeed on retry
             if (statusCode && statusCode >= 400 && statusCode < 500) {
+                const detailedMessage = errorBody?.errors?.[0]?.message || error.message;
                 return {
                     success: false,
                     statusCode,
-                    error: classifyError(statusCode, error.message),
+                    error: classifyError(statusCode, detailedMessage),
                 };
             }
 
@@ -94,6 +95,9 @@ const sendEmail = async ({ to, subject, html, text, replyTo }, retries = 2) => {
 const classifyError = (statusCode, message) => {
     switch (statusCode) {
         case 401:
+            if (message && message.toLowerCase().includes('credits exceeded')) {
+                return 'Email sending limit exceeded. Please try again later or upgrade your SendGrid plan.';
+            }
             return 'Email service authentication failed. Please check the API key.';
         case 403:
             return 'Email service access denied. Verify sender authentication in SendGrid.';
