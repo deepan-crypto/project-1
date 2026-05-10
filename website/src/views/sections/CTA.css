@@ -34,12 +34,12 @@
   font-family: "Poppins", sans-serif;
   font-size: clamp(2rem, 5vw, 3.2rem);
   font-weight: 700;
-  color: #fff;
+  color: #101720;
   margin: 0 0 1rem;
   line-height: 1.15;
 }
 .cta__sub {
-  color: rgba(255,255,255,0.55);
+  color: #6C7278;
   font-size: 1rem;
   margin: 0 0 2.2rem;
   line-height: 1.6;
@@ -57,19 +57,19 @@
 .cta__input {
   flex: 1;
   min-width: 220px;
-  background: rgba(255,255,255,0.06);
-  border: 1.5px solid rgba(255,255,255,0.12);
+  background: #F8F9FA;
+  border: 1.5px solid rgba(0,0,0,0.1);
   border-radius: 50px;
   padding: 0.85rem 1.4rem;
-  color: #fff;
+  color: #101720;
   font-size: 0.95rem;
   font-family: inherit;
   outline: none;
   transition: border-color 0.2s;
 }
-.cta__input::placeholder { color: rgba(255,255,255,0.3); }
-.cta__input:focus { border-color: rgba(7,242,223,0.5); }
-.cta__input--error { border-color: rgba(255, 80, 80, 0.6); }
+.cta__input::placeholder { color: #6C7278; }
+.cta__input:focus { border-color: #458FD0; }
+.cta__input--error { border-color: rgba(255, 80, 80, 0.8); }
 
 .cta__submit { flex-shrink: 0; }
 .btn--loading { opacity: 0.7; cursor: not-allowed; }

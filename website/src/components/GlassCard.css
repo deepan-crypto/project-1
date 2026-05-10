@@ -1,6 +1,7 @@
 .glass-card {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
   border-radius: 20px;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -9,6 +10,6 @@
 
 .glass-card--hover:hover {
   transform: translateY(-4px) scale(1.01);
-  border-color: rgba(7, 242, 223, 0.35);
-  box-shadow: 0 8px 40px rgba(7, 242, 223, 0.12);
+  border-color: #458FD0;
+  box-shadow: 0 12px 40px rgba(69, 143, 208, 0.15);
 }

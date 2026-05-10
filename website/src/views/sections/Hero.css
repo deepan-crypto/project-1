@@ -6,15 +6,7 @@
   justify-content: center;
   text-align: center;
   overflow: hidden;
-  background: #0A0E17;
-}
-
-.hero__canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
+  /* background removed to show global canvas */
 }
 
 .hero__orb {
@@ -26,13 +18,13 @@
 }
 .hero__orb--1 {
   width: 520px; height: 520px;
-  background: radial-gradient(circle, rgba(7,242,223,0.12), transparent 70%);
+  background: radial-gradient(circle, rgba(7,242,223,0.15), transparent 70%);
   top: -100px; left: -80px;
   animation: orbFloat 10s ease-in-out infinite alternate;
 }
 .hero__orb--2 {
   width: 420px; height: 420px;
-  background: radial-gradient(circle, rgba(69,143,208,0.14), transparent 70%);
+  background: radial-gradient(circle, rgba(69,143,208,0.15), transparent 70%);
   bottom: -80px; right: -60px;
   animation: orbFloat 13s ease-in-out infinite alternate-reverse;
 }
@@ -75,7 +67,7 @@
 .hero__logo-glow {
   position: absolute;
   inset: -12px;
-  background: radial-gradient(circle, rgba(7,242,223,0.35) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(7,242,223,0.4) 0%, transparent 70%);
   border-radius: 50%;
   animation: logoPulse 3s ease-in-out infinite;
   z-index: 1;
@@ -96,7 +88,7 @@
 
 .hero__tagline {
   font-size: clamp(1.05rem, 2.5vw, 1.35rem);
-  color: rgba(255,255,255,0.85);
+  color: #101720;
   font-weight: 500;
   margin: 0 0 0.8rem;
   font-family: "Poppins", sans-serif;
@@ -104,7 +96,7 @@
 
 .hero__subtext {
   font-size: 0.95rem;
-  color: rgba(255,255,255,0.55);
+  color: #6C7278;
   max-width: 520px;
   margin: 0 auto 2.5rem;
   line-height: 1.7;
@@ -123,7 +115,7 @@
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  color: rgba(255,255,255,0.35);
+  color: #6C7278;
   font-size: 0.75rem;
   letter-spacing: 0.05em;
   animation: scrollBounce 2s ease-in-out infinite;
@@ -131,7 +123,7 @@
 .hero__scroll-dot {
   width: 6px; height: 6px;
   border-radius: 50%;
-  background: rgba(7,242,223,0.6);
+  background: #458FD0;
 }
 @keyframes scrollBounce {
   0%,100% { transform: translateY(0); }

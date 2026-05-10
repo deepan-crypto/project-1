@@ -4,8 +4,8 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 body {
-  background: #0A0E17;
-  color: #fff;
+  background: #FFFFFF;
+  color: #101720;
   font-family: "Inter", sans-serif;
   font-size: 16px;
   line-height: 1.6;
@@ -26,19 +26,19 @@ body {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #07F2DF;
+  color: #458FD0;
   margin-bottom: 0.8rem;
 }
 .section__title {
   font-family: "Poppins", sans-serif;
   font-size: clamp(2rem, 5vw, 3rem);
   font-weight: 700;
-  color: #fff;
+  color: #101720;
   line-height: 1.15;
   margin-bottom: 0.9rem;
 }
 .section__sub {
-  color: rgba(255,255,255,0.55);
+  color: #6C7278;
   font-size: 1.02rem;
   max-width: 520px;
   line-height: 1.7;
@@ -63,7 +63,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.18) 50%, transparent 70%);
+  background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.3) 50%, transparent 70%);
   transform: translateX(-100%);
   transition: transform 0.45s ease;
 }
@@ -71,22 +71,22 @@ body {
 
 .btn--gradient {
   background: linear-gradient(135deg, #07F2DF, #458FD0);
-  color: #0A0E17;
+  color: #FFFFFF;
 }
 .btn--gradient:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(7,242,223,0.35); }
 
 .btn--glass {
-  background: rgba(255,255,255,0.06);
-  border: 1.5px solid rgba(255,255,255,0.15);
-  color: #fff;
+  background: #F8F9FA;
+  border: 1.5px solid rgba(0,0,0,0.1);
+  color: #101720;
   backdrop-filter: blur(8px);
 }
-.btn--glass:hover { transform: translateY(-2px); border-color: rgba(7,242,223,0.4); box-shadow: 0 6px 22px rgba(7,242,223,0.15); }
+.btn--glass:hover { transform: translateY(-2px); border-color: #458FD0; box-shadow: 0 6px 22px rgba(69,143,208,0.15); }
 
 .btn--lg { padding: 0.9rem 2rem; font-size: 1rem; }
 .btn--sm { padding: 0.55rem 1.2rem; font-size: 0.85rem; }
 
 /* ── Scrollbar ──────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 6px; }
-::-webkit-scrollbar-track { background: #0A0E17; }
-::-webkit-scrollbar-thumb { background: rgba(7,242,223,0.3); border-radius: 6px; }
+::-webkit-scrollbar-track { background: #FFFFFF; }
+::-webkit-scrollbar-thumb { background: rgba(69,143,208,0.3); border-radius: 6px; }

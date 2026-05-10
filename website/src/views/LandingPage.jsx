@@ -1,5 +1,6 @@
 import React from "react";
 import Navbar from "../components/Navbar";
+import NeuralCanvas from "../components/NeuralCanvas";
 import Hero from "./sections/Hero";
 import HowItWorks from "./sections/HowItWorks";
 import Features from "./sections/Features";
@@ -11,6 +12,7 @@ import Footer from "./sections/Footer";
 export default function LandingPage() {
   return (
     <>
+      <NeuralCanvas />
       <Navbar />
       <main>
         <Hero />
