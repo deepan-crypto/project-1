@@ -44,7 +44,7 @@ const initSES = async () => {
 
     // ── Verify connectivity (non-blocking — log only) ───────────────────────
     try {
-        const command = new GetAccountCommand({});
+        const command = new GetSendQuotaCommand({});
         await sesClient.send(command);
         console.log('✅ AWS SES initialized successfully');
         console.log(`   Region: ${region}`);
