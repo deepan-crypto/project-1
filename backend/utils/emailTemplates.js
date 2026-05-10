@@ -1,13 +1,16 @@
 /**
  * Professional Email Templates
  * Centralized email template system for all application emails
+ * Brand: Thoughts (thoughts.co.in)
  */
+
+const APP_NAME = process.env.APP_NAME || 'Thoughts';
 
 /**
  * Base email template wrapper
  * Provides consistent styling across all emails
  */
-const baseEmailTemplate = (content, appName = 'Polling App') => {
+const baseEmailTemplate = (content, appName = APP_NAME) => {
     return `
     <!DOCTYPE html>
     <html lang="en">
@@ -25,7 +28,7 @@ const baseEmailTemplate = (content, appName = 'Polling App') => {
               <tr>
                 <td style="background: linear-gradient(135deg, #45BFD0 0%, #2B9EB3 100%); padding: 40px 40px 30px; text-align: center;">
                   <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 700; letter-spacing: -0.5px;">
-                    🗳️ ${appName}
+                    💭 ${appName}
                   </h1>
                 </td>
               </tr>
@@ -118,6 +121,63 @@ const alertBox = (message, type = 'info') => {
   `;
 };
 
+// ─── Email Templates ─────────────────────────────────────────────────────────
+
+/**
+ * OTP Verification Email Template
+ */
+const otpEmailTemplate = (otp, expiryMinutes = 10) => {
+    const content = `
+    <h2 style="margin: 0 0 20px; color: #212529; font-size: 24px; font-weight: 600;">
+      Your Verification Code
+    </h2>
+    
+    <p style="margin: 0 0 20px; color: #495057; font-size: 16px; line-height: 1.6;">
+      Hi there! 👋
+    </p>
+    
+    <p style="margin: 0 0 25px; color: #495057; font-size: 16px; line-height: 1.6;">
+      Use the following code to complete your verification. Do not share this code with anyone.
+    </p>
+    
+    <!-- OTP Code Block -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 30px 0;">
+      <tr>
+        <td align="center">
+          <div style="background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); 
+                      border: 2px dashed #45BFD0; 
+                      border-radius: 12px; 
+                      padding: 25px 40px; 
+                      display: inline-block;">
+            <span style="font-size: 36px; 
+                         font-weight: 700; 
+                         letter-spacing: 12px; 
+                         color: #212529; 
+                         font-family: 'Courier New', monospace;">
+              ${otp}
+            </span>
+          </div>
+        </td>
+      </tr>
+    </table>
+    
+    ${alertBox(`⏰ This code will expire in <strong>${expiryMinutes} minute${expiryMinutes > 1 ? 's' : ''}</strong>.`, 'warning')}
+    
+    <div style="margin-top: 30px; padding-top: 30px; border-top: 1px solid #dee2e6;">
+      <p style="margin: 0 0 10px; color: #6c757d; font-size: 13px; line-height: 1.6;">
+        <strong>Security Tips:</strong>
+      </p>
+      <ul style="margin: 0; padding-left: 20px; color: #6c757d; font-size: 13px; line-height: 1.8;">
+        <li>Never share your verification code with anyone</li>
+        <li>Our team will never ask you for this code</li>
+        <li>If you didn't request this code, you can safely ignore this email</li>
+      </ul>
+    </div>
+  `;
+
+    return baseEmailTemplate(content);
+};
+
 /**
  * Password Reset Email Template
  */
@@ -161,9 +221,10 @@ const passwordResetTemplate = (resetUrl, expiryHours = 1) => {
  * Welcome Email Template
  */
 const welcomeEmailTemplate = (userName, appUrl = '') => {
+    const appName = process.env.APP_NAME || 'Thoughts';
     const content = `
     <h2 style="margin: 0 0 20px; color: #212529; font-size: 24px; font-weight: 600;">
-      Welcome to Polling App! 🎉
+      Welcome to ${appName}! 🎉
     </h2>
     
     <p style="margin: 0 0 20px; color: #495057; font-size: 16px; line-height: 1.6;">
@@ -317,12 +378,60 @@ const loginNotificationTemplate = (userName, location, device) => {
     return baseEmailTemplate(content);
 };
 
+/**
+ * Contact Form Submission Email Template (for admin)
+ */
+const contactFormTemplate = (name, email, subject, message) => {
+    const content = `
+    <h2 style="margin: 0 0 20px; color: #212529; font-size: 24px; font-weight: 600;">
+      📬 New Contact Form Submission
+    </h2>
+    
+    <div style="background-color: #f8f9fa; border-radius: 8px; padding: 24px; margin: 20px 0;">
+      <table style="width: 100%; color: #495057; font-size: 14px; border-collapse: collapse;">
+        <tr>
+          <td style="padding: 10px 0; border-bottom: 1px solid #dee2e6; font-weight: 600; width: 100px; vertical-align: top;">From:</td>
+          <td style="padding: 10px 0; border-bottom: 1px solid #dee2e6;">${name}</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 0; border-bottom: 1px solid #dee2e6; font-weight: 600; vertical-align: top;">Email:</td>
+          <td style="padding: 10px 0; border-bottom: 1px solid #dee2e6;">
+            <a href="mailto:${email}" style="color: #45BFD0; text-decoration: none;">${email}</a>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 0; border-bottom: 1px solid #dee2e6; font-weight: 600; vertical-align: top;">Subject:</td>
+          <td style="padding: 10px 0; border-bottom: 1px solid #dee2e6;">${subject}</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px 0; font-weight: 600; vertical-align: top;">Message:</td>
+          <td style="padding: 10px 0;">
+            <div style="background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 6px; padding: 16px; line-height: 1.6; white-space: pre-wrap;">
+              ${message}
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    ${alertBox(`<strong>Reply directly</strong> to this email to respond to ${name}.`, 'info')}
+    
+    <p style="margin: 20px 0 0; color: #adb5bd; font-size: 12px;">
+      Submitted at: ${new Date().toLocaleString()} (Server Time)
+    </p>
+  `;
+
+    return baseEmailTemplate(content);
+};
+
 module.exports = {
+    otpEmailTemplate,
     passwordResetTemplate,
     welcomeEmailTemplate,
     verificationEmailTemplate,
     passwordChangedTemplate,
     loginNotificationTemplate,
+    contactFormTemplate,
     baseEmailTemplate,
     buttonTemplate,
     alertBox,

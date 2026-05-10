@@ -1,207 +1,226 @@
-const { google } = require('googleapis');
+const { sgMail, getSender } = require('../config/sendgridConfig');
 
 /**
- * Gmail OAuth2 Email Service
- * Sends emails using Gmail API with OAuth2 authentication
+ * SendGrid Email Service
+ * Production-grade email sending with retry logic, error classification, and structured logging
  */
 
-// OAuth2 Client Configuration
-const createOAuth2Client = () => {
-  const OAuth2 = google.auth.OAuth2;
-
-  const oauth2Client = new OAuth2(
-    process.env.GMAIL_CLIENT_ID,
-    process.env.GMAIL_CLIENT_SECRET,
-    'https://developers.google.com/oauthplayground' // Redirect URI used to get tokens
-  );
-
-  // Set credentials with refresh token
-  oauth2Client.setCredentials({
-    refresh_token: process.env.GMAIL_REFRESH_TOKEN,
-  });
-
-  return oauth2Client;
-};
+// ─── Base Send Function ──────────────────────────────────────────────────────
 
 /**
- * Create email in RFC 2822 format
+ * Send an email via SendGrid with retry logic
+ * @param {Object} options
+ * @param {string} options.to - Recipient email
+ * @param {string} options.subject - Email subject
+ * @param {string} options.html - HTML content
+ * @param {string} [options.text] - Plain text fallback
+ * @param {Object} [options.replyTo] - Reply-to address
+ * @param {number} [retries=2] - Number of retries on transient failures
+ * @returns {Promise<Object>} Result with success status and message ID
  */
-const createEmailMessage = (to, subject, htmlContent) => {
-  const from = process.env.GMAIL_USER || 'noreply@pollingapp.com';
-  const appName = process.env.APP_NAME || 'Polling App';
+const sendEmail = async ({ to, subject, html, text, replyTo }, retries = 2) => {
+    const sender = getSender();
 
-  const email = [
-    `From: "${appName}" <${from}>`,
-    `To: ${to}`,
-    `Subject: ${subject}`,
-    'MIME-Version: 1.0',
-    'Content-Type: text/html; charset=utf-8',
-    '',
-    htmlContent,
-  ].join('\n');
-
-  // Encode in base64url format
-  const encodedMessage = Buffer.from(email)
-    .toString('base64')
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
-
-  return encodedMessage;
-};
-
-/**
- * Send password reset email via Gmail API
- * @param {string} email - Recipient email address
- * @param {string} resetToken - Password reset token
- * @returns {Promise<Object>} Result object with success status
- */
-const sendPasswordResetEmail = async (email, resetToken) => {
-  try {
-    const { passwordResetTemplate } = require('./emailTemplates');
-
-    // Create OAuth2 client
-    const oauth2Client = createOAuth2Client();
-
-    // Create Gmail API instance
-    const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
-
-    // Construct reset URL
-    const resetUrl = `${process.env.FRONTEND_URL || 'myapp://auth'}/reset-password?token=${resetToken}`;
-
-    // Use professional email template
-    const htmlContent = passwordResetTemplate(resetUrl, 1); // 1 hour expiry
-
-    // Create RFC 2822 formatted email
-    const encodedMessage = createEmailMessage(
-      email,
-      `Password Reset Request - ${process.env.APP_NAME || 'Polling App'}`,
-      htmlContent
-    );
-
-    // Send email via Gmail API
-    const response = await gmail.users.messages.send({
-      userId: 'me',
-      requestBody: {
-        raw: encodedMessage,
-      },
-    });
-
-    console.log('Password reset email sent successfully via Gmail API:', response.data.id);
-    return {
-      success: true,
-      messageId: response.data.id,
+    const msg = {
+        to,
+        from: {
+            email: sender.email,
+            name: sender.name,
+        },
+        subject,
+        html,
+        ...(text && { text }),
+        ...(replyTo && { replyTo }),
     };
-  } catch (error) {
-    console.error('Failed to send password reset email via Gmail API:', error);
 
-    // Handle specific Gmail API errors
-    if (error.code === 401 || error.code === 403) {
-      return {
-        success: false,
-        error: 'Gmail authentication failed. Please check OAuth2 credentials and refresh token.',
-      };
-    } else if (error.message?.includes('invalid_grant') || error.message?.includes('invalid_client')) {
-      return {
-        success: false,
-        error: 'Gmail refresh token expired or invalid. Please regenerate the refresh token using OAuth Playground.',
-      };
+    for (let attempt = 1; attempt <= retries + 1; attempt++) {
+        try {
+            const [response] = await sgMail.send(msg);
+
+            console.log(`✅ Email sent successfully`);
+            console.log(`   To: ${to}`);
+            console.log(`   Subject: ${subject}`);
+            console.log(`   Status: ${response.statusCode}`);
+            console.log(`   Message-ID: ${response.headers['x-message-id'] || 'N/A'}`);
+
+            return {
+                success: true,
+                statusCode: response.statusCode,
+                messageId: response.headers['x-message-id'] || null,
+            };
+        } catch (error) {
+            const statusCode = error.code || error.response?.statusCode;
+            const errorBody = error.response?.body;
+
+            console.error(`❌ Email send attempt ${attempt}/${retries + 1} failed`);
+            console.error(`   To: ${to}`);
+            console.error(`   Subject: ${subject}`);
+            console.error(`   Status: ${statusCode}`);
+            console.error(`   Error: ${error.message}`);
+
+            if (errorBody?.errors) {
+                errorBody.errors.forEach((e, i) => {
+                    console.error(`   Error[${i}]: ${e.message} (field: ${e.field})`);
+                });
+            }
+
+            // Don't retry on client errors (4xx) — they won't succeed on retry
+            if (statusCode && statusCode >= 400 && statusCode < 500) {
+                return {
+                    success: false,
+                    statusCode,
+                    error: classifyError(statusCode, error.message),
+                };
+            }
+
+            // Retry on server errors (5xx) or network errors
+            if (attempt <= retries) {
+                const delay = Math.pow(2, attempt) * 500; // Exponential backoff: 1s, 2s
+                console.log(`   Retrying in ${delay}ms...`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        }
     }
 
     return {
-      success: false,
-      error: error.message || 'Failed to send email',
+        success: false,
+        error: 'Failed to send email after all retries. Please try again later.',
     };
-  }
+};
+
+/**
+ * Classify SendGrid errors into user-friendly messages
+ */
+const classifyError = (statusCode, message) => {
+    switch (statusCode) {
+        case 401:
+            return 'Email service authentication failed. Please check the API key.';
+        case 403:
+            return 'Email service access denied. Verify sender authentication in SendGrid.';
+        case 413:
+            return 'Email content is too large.';
+        case 429:
+            return 'Email rate limit exceeded. Please try again later.';
+        default:
+            return message || 'Failed to send email.';
+    }
+};
+
+// ─── Email Sending Functions ─────────────────────────────────────────────────
+
+/**
+ * Send OTP verification email
+ * @param {string} email - Recipient email address
+ * @param {string} otp - The OTP code
+ * @param {number} [expiryMinutes=10] - OTP expiry in minutes
+ * @returns {Promise<Object>}
+ */
+const sendOtpEmail = async (email, otp, expiryMinutes = 10) => {
+    const { otpEmailTemplate } = require('./emailTemplates');
+
+    const html = otpEmailTemplate(otp, expiryMinutes);
+    const appName = process.env.APP_NAME || 'Thoughts';
+
+    return sendEmail({
+        to: email,
+        subject: `${otp} is your ${appName} verification code`,
+        html,
+        text: `Your verification code is: ${otp}. It expires in ${expiryMinutes} minutes. Do not share this code with anyone.`,
+    });
+};
+
+/**
+ * Send password reset email
+ * @param {string} email - Recipient email address
+ * @param {string} resetToken - Password reset token
+ * @returns {Promise<Object>}
+ */
+const sendPasswordResetEmail = async (email, resetToken) => {
+    const { passwordResetTemplate } = require('./emailTemplates');
+
+    const resetUrl = `${process.env.FRONTEND_URL || 'myapp://auth'}/reset-password?token=${resetToken}`;
+    const html = passwordResetTemplate(resetUrl, 1); // 1 hour expiry
+    const appName = process.env.APP_NAME || 'Thoughts';
+
+    return sendEmail({
+        to: email,
+        subject: `Password Reset Request - ${appName}`,
+        html,
+        text: `You requested a password reset. Use this link to reset your password: ${resetUrl}. This link expires in 1 hour.`,
+    });
 };
 
 /**
  * Send welcome email to new users
  * @param {string} email - Recipient email address
- * @param {string} userName - User's name
- * @returns {Promise<Object>} Result object with success status
+ * @param {string} userName - User's display name
+ * @returns {Promise<Object>}
  */
 const sendWelcomeEmail = async (email, userName) => {
-  try {
     const { welcomeEmailTemplate } = require('./emailTemplates');
 
-    const oauth2Client = createOAuth2Client();
-    const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
-
     const appUrl = process.env.FRONTEND_URL || 'myapp://';
-    const htmlContent = welcomeEmailTemplate(userName, appUrl);
+    const html = welcomeEmailTemplate(userName, appUrl);
+    const appName = process.env.APP_NAME || 'Thoughts';
 
-    const encodedMessage = createEmailMessage(
-      email,
-      `Welcome to ${process.env.APP_NAME || 'Polling App'}! 🎉`,
-      htmlContent
-    );
-
-    const response = await gmail.users.messages.send({
-      userId: 'me',
-      requestBody: {
-        raw: encodedMessage,
-      },
+    return sendEmail({
+        to: email,
+        subject: `Welcome to ${appName}! 🎉`,
+        html,
+        text: `Welcome to ${appName}, ${userName}! Your account has been created successfully.`,
     });
-
-    console.log('Welcome email sent successfully:', response.data.id);
-    return {
-      success: true,
-      messageId: response.data.id,
-    };
-  } catch (error) {
-    console.error('Failed to send welcome email:', error);
-    return {
-      success: false,
-      error: error.message || 'Failed to send email',
-    };
-  }
 };
 
 /**
  * Send password changed confirmation email
  * @param {string} email - Recipient email address
- * @param {string} userName - User's name
- * @returns {Promise<Object>} Result object with success status
+ * @param {string} userName - User's display name
+ * @returns {Promise<Object>}
  */
 const sendPasswordChangedEmail = async (email, userName) => {
-  try {
     const { passwordChangedTemplate } = require('./emailTemplates');
 
-    const oauth2Client = createOAuth2Client();
-    const gmail = google.gmail({ version: 'v1', auth: oauth2Client });
+    const html = passwordChangedTemplate(userName);
+    const appName = process.env.APP_NAME || 'Thoughts';
 
-    const htmlContent = passwordChangedTemplate(userName);
-
-    const encodedMessage = createEmailMessage(
-      email,
-      `Password Changed - ${process.env.APP_NAME || 'Polling App'}`,
-      htmlContent
-    );
-
-    const response = await gmail.users.messages.send({
-      userId: 'me',
-      requestBody: {
-        raw: encodedMessage,
-      },
+    return sendEmail({
+        to: email,
+        subject: `Password Changed - ${appName}`,
+        html,
+        text: `Hi ${userName}, your password has been changed successfully. If you didn't do this, please contact support immediately.`,
     });
+};
 
-    console.log('Password changed email sent successfully:', response.data.id);
-    return {
-      success: true,
-      messageId: response.data.id,
-    };
-  } catch (error) {
-    console.error('Failed to send password changed email:', error);
-    return {
-      success: false,
-      error: error.message || 'Failed to send email',
-    };
-  }
+/**
+ * Send contact form email to admin
+ * @param {Object} formData
+ * @param {string} formData.name - Sender name
+ * @param {string} formData.email - Sender email
+ * @param {string} formData.subject - Message subject
+ * @param {string} formData.message - Message body
+ * @returns {Promise<Object>}
+ */
+const sendContactFormEmail = async ({ name, email, subject, message }) => {
+    const { contactFormTemplate } = require('./emailTemplates');
+
+    const adminEmail = process.env.CONTACT_FORM_TO_EMAIL || 'support@thoughts.co.in';
+    const html = contactFormTemplate(name, email, subject, message);
+    const appName = process.env.APP_NAME || 'Thoughts';
+
+    return sendEmail({
+        to: adminEmail,
+        subject: `[${appName} Contact] ${subject}`,
+        html,
+        text: `Contact form submission from ${name} (${email}):\n\nSubject: ${subject}\n\n${message}`,
+        replyTo: { email, name },
+    });
 };
 
 module.exports = {
-  sendPasswordResetEmail,
-  sendWelcomeEmail,
-  sendPasswordChangedEmail,
+    sendEmail,
+    sendOtpEmail,
+    sendPasswordResetEmail,
+    sendWelcomeEmail,
+    sendPasswordChangedEmail,
+    sendContactFormEmail,
 };
