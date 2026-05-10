@@ -49,7 +49,7 @@ const sendOtp = async (req, res, next) => {
             expiresAt: new Date(Date.now() + expiryMinutes * 60 * 1000),
         });
 
-        // Send OTP email via SendGrid
+        // Send OTP email via AWS SES
         const emailResult = await sendOtpEmail(email, otpCode, expiryMinutes);
 
         if (!emailResult.success) {
