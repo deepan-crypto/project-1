@@ -81,6 +81,16 @@ export default function PollCard({
     setIsLiked(initialIsLiked);
   }, [initialOptions, initialHasVoted, initialLikes, initialIsLiked]);
 
+  const getProfileImageUrl = (avatar: string) => {
+    if (!avatar) {
+      return 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200';
+    }
+    if (avatar.startsWith('http')) {
+      return `${avatar}?t=${Date.now()}`;
+    }
+    return `${API_BASE_URL.replace('/api', '')}${avatar}?t=${Date.now()}`;
+  };
+
   const handleVote = async (optionIndex: number) => {
     // Prevent voting if user has already voted
     if (hasVoted) {
@@ -212,7 +222,7 @@ export default function PollCard({
     <View style={styles.card}>
       {/* Header with user info */}
       <View style={styles.header}>
-        <Image source={{ uri: user.avatar }} style={styles.avatar} />
+        <Image source={{ uri: getProfileImageUrl(user.avatar) }} style={styles.avatar} />
         <View style={styles.userInfo}>
           <View style={styles.userHeader}>
             <TouchableOpacity onPress={handleUserPress} disabled={!user.username}>
