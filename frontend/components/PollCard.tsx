@@ -86,7 +86,8 @@ export default function PollCard({
       return 'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=200';
     }
     if (avatar.startsWith('http')) {
-      return `${avatar}?t=${Date.now()}`;
+      const separator = avatar.includes('?') ? '&' : '?';
+      return `${avatar}${separator}t=${Date.now()}`;
     }
     return `${API_BASE_URL.replace('/api', '')}${avatar}?t=${Date.now()}`;
   };

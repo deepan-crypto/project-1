@@ -110,7 +110,7 @@ export default function EditProfileScreen() {
             // Add image if selected
             if (profileImage) {
                 const filename = profileImage.split('/').pop() || 'profile.jpg';
-                const match = /\.(\\w+)$/.exec(filename);
+                const match = /\.(\w+)$/.exec(filename);
                 const type = match ? `image/${match[1]}` : 'image/jpeg';
 
                 formData.append('profilePicture', {
