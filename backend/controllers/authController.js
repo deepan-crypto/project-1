@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const { sendPasswordResetEmail } = require('../utils/emailService');
+const { sendPasswordResetEmail, sendWelcomeEmail } = require('../utils/emailService');
 
 // @desc    Register a new user
 // @route   POST /api/auth/signup
@@ -67,6 +67,17 @@ const signup = async (req, res, next) => {
 
         // Generate token
         const token = user.generateAuthToken();
+
+        // Send welcome email (non-blocking — don't delay signup response)
+        sendWelcomeEmail(user.email, user.fullName || user.username)
+            .then(result => {
+                if (result.success) {
+                    console.log('Welcome email sent to:', user.email);
+                } else {
+                    console.error('Failed to send welcome email:', result.error);
+                }
+            })
+            .catch(err => console.error('Error sending welcome email:', err));
 
         res.status(201).json({
             success: true,
