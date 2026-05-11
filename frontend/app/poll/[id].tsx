@@ -105,7 +105,7 @@ export default function PollDetailScreen() {
         try {
             const pollUrl = `${API_BASE_URL.replace('/api', '')}/poll/${id}`;
             await Share.share({
-                message: `Check out this poll: "${poll?.question}"\n\n${pollUrl}`,
+                message: pollUrl,
                 url: pollUrl,
                 title: 'Share Poll',
             });

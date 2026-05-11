@@ -162,6 +162,96 @@ app.get('/', (req, res) => {
     });
 });
 
+// Deep link redirect for shared polls
+// When someone clicks a shared poll link, this page opens the poll in the app
+app.get('/poll/:pollId', async (req, res) => {
+    const { pollId } = req.params;
+    const deepLink = `myapp://poll/${pollId}`;
+
+    // Try to fetch the poll question for a nicer preview
+    let pollQuestion = 'Check out this poll on Thoughts!';
+    try {
+        const Poll = require('./models/Poll');
+        const poll = await Poll.findById(pollId);
+        if (poll) {
+            pollQuestion = poll.question;
+        }
+    } catch (err) {
+        // Ignore - use default question
+    }
+
+    res.send(`<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thoughts - ${pollQuestion}</title>
+    <meta property="og:title" content="Vote on Thoughts">
+    <meta property="og:description" content="${pollQuestion}">
+    <meta property="og:type" content="website">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: white; border-radius: 16px; padding: 32px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.1); }
+        .logo { font-size: 28px; font-weight: 700; color: #458FD0; margin-bottom: 16px; }
+        .question { font-size: 18px; color: #101720; margin-bottom: 24px; line-height: 1.5; }
+        .btn { display: inline-block; background: #458FD0; color: white; padding: 14px 32px; border-radius: 12px; text-decoration: none; font-size: 16px; font-weight: 600; }
+        .sub { margin-top: 16px; font-size: 13px; color: #687684; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="logo">Thoughts</div>
+        <p class="question">${pollQuestion}</p>
+        <a href="${deepLink}" class="btn">Open in App</a>
+        <p class="sub">Opening Thoughts app...</p>
+    </div>
+    <script>
+        // Try to open the app automatically
+        window.location.href = "${deepLink}";
+    </script>
+</body>
+</html>`);
+});
+
+// Deep link redirect for shared profiles
+app.get('/profile/:username', (req, res) => {
+    const { username } = req.params;
+    const deepLink = `myapp://profile/${username}`;
+
+    res.send(`<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thoughts - @${username}</title>
+    <meta property="og:title" content="@${username} on Thoughts">
+    <meta property="og:description" content="Check out @${username}'s profile on Thoughts!">
+    <meta property="og:type" content="profile">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: white; border-radius: 16px; padding: 32px; max-width: 400px; width: 90%; text-align: center; box-shadow: 0 4px 24px rgba(0,0,0,0.1); }
+        .logo { font-size: 28px; font-weight: 700; color: #458FD0; margin-bottom: 16px; }
+        .question { font-size: 18px; color: #101720; margin-bottom: 24px; line-height: 1.5; }
+        .btn { display: inline-block; background: #458FD0; color: white; padding: 14px 32px; border-radius: 12px; text-decoration: none; font-size: 16px; font-weight: 600; }
+        .sub { margin-top: 16px; font-size: 13px; color: #687684; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="logo">Thoughts</div>
+        <p class="question">Check out @${username}'s profile</p>
+        <a href="${deepLink}" class="btn">Open in App</a>
+        <p class="sub">Opening Thoughts app...</p>
+    </div>
+    <script>
+        window.location.href = "${deepLink}";
+    </script>
+</body>
+</html>`);
+});
+
 // 404 handler
 app.use((req, res) => {
     res.status(404).json({

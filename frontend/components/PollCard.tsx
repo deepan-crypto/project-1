@@ -140,7 +140,7 @@ export default function PollCard({
     try {
       const pollUrl = `${API_BASE_URL.replace('/api', '')}/poll/${id}`;
       const result = await Share.share({
-        message: `Check out this poll: "${question}"\n\nVote now: ${pollUrl}`,
+        message: pollUrl,
         url: pollUrl,
         title: 'Share Poll',
       });

@@ -223,7 +223,7 @@ export default function ProfileScreen() {
     try {
       const profileUrl = `${API_BASE_URL.replace('/api', '')}/profile/${user?.username || 'user'}`;
       await Share.share({
-        message: `Check out my profile on Thoughts!\n\n${profileUrl}`,
+        message: profileUrl,
         url: profileUrl,
         title: 'Share Profile',
       });
@@ -380,7 +380,7 @@ export default function ProfileScreen() {
     try {
       const pollUrl = `${API_BASE_URL.replace('/api', '')}/poll/${pollId}`;
       await Share.share({
-        message: `Check out this poll: "${question}"\n\n${pollUrl}`,
+        message: pollUrl,
         url: pollUrl,
         title: 'Share Poll',
       });
