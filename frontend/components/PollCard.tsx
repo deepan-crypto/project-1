@@ -138,9 +138,10 @@ export default function PollCard({
   const handleShare = async () => {
     if (!id) return;
     try {
-      const pollUrl = `myapp://poll/${id}`;
+      const pollUrl = `${API_BASE_URL.replace('/api', '')}/poll/${id}`;
       const result = await Share.share({
         message: `Check out this poll: "${question}"\n\nVote now: ${pollUrl}`,
+        url: pollUrl,
         title: 'Share Poll',
       });
 

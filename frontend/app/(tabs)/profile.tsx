@@ -221,11 +221,11 @@ export default function ProfileScreen() {
 
   const handleShareProfile = async () => {
     try {
-      const profileUrl = `myapp://profile/${user?.username || 'user'}`;
+      const profileUrl = `${API_BASE_URL.replace('/api', '')}/profile/${user?.username || 'user'}`;
       await Share.share({
-        message: `Check out my profile on the app!\n\n${profileUrl}`,
+        message: `Check out my profile on Thoughts!\n\n${profileUrl}`,
+        url: profileUrl,
         title: 'Share Profile',
-        url: profileUrl, // iOS uses this
       });
     } catch (error) {
       Alert.alert('Error', 'Unable to share profile');
@@ -378,9 +378,10 @@ export default function ProfileScreen() {
   // Handle share poll
   const handleSharePoll = async (pollId: string, question: string) => {
     try {
-      const pollUrl = `myapp://poll/${pollId}`;
+      const pollUrl = `${API_BASE_URL.replace('/api', '')}/poll/${pollId}`;
       await Share.share({
         message: `Check out this poll: "${question}"\n\n${pollUrl}`,
+        url: pollUrl,
         title: 'Share Poll',
       });
     } catch (error) {

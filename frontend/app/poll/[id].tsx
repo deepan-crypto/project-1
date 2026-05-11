@@ -103,9 +103,10 @@ export default function PollDetailScreen() {
 
     const handleShare = async () => {
         try {
-            const pollUrl = `myapp://poll/${id}`;
+            const pollUrl = `${API_BASE_URL.replace('/api', '')}/poll/${id}`;
             await Share.share({
                 message: `Check out this poll: "${poll?.question}"\n\n${pollUrl}`,
+                url: pollUrl,
                 title: 'Share Poll',
             });
         } catch (error) {
