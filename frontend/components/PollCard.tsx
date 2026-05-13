@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, Share, Modal, T
 import { Heart, Trash2, MoreVertical, Flag, X } from 'lucide-react-native';
 import SendIcon from './SendIcon';
 import { router } from 'expo-router';
-import API_BASE_URL from '@/config/api';
+import API_BASE_URL, { SHARE_BASE_URL } from '@/config/api';
 
 interface PollOption {
   id: string | number;
@@ -138,9 +138,10 @@ export default function PollCard({
   const handleShare = async () => {
     if (!id) return;
     try {
-      const pollUrl = `${API_BASE_URL.replace('/api', '')}/poll/${id}`;
+      const pollUrl = `${SHARE_BASE_URL}/poll/${id}`;
+      const shareMessage = `Check out this poll: "${question}"\n\nVote now: ${pollUrl}`;
       const result = await Share.share({
-        message: pollUrl,
+        message: shareMessage,
         url: pollUrl,
         title: 'Share Poll',
       });

@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { ArrowLeft, Heart, Share2 } from 'lucide-react-native';
-import API_BASE_URL from '@/config/api';
+import API_BASE_URL, { SHARE_BASE_URL } from '@/config/api';
 import { authStorage } from '@/utils/authStorage';
 
 interface PollOption {
@@ -103,9 +103,10 @@ export default function PollDetailScreen() {
 
     const handleShare = async () => {
         try {
-            const pollUrl = `${API_BASE_URL.replace('/api', '')}/poll/${id}`;
+            const pollUrl = `${SHARE_BASE_URL}/poll/${id}`;
+            const shareMessage = `Check out this poll: "${poll?.question || ''}"\n\nVote now: ${pollUrl}`;
             await Share.share({
-                message: pollUrl,
+                message: shareMessage,
                 url: pollUrl,
                 title: 'Share Poll',
             });

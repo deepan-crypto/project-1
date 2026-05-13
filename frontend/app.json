@@ -12,12 +12,31 @@
       },
       "permissions": [
         "NOTIFICATIONS"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "thoughts.co.in",
+              "pathPrefix": "/poll"
+            },
+            {
+              "scheme": "https",
+              "host": "thoughts.co.in",
+              "pathPrefix": "/profile"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
       ]
     },
 
     "orientation": "portrait",
     "icon": "./assets/images/ican.png",
-    "scheme": "myapp",
+    "scheme": "thoughts",
 
     "splash": {
       "image": "./assets/images/ican.png",

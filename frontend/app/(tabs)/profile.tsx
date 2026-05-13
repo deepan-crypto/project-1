@@ -15,7 +15,7 @@ import { router, useFocusEffect } from 'expo-router';
 import { Heart, ArrowRight, Trash2, Settings } from 'lucide-react-native';
 import SendIcon from '@/components/SendIcon';
 import { authStorage } from '@/utils/authStorage';
-import API_BASE_URL from '@/config/api';
+import API_BASE_URL, { SHARE_BASE_URL } from '@/config/api';
 import { getProfileImageUrl as getProfileImage } from '@/utils/profileImageUtils';
 
 interface UserPoll {
@@ -221,9 +221,10 @@ export default function ProfileScreen() {
 
   const handleShareProfile = async () => {
     try {
-      const profileUrl = `${API_BASE_URL.replace('/api', '')}/profile/${user?.username || 'user'}`;
+      const profileUrl = `${SHARE_BASE_URL}/profile/${user?.username || 'user'}`;
+      const shareMessage = `Check out ${user?.fullName || 'this user'}'s profile on Thoughts!\n\n${profileUrl}`;
       await Share.share({
-        message: profileUrl,
+        message: shareMessage,
         url: profileUrl,
         title: 'Share Profile',
       });
@@ -378,9 +379,10 @@ export default function ProfileScreen() {
   // Handle share poll
   const handleSharePoll = async (pollId: string, question: string) => {
     try {
-      const pollUrl = `${API_BASE_URL.replace('/api', '')}/poll/${pollId}`;
+      const pollUrl = `${SHARE_BASE_URL}/poll/${pollId}`;
+      const shareMessage = `Check out this poll: "${question}"\n\nVote now: ${pollUrl}`;
       await Share.share({
-        message: pollUrl,
+        message: shareMessage,
         url: pollUrl,
         title: 'Share Poll',
       });
