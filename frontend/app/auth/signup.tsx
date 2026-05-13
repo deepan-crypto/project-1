@@ -304,6 +304,16 @@ export default function SignUpScreen() {
                   </>
                 )}
               </TouchableOpacity> */}
+
+              <View style={styles.legalLinksContainer}>
+                <TouchableOpacity onPress={() => router.push('/privacy-policy')}>
+                  <Text style={styles.legalLink}>Privacy Policy</Text>
+                </TouchableOpacity>
+                <Text style={styles.legalSeparator}>•</Text>
+                <TouchableOpacity onPress={() => router.push('/terms')}>
+                  <Text style={styles.legalLink}>Terms of Use</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           </View>
         </ScrollView>
@@ -573,5 +583,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     fontFamily: 'Roboto',
+  },
+  legalLinksContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+  },
+  legalLink: {
+    fontSize: 13,
+    color: '#45BFD0',
+    fontWeight: '500',
+  },
+  legalSeparator: {
+    fontSize: 13,
+    color: '#999',
+    marginHorizontal: 8,
   },
 });

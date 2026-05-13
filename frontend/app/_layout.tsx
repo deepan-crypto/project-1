@@ -46,6 +46,8 @@ export default function RootLayout() {
         <Stack.Screen name="auth/reset-password-sent" />
         <Stack.Screen name="auth/reset-password" />
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="privacy-policy" />
+        <Stack.Screen name="terms" />
         <Stack.Screen name="edit-profile" options={{ presentation: 'modal' }} />
         <Stack.Screen name="+not-found" />
       </Stack>
