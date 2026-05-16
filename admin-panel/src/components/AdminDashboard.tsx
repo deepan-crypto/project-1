@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useAdmin } from '../context/AdminContext';
 import { pollReportsAPI, userAPI, ReportedPoll, User } from '../lib/api';
 import { getProfileImageUrl } from '../lib/imageUtils';
-import { LogOut, AlertTriangle, FileText, Trash2, CheckCircle, Users, ChevronDown, ChevronUp, List, Search, Calendar } from 'lucide-react';
+import { LogOut, FileText, Trash2, CheckCircle, Users, ChevronDown, ChevronUp, List, Search, Calendar } from 'lucide-react';
+import ThoughtsLogo from './ThoughtsLogo';
 
 export default function AdminDashboard() {
   const { admin, logout } = useAdmin();
@@ -194,10 +195,8 @@ export default function AdminDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-3">
-              <div className="bg-slate-900 p-2 rounded-lg">
-                <AlertTriangle className="w-5 h-5 text-white" />
-              </div>
-              <h1 className="text-xl font-bold text-slate-900">Admin Dashboard</h1>
+              <ThoughtsLogo size={36} showText={true} textClassName="text-xl font-bold text-slate-900" />
+              <span className="text-xs font-medium text-slate-400 uppercase tracking-widest border-l border-slate-200 pl-3">Admin</span>
             </div>
             <div className="flex items-center gap-4">
               <span className="text-sm text-slate-600">{admin?.email}</span>

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAdmin } from '../context/AdminContext';
-import { Lock, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
+import ThoughtsLogo from './ThoughtsLogo';
 
 export default function AdminLogin() {
   const [email, setEmail] = useState('');
@@ -27,10 +28,10 @@ export default function AdminLogin() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="bg-white rounded-2xl shadow-2xl p-8">
-          <div className="flex justify-center mb-6">
-            <div className="bg-slate-900 p-4 rounded-full">
-              <Lock className="w-8 h-8 text-white" />
-            </div>
+          <div className="flex flex-col items-center mb-6 gap-2">
+            <ThoughtsLogo size={64} showText={false} />
+            <span className="text-2xl font-bold tracking-tight text-slate-900">Thoughts</span>
+            <span className="text-xs font-medium text-slate-400 uppercase tracking-widest">Admin Panel</span>
           </div>
 
           <h1 className="text-3xl font-bold text-center text-slate-900 mb-2">
