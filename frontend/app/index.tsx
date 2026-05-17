@@ -18,15 +18,14 @@ export default function SplashScreen() {
       // Check if onboarding has been completed
       const hasSeenOnboarding = await authStorage.hasCompletedOnboarding();
 
-      // Check if user opted for remember me
-      const rememberMe = await authStorage.getRememberMe();
+      // Check if user has a stored token (users are always remembered until logout)
       const token = await authStorage.getToken();
       const user = await authStorage.getUser();
 
       // Wait minimum 1.5 seconds for splash screen visibility
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      if (rememberMe && token && user) {
+      if (token && user) {
         // Fetch latest user data from server to keep profile in sync
         try {
           const response = await fetch(`${API_BASE_URL}/users/me`, {
@@ -42,7 +41,7 @@ export default function SplashScreen() {
           console.error('Failed to refresh user profile on startup:', err);
         }
 
-        // User has remember me enabled and valid token - auto login
+        // User has valid session — auto login (stays until explicit logout)
         // Note: If token is expired, API calls will handle it and redirect to login
         router.replace('/(tabs)');
       } else if (hasSeenOnboarding) {

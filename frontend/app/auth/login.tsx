@@ -23,7 +23,8 @@ export default function LoginScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
+  // Remember Me is always true — users stay logged in until explicit logout
+  // const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(false);
 
@@ -68,12 +69,10 @@ export default function LoginScreen() {
       const data = await response.json();
 
       if (response.ok) {
-        // Save remember me preference only if user checked the box
-        if (rememberMe) {
-          await authStorage.setRememberMe(true);
-        }
+        // Always persist session — user stays logged in until explicit logout
+        await authStorage.setRememberMe(true);
 
-        // Always store token and user data (needed for current session)
+        // Store token and user data
         await authStorage.setToken(data.token);
         await authStorage.setUser(data.user);
 
@@ -184,7 +183,8 @@ export default function LoginScreen() {
                 {errors.password && <Text style={styles.fieldError}>{errors.password}</Text>}
               </View>
 
-              <View style={styles.row}>
+              {/* Remember Me checkbox removed — users are always remembered until logout */}
+              {/* <View style={styles.row}>
                 <TouchableOpacity
                   style={styles.checkboxRow}
                   onPress={() => setRememberMe(!rememberMe)}
@@ -194,7 +194,10 @@ export default function LoginScreen() {
                   </View>
                   <Text style={styles.checkboxLabel}>Remember me</Text>
                 </TouchableOpacity>
+              </View> */}
 
+              <View style={styles.row}>
+                <View />
                 <TouchableOpacity
                   onPress={() => router.push('/auth/forgot-password')}
                 >
