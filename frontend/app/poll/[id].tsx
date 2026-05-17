@@ -25,13 +25,16 @@ interface PollOption {
 interface Poll {
     id: string;
     user: {
+        _id: string;
         name: string;
+        username: string;
         avatar: string;
     };
     question: string;
     options: PollOption[];
     likes: number;
     hasVoted: boolean;
+    votedOption?: number;
 }
 
 export default function PollDetailScreen() {
@@ -41,6 +44,9 @@ export default function PollDetailScreen() {
     const [error, setError] = useState<string | null>(null);
     const [isLiked, setIsLiked] = useState(false);
     const [likes, setLikes] = useState(0);
+    const [hasVoted, setHasVoted] = useState(false);
+    const [votedOption, setVotedOption] = useState<number | null>(null);
+    const [pollOptions, setPollOptions] = useState<PollOption[]>([]);
 
     useEffect(() => {
         const fetchPoll = async () => {
@@ -52,6 +58,9 @@ export default function PollDetailScreen() {
                 if (response.ok && data.poll) {
                     setPoll(data.poll);
                     setLikes(data.poll.likes);
+                    setHasVoted(data.poll.hasVoted || false);
+                    setVotedOption(data.poll.votedOption ?? null);
+                    setPollOptions(data.poll.options || []);
                 } else {
                     setError(data.message || 'Poll not found');
                 }
@@ -98,6 +107,41 @@ export default function PollDetailScreen() {
             }
         } catch (error) {
             console.error('Error liking poll:', error);
+        }
+    };
+
+    const handleVote = async (optionId: number) => {
+        if (hasVoted) return; // already voted
+        try {
+            const token = await authStorage.getToken();
+            if (!token) return;
+
+            const response = await fetch(`${API_BASE_URL}/polls/${id}/vote`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ optionId }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setHasVoted(true);
+                setVotedOption(optionId);
+                // Update options with new percentages from server
+                if (data.options) {
+                    setPollOptions(data.options);
+                }
+            }
+        } catch (error) {
+            console.error('Error voting:', error);
+        }
+    };
+
+    const handleProfilePress = () => {
+        if (poll?.user?.username) {
+            router.push({ pathname: '/(tabs)/profile/[username]', params: { username: poll.user.username } });
         }
     };
 
@@ -152,23 +196,30 @@ export default function PollDetailScreen() {
                 {/* Poll Card */}
                 <View style={styles.pollCard}>
                     {/* User info */}
-                    <View style={styles.userRow}>
+                    <TouchableOpacity style={styles.userRow} onPress={handleProfilePress}>
                         <Image source={{ uri: getAvatarUrl() }} style={styles.avatar} />
                         <Text style={styles.userName}>{poll.user.name}</Text>
-                    </View>
+                    </TouchableOpacity>
 
                     {/* Question */}
                     <Text style={styles.question}>{poll.question}</Text>
 
                     {/* Options */}
                     <View style={styles.optionsContainer}>
-                        {poll.options.map((option, index) => (
-                            <View key={index} style={styles.optionRow}>
+                        {pollOptions.map((option, index) => (
+                            <TouchableOpacity
+                                key={index}
+                                style={styles.optionRow}
+                                onPress={() => handleVote(option.id)}
+                                disabled={hasVoted}
+                                activeOpacity={hasVoted ? 1 : 0.7}
+                            >
                                 <View style={[
                                     styles.option,
-                                    poll.hasVoted && styles.optionVoted,
+                                    hasVoted && styles.optionVoted,
+                                    hasVoted && votedOption === option.id && styles.optionSelected,
                                 ]}>
-                                    {poll.hasVoted && (
+                                    {hasVoted && (
                                         <View
                                             style={[
                                                 styles.progressBar,
@@ -180,10 +231,10 @@ export default function PollDetailScreen() {
                                         {option.text} {option.emoji || ''}
                                     </Text>
                                 </View>
-                                {poll.hasVoted && (
+                                {hasVoted && (
                                     <Text style={styles.percentage}>{option.percentage}%</Text>
                                 )}
-                            </View>
+                            </TouchableOpacity>
                         ))}
                     </View>
 
@@ -308,6 +359,10 @@ const styles = StyleSheet.create({
     },
     optionVoted: {
         backgroundColor: '#E8F4FD',
+    },
+    optionSelected: {
+        borderWidth: 2,
+        borderColor: '#458FD0',
     },
     progressBar: {
         position: 'absolute',
