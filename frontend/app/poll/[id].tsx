@@ -59,7 +59,8 @@ export default function PollDetailScreen() {
                     setPoll(data.poll);
                     setLikes(data.poll.likes);
                     setHasVoted(data.poll.hasVoted || false);
-                    setVotedOption(data.poll.votedOption ?? null);
+                    // Use votedOptionIndex from API (the index in the options array)
+                    setVotedOption(data.poll.votedOptionIndex ?? null);
                     setPollOptions(data.poll.options || []);
                 } else {
                     setError(data.message || 'Poll not found');
@@ -122,7 +123,7 @@ export default function PollDetailScreen() {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ optionId }),
+                body: JSON.stringify({ optionIndex: optionId }),
             });
 
             if (response.ok) {

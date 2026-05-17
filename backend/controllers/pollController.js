@@ -603,12 +603,22 @@ const getPollDetails = async (req, res, next) => {
             ? poll.likes.some(like => like.userId && like.userId.toString() === req.user._id.toString())
             : false;
 
+        // Find which option the user voted for
+        let votedOptionIndex = -1;
+        if (req.user && hasVoted) {
+            votedOptionIndex = poll.options.findIndex(opt =>
+                opt.votes.some(v => v.toString() === req.user._id.toString())
+            );
+        }
+
         res.status(200).json({
             success: true,
             poll: {
                 id: poll._id,
                 user: {
-                    name: poll.userId.username,
+                    _id: poll.userId._id,
+                    name: poll.userId.fullName || poll.userId.username,
+                    username: poll.userId.username,
                     avatar: getFullImageUrl(poll.userId.profilePicture),
                 },
                 question: poll.question,
@@ -621,6 +631,7 @@ const getPollDetails = async (req, res, next) => {
                 likes: poll.likes.length,
                 hasVoted,
                 isLiked,
+                votedOptionIndex: votedOptionIndex >= 0 ? votedOptionIndex : undefined,
                 createdAt: poll.createdAt,
             },
         });
