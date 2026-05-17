@@ -1,5 +1,5 @@
 // Production backend hosted on AWS EC2 via nginx reverse proxy on port 80
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'http://18.60.40.153/api';
+const API_BASE_URL = process.env.EXPO_PUBLIC_API_BASE_URL || 'https://thoughts.co.in/api';
 
 // Public-facing URL for share links (never expose the raw EC2 IP)
 export const SHARE_BASE_URL = 'https://thoughts.co.in';

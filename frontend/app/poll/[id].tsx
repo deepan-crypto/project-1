@@ -52,7 +52,10 @@ export default function PollDetailScreen() {
         const fetchPoll = async () => {
             try {
                 console.log('Fetching poll:', id);
-                const response = await fetch(`${API_BASE_URL}/polls/${id}`);
+                const token = await authStorage.getToken();
+                const headers: Record<string, string> = {};
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+                const response = await fetch(`${API_BASE_URL}/polls/${id}`, { headers });
                 const data = await response.json();
 
                 if (response.ok && data.poll) {

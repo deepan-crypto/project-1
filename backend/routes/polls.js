@@ -37,7 +37,7 @@ router.get('/admin/all', isAdmin, getAllPollsAdmin);
 router.delete('/admin/:pollId', isAdmin, deletePollByIdAdmin);
 
 // Poll detail and deletion (generic dynamic route comes after specific routes)
-router.get('/:pollId', getPollDetails);
+router.get('/:pollId', optionalAuth, getPollDetails);
 router.delete('/:pollId', protect, deletePoll);
 
 // Poll interaction routes
