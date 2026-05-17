@@ -13,8 +13,9 @@ const FallbackPage = () => {
   const PACKAGE_NAME = 'com.deepangokul.cryptoapp';
   const PLAY_STORE_URL = `https://play.google.com/store/apps/details?id=${PACKAGE_NAME}`;
 
-  // Intent URL format: tries app first, falls back to Play Store
-  const intentUrl = `intent://${deepLinkPath.replace(/^\//, '')}#Intent;scheme=thoughts;package=${PACKAGE_NAME};S.browser_fallback_url=${encodeURIComponent(PLAY_STORE_URL)};end`;
+  // Intent URL: uses https scheme so the app receives https://thoughts.co.in/poll/:id
+  // which matches the existing deep link handler in _layout.tsx
+  const intentUrl = `intent://thoughts.co.in${deepLinkPath}#Intent;scheme=https;package=${PACKAGE_NAME};S.browser_fallback_url=${encodeURIComponent(PLAY_STORE_URL)};end`;
 
   // Universal link (Android App Links — works if app is installed & verified)
   const universalUrl = `https://thoughts.co.in${deepLinkPath}`;
